@@ -1,0 +1,2 @@
+- instalar postgres
+- instalar pgadmin4 (ver site oficial) # pode ser necessario acessar como root o server e resetar senha do usuario postgres
