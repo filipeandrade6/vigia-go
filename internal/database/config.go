@@ -1,15 +1,51 @@
-package db
+package database
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strconv"
 )
 
-const PostgresDriver = "postgres"
-const User = "postgres"
-const Host = "localhost"
-const Port = "5432"
-const Password = "postgres"
-const DbName = "vigia"
-const TableName = "camera"
+type Config struct {
+	dbUser         string
+	dbPass         string
+	dbHost         string
+	dbPort         int
+	dbName         string
+	dbPoolMaxConns int
+	dbDSN          string
+}
 
-var DataSourceName = fmt.Sprintf("host=%s, port=%s user=%s password=%s dbname=%s sslmode=disable", Host, Port, User, Password, DbName)
+func NewConfig() *Config {
+	var cfg Config
+
+	cfg.dbUser = os.Getenv("DATABASE_USER")
+	cfg.dbPass = os.Getenv("DATABASE_PASS")
+	cfg.dbHost = os.Getenv("DATABASE_HOST")
+
+	var err error
+	cfg.dbPort, err = strconv.Atoi(os.Getenv("DATABASE_PORT"))
+	if err != nil {
+		log.Fatalln("Error on load env var:", err.Error())
+	}
+
+	cfg.dbName = os.Getenv("DATABASE_NAME")
+
+	cfg.dbPoolMaxConns, err = strconv.Atoi(os.Getenv("DATABASE_POOLMAXCONNS"))
+	if err != nil {
+		log.Fatalln("Error on load env var", err.Error())
+	}
+
+	cfg.dbDSN = fmt.Sprintf(
+		"user=%s password=%s host=%s port=%d dbname=%s pool_max_conns=%d",
+		cfg.dbUser,
+		cfg.dbPass,
+		cfg.dbHost,
+		cfg.dbPort,
+		cfg.dbName,
+		cfg.dbPoolMaxConns,
+	)
+
+	return &cfg
+}
