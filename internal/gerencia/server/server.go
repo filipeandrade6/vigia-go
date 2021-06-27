@@ -10,10 +10,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-	port = 10000
-)
-
 type gerenciaServer struct {
 	pb.UnimplementedGerenciaServer
 	mu sync.Mutex
@@ -21,9 +17,9 @@ type gerenciaServer struct {
 	dbCfg *pb.DatabaseConfig
 }
 
-func (s *gerenciaServer) GetDatabaseConfig(ctx context.Context, in *pb.GravacaoConfig, opts ...grpc.CallOption) (*pb.DatabaseConfig, error) {
+func (s *gerenciaServer) GetDatabaseConfig(ctx context.Context, cfg *pb.GravacaoConfig) (*pb.DatabaseConfig, error) {
 	s.mu.Lock()
-	fmt.Println("dentro do lock: ", in.GetId())
+	fmt.Println("dentro do lock: ", cfg.Id)
 	s.mu.Unlock()
 
 	return s.dbCfg, nil
@@ -43,7 +39,7 @@ func newServer() *gerenciaServer {
 }
 
 func Main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
+	lis, err := net.Listen("tcp", "localhost:10000")
 	if err != nil {
 		fmt.Println("erro aqui")
 		panic(err)

@@ -241,5 +241,5 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "gerencia.proto",
+	Metadata: "internal/messages/gerencia.proto",
 }
