@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./internal/pb";
+
+service GravacaoConn {
+    rpc GetDatabaseConfig (GravacaoConfig) returns (DatabaseConfig) {}
+}
+
+message GravacaoConfig {
+    // Identificador do servidor (nome do host ou ip)
+    string id = 1;
+}
+
+// Configurações necessárias para conectar no banco de dados
+message DatabaseConfig {
+    string host = 1;
+    int32 port = 2;
+    string user = 3;
+    string password = 4;
+    string dbname = 5;
+    int32 poolmaxconns = 6;
+}

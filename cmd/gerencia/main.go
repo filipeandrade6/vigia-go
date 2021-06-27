@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/server"
+)
 
 func main() {
-	fmt.Println("Hello")
+	server.Main()
 }
