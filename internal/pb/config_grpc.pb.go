@@ -97,5 +97,5 @@ var GravacaoConn_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "internal/messages/config.proto",
+	Metadata: "config.proto",
 }
