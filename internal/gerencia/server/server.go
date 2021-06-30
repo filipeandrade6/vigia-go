@@ -11,7 +11,7 @@ import (
 )
 
 type gerenciaServer struct {
-	pb.UnimplementedGerenciaServer
+	pb.UnimplementedGravacaoConnServer
 	mu sync.Mutex
 
 	dbCfg *pb.DatabaseConfig
@@ -45,6 +45,6 @@ func Main() {
 		panic(err)
 	}
 	grpcServer := grpc.NewServer()
-	pb.RegisterGerenciaServer(grpcServer, newServer())
+	pb.RegisterGravacaoConnServer(grpcServer, newServer())
 	grpcServer.Serve(lis)
 }
