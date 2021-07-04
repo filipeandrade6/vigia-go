@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/client"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/server"
 )
 
 func main() {
@@ -9,5 +9,5 @@ func main() {
 	// 	fmt.Fprintf(os.Stderr, "%v", err)
 	// 	os.Exit(1)
 	// }
-	client.Main()
+	server.Main()
 }

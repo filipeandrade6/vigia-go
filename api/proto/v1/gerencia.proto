@@ -5,48 +5,27 @@ option go_package = "./internal/api/v1";
 package gerencia;
 
 service Gerencia {
-    rpc iniciarProcesso (Params) returns (StatusIniciar) {}
-    rpc alterarProcesso (Params) returns (StatusAlterar) {}
-    rpc pararProcesso (Camera) returns (StatusParar) {}
-    rpc removerProcesso (Camera) returns (StatusRemover) {}
-
-    rpc statusArmazenamentoGravacao (ArmazenamentoParams) returns (StatusArmazenamento) {}
+    rpc GravacaoConfig (GravacaoConfigReq) returns (GravacaoConfigResp) {}
+//     rpc Notificar () returns ()  {}
 }
 
-message Camera {
-    // ID no banco de dados
-    string id = 1;
+message GravacaoConfigReq {
+    // Identificador do servidor (nome do host ou ip)
+    string servidor_gravacao = 1;
+    int32 porta_servidor_gravacao = 2;
 }
 
-message Params {
-    // Camera a ser processada/modificada
-    Camera camera = 1;
-    // Processador a ser acoplado na câmera ou que irá substituir
-
-    message Processador {
-        // Processador no baco de dados
-        string id = 1;
+// TODO separar a aquisição de banco de dados em um serviço proprio e o de registrar
+// Configurações necessárias para conectar no banco de dados
+message GravacaoConfigResp {
+    int32 servidor_gravacao_id = 1;
+    message Database {
+        string host = 1;
+        int32 port = 2;
+        string user = 3;
+        string password = 4;
+        string dbname = 5;
+        int32 poolmaxconns = 6;
     }
-
-    Processador processador = 2;
+    Database database = 2;
 }
-
-message StatusArmazenamento {
-    message Disco {
-        int32 disponivel = 1;
-        int32 alocado = 2;
-        int32 utilizado = 3;
-        string caminho = 4;
-    }
-    repeated Disco discos = 1;
-}
-
-message ArmazenamentoParams {}
-
-message StatusIniciar {}
-
-message StatusAlterar {}
-
-message StatusParar {}
-
-message StatusRemover {}

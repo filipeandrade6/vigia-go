@@ -6,45 +6,34 @@ import (
 	"net"
 	"sync"
 
-	"github.com/filipeandrade6/vigia-go/internal/pb"
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"google.golang.org/grpc"
 )
 
 type gerenciaServer struct {
-	pb.UnimplementedGravacaoConnServer
+	pb.UnimplementedGerenciaServer
 	mu sync.Mutex
-
-	dbCfg *pb.DatabaseConfig
-}
-
-func (s *gerenciaServer) GetDatabaseConfig(ctx context.Context, cfg *pb.GravacaoConfig) (*pb.DatabaseConfig, error) {
-	s.mu.Lock()
-	fmt.Println("dentro do lock: ", cfg.Id)
-	s.mu.Unlock()
-
-	return s.dbCfg, nil
 }
 
 func newServer() *gerenciaServer {
-	return &gerenciaServer{
-		dbCfg: &pb.DatabaseConfig{
-			Host:         "localhost",
-			Port:         5432,
-			User:         "postgres",
-			Password:     "postgres",
-			Dbname:       "vigia",
-			Poolmaxconns: 50,
-		},
-	}
+	return &gerenciaServer{}
+}
+
+func (s *gerenciaServer) GravacaoConfig(ctx context.Context, in *pb.GravacaoConfigReq) (*pb.GravacaoConfigResp, error) {
+	s.mu.Lock()
+
+	defer s.mu.Unlock()
+	fmt.Println("Entrouaa qui")
+	return &pb.GravacaoConfigResp{}, nil
 }
 
 func Main() {
-	lis, err := net.Listen("tcp", "localhost:10000")
+	lis, err := net.Listen("tcp", "localhost:12347")
 	if err != nil {
-		fmt.Println("erro aqui")
+		fmt.Println("Erro aqui2")
 		panic(err)
 	}
-	grpcServer := grpc.NewServer()
-	pb.RegisterGravacaoConnServer(grpcServer, newServer())
-	grpcServer.Serve(lis)
+	grpcGerenciaServer := grpc.NewServer()
+	pb.RegisterGerenciaServer(grpcGerenciaServer, newServer())
+	grpcGerenciaServer.Serve(lis)
 }

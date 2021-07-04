@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+option go_package = "./internal/api/v1";
+
+package gravacao;
+
+service Gravacao {
+    rpc InfoServidor (InfoServidorReq) returns (InfoServidorResp) {}
+    rpc ConfigurarProcesso (ConfigurarProcessoReq) returns (ConfigurarProcessoResp) {}
+    // rpc statusArmazenamento (StatusArmazenamentoParams) returns (StatusArmazenamento) {}
+    // rpc configurarHousekeeping (HousekeepingConfig) returns (StatusHousekeeping) {}
+}
+
+message InfoServidorReq {
+}
+
+message InfoServidorResp {
+    message Processo {
+        int32 processo_id = 1;
+        int32 camera_id = 2;
+        string processador_caminho = 3;
+        enum StatusProcesso {
+            PARADO = 0;
+            EXECUTANDO = 1;
+        }
+        StatusProcesso status_processo = 4;
+    }
+    repeated Processo processos = 1;
+}
+
+message ConfigurarProcessoReq {
+    // ! zero deve significar alguma coisa
+    enum Acao {
+        CONFIGURAR = 0;
+        INICIAR = 1;
+        PARAR = 2;
+        REMOVER = 3;
+        INFO = 4;
+    }
+    Acao acao = 1;
+    int32 processo_id = 2;
+    int32 camera_id = 3;
+    string processador_caminho = 4;
+}
+
+// TODO colocar info do processo abaixo (consumo armazenamento, veiculos, etc)
+message ConfigurarProcessoResp {
+    enum Status {
+        CONFIGURADO = 0;
+        INICIADO = 1;
+        PARADO = 2;
+        REMOVIDO = 3;
+    }
+    Status status = 1;
+}
+
+// message StatusArmazenamento {
+//     message Armazenamento {
+//         string caminho = 1;
+//         int32 disponivel = 2;
+//         int32 alocado = 3;
+//         int32 utilizado = 4;
+//     }
+//     repeated Armazenamento armazenamento = 1;
+// }
+
+// message StatusArmazenamentoParams {}
+
+// message StatusArmazenamento {}

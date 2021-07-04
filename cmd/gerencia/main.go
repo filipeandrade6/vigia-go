@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/filipeandrade6/vigia-go/internal/gerencia/server"
-)
+import "github.com/filipeandrade6/vigia-go/internal/gerencia/client"
 
 func main() {
-	server.Main()
+	client.Main()
 }

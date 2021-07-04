@@ -20,17 +20,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Camera struct {
+type GravacaoConfigReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// ID no banco de dados
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Identificador do servidor (nome do host ou ip)
+	ServidorGravacao      string `protobuf:"bytes,1,opt,name=servidor_gravacao,json=servidorGravacao,proto3" json:"servidor_gravacao,omitempty"`
+	PortaServidorGravacao int32  `protobuf:"varint,2,opt,name=porta_servidor_gravacao,json=portaServidorGravacao,proto3" json:"porta_servidor_gravacao,omitempty"`
 }
 
-func (x *Camera) Reset() {
-	*x = Camera{}
+func (x *GravacaoConfigReq) Reset() {
+	*x = GravacaoConfigReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -38,13 +39,13 @@ func (x *Camera) Reset() {
 	}
 }
 
-func (x *Camera) String() string {
+func (x *GravacaoConfigReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Camera) ProtoMessage() {}
+func (*GravacaoConfigReq) ProtoMessage() {}
 
-func (x *Camera) ProtoReflect() protoreflect.Message {
+func (x *GravacaoConfigReq) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,30 +57,37 @@ func (x *Camera) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Camera.ProtoReflect.Descriptor instead.
-func (*Camera) Descriptor() ([]byte, []int) {
+// Deprecated: Use GravacaoConfigReq.ProtoReflect.Descriptor instead.
+func (*GravacaoConfigReq) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Camera) GetId() string {
+func (x *GravacaoConfigReq) GetServidorGravacao() string {
 	if x != nil {
-		return x.Id
+		return x.ServidorGravacao
 	}
 	return ""
 }
 
-type Params struct {
+func (x *GravacaoConfigReq) GetPortaServidorGravacao() int32 {
+	if x != nil {
+		return x.PortaServidorGravacao
+	}
+	return 0
+}
+
+// Configurações necessárias para conectar no banco de dados
+type GravacaoConfigResp struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Camera a ser processada/modificada
-	Camera      *Camera             `protobuf:"bytes,1,opt,name=camera,proto3" json:"camera,omitempty"` // Processador a ser acoplado na câmera ou que irá substituir
-	Processador *Params_Processador `protobuf:"bytes,2,opt,name=processador,proto3" json:"processador,omitempty"`
+	ServidorGravacaoId int32                        `protobuf:"varint,1,opt,name=servidor_gravacao_id,json=servidorGravacaoId,proto3" json:"servidor_gravacao_id,omitempty"`
+	Database           *GravacaoConfigResp_Database `protobuf:"bytes,2,opt,name=database,proto3" json:"database,omitempty"`
 }
 
-func (x *Params) Reset() {
-	*x = Params{}
+func (x *GravacaoConfigResp) Reset() {
+	*x = GravacaoConfigResp{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -87,13 +95,13 @@ func (x *Params) Reset() {
 	}
 }
 
-func (x *Params) String() string {
+func (x *GravacaoConfigResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Params) ProtoMessage() {}
+func (*GravacaoConfigResp) ProtoMessage() {}
 
-func (x *Params) ProtoReflect() protoreflect.Message {
+func (x *GravacaoConfigResp) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -105,35 +113,40 @@ func (x *Params) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Params.ProtoReflect.Descriptor instead.
-func (*Params) Descriptor() ([]byte, []int) {
+// Deprecated: Use GravacaoConfigResp.ProtoReflect.Descriptor instead.
+func (*GravacaoConfigResp) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Params) GetCamera() *Camera {
+func (x *GravacaoConfigResp) GetServidorGravacaoId() int32 {
 	if x != nil {
-		return x.Camera
+		return x.ServidorGravacaoId
+	}
+	return 0
+}
+
+func (x *GravacaoConfigResp) GetDatabase() *GravacaoConfigResp_Database {
+	if x != nil {
+		return x.Database
 	}
 	return nil
 }
 
-func (x *Params) GetProcessador() *Params_Processador {
-	if x != nil {
-		return x.Processador
-	}
-	return nil
-}
-
-type StatusArmazenamento struct {
+type GravacaoConfigResp_Database struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Discos []*StatusArmazenamento_Disco `protobuf:"bytes,1,rep,name=discos,proto3" json:"discos,omitempty"`
+	Host         string `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
+	Port         int32  `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
+	User         string `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
+	Password     string `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
+	Dbname       string `protobuf:"bytes,5,opt,name=dbname,proto3" json:"dbname,omitempty"`
+	Poolmaxconns int32  `protobuf:"varint,6,opt,name=poolmaxconns,proto3" json:"poolmaxconns,omitempty"`
 }
 
-func (x *StatusArmazenamento) Reset() {
-	*x = StatusArmazenamento{}
+func (x *GravacaoConfigResp_Database) Reset() {
+	*x = GravacaoConfigResp_Database{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -141,13 +154,13 @@ func (x *StatusArmazenamento) Reset() {
 	}
 }
 
-func (x *StatusArmazenamento) String() string {
+func (x *GravacaoConfigResp_Database) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StatusArmazenamento) ProtoMessage() {}
+func (*GravacaoConfigResp_Database) ProtoMessage() {}
 
-func (x *StatusArmazenamento) ProtoReflect() protoreflect.Message {
+func (x *GravacaoConfigResp_Database) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -159,386 +172,92 @@ func (x *StatusArmazenamento) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StatusArmazenamento.ProtoReflect.Descriptor instead.
-func (*StatusArmazenamento) Descriptor() ([]byte, []int) {
-	return file_gerencia_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *StatusArmazenamento) GetDiscos() []*StatusArmazenamento_Disco {
-	if x != nil {
-		return x.Discos
-	}
-	return nil
-}
-
-type ArmazenamentoParams struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *ArmazenamentoParams) Reset() {
-	*x = ArmazenamentoParams{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_gerencia_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ArmazenamentoParams) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ArmazenamentoParams) ProtoMessage() {}
-
-func (x *ArmazenamentoParams) ProtoReflect() protoreflect.Message {
-	mi := &file_gerencia_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ArmazenamentoParams.ProtoReflect.Descriptor instead.
-func (*ArmazenamentoParams) Descriptor() ([]byte, []int) {
-	return file_gerencia_proto_rawDescGZIP(), []int{3}
-}
-
-type StatusIniciar struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *StatusIniciar) Reset() {
-	*x = StatusIniciar{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_gerencia_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StatusIniciar) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusIniciar) ProtoMessage() {}
-
-func (x *StatusIniciar) ProtoReflect() protoreflect.Message {
-	mi := &file_gerencia_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusIniciar.ProtoReflect.Descriptor instead.
-func (*StatusIniciar) Descriptor() ([]byte, []int) {
-	return file_gerencia_proto_rawDescGZIP(), []int{4}
-}
-
-type StatusAlterar struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *StatusAlterar) Reset() {
-	*x = StatusAlterar{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_gerencia_proto_msgTypes[5]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StatusAlterar) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusAlterar) ProtoMessage() {}
-
-func (x *StatusAlterar) ProtoReflect() protoreflect.Message {
-	mi := &file_gerencia_proto_msgTypes[5]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusAlterar.ProtoReflect.Descriptor instead.
-func (*StatusAlterar) Descriptor() ([]byte, []int) {
-	return file_gerencia_proto_rawDescGZIP(), []int{5}
-}
-
-type StatusParar struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *StatusParar) Reset() {
-	*x = StatusParar{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_gerencia_proto_msgTypes[6]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StatusParar) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusParar) ProtoMessage() {}
-
-func (x *StatusParar) ProtoReflect() protoreflect.Message {
-	mi := &file_gerencia_proto_msgTypes[6]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusParar.ProtoReflect.Descriptor instead.
-func (*StatusParar) Descriptor() ([]byte, []int) {
-	return file_gerencia_proto_rawDescGZIP(), []int{6}
-}
-
-type StatusRemover struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *StatusRemover) Reset() {
-	*x = StatusRemover{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_gerencia_proto_msgTypes[7]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StatusRemover) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusRemover) ProtoMessage() {}
-
-func (x *StatusRemover) ProtoReflect() protoreflect.Message {
-	mi := &file_gerencia_proto_msgTypes[7]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusRemover.ProtoReflect.Descriptor instead.
-func (*StatusRemover) Descriptor() ([]byte, []int) {
-	return file_gerencia_proto_rawDescGZIP(), []int{7}
-}
-
-type Params_Processador struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Processador no baco de dados
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *Params_Processador) Reset() {
-	*x = Params_Processador{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_gerencia_proto_msgTypes[8]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Params_Processador) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Params_Processador) ProtoMessage() {}
-
-func (x *Params_Processador) ProtoReflect() protoreflect.Message {
-	mi := &file_gerencia_proto_msgTypes[8]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Params_Processador.ProtoReflect.Descriptor instead.
-func (*Params_Processador) Descriptor() ([]byte, []int) {
+// Deprecated: Use GravacaoConfigResp_Database.ProtoReflect.Descriptor instead.
+func (*GravacaoConfigResp_Database) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{1, 0}
 }
 
-func (x *Params_Processador) GetId() string {
+func (x *GravacaoConfigResp_Database) GetHost() string {
 	if x != nil {
-		return x.Id
+		return x.Host
 	}
 	return ""
 }
 
-type StatusArmazenamento_Disco struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Disponivel int32  `protobuf:"varint,1,opt,name=disponivel,proto3" json:"disponivel,omitempty"`
-	Alocado    int32  `protobuf:"varint,2,opt,name=alocado,proto3" json:"alocado,omitempty"`
-	Utilizado  int32  `protobuf:"varint,3,opt,name=utilizado,proto3" json:"utilizado,omitempty"`
-	Caminho    string `protobuf:"bytes,4,opt,name=caminho,proto3" json:"caminho,omitempty"`
-}
-
-func (x *StatusArmazenamento_Disco) Reset() {
-	*x = StatusArmazenamento_Disco{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_gerencia_proto_msgTypes[9]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StatusArmazenamento_Disco) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusArmazenamento_Disco) ProtoMessage() {}
-
-func (x *StatusArmazenamento_Disco) ProtoReflect() protoreflect.Message {
-	mi := &file_gerencia_proto_msgTypes[9]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusArmazenamento_Disco.ProtoReflect.Descriptor instead.
-func (*StatusArmazenamento_Disco) Descriptor() ([]byte, []int) {
-	return file_gerencia_proto_rawDescGZIP(), []int{2, 0}
-}
-
-func (x *StatusArmazenamento_Disco) GetDisponivel() int32 {
+func (x *GravacaoConfigResp_Database) GetPort() int32 {
 	if x != nil {
-		return x.Disponivel
+		return x.Port
 	}
 	return 0
 }
 
-func (x *StatusArmazenamento_Disco) GetAlocado() int32 {
+func (x *GravacaoConfigResp_Database) GetUser() string {
 	if x != nil {
-		return x.Alocado
-	}
-	return 0
-}
-
-func (x *StatusArmazenamento_Disco) GetUtilizado() int32 {
-	if x != nil {
-		return x.Utilizado
-	}
-	return 0
-}
-
-func (x *StatusArmazenamento_Disco) GetCaminho() string {
-	if x != nil {
-		return x.Caminho
+		return x.User
 	}
 	return ""
+}
+
+func (x *GravacaoConfigResp_Database) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *GravacaoConfigResp_Database) GetDbname() string {
+	if x != nil {
+		return x.Dbname
+	}
+	return ""
+}
+
+func (x *GravacaoConfigResp_Database) GetPoolmaxconns() int32 {
+	if x != nil {
+		return x.Poolmaxconns
+	}
+	return 0
 }
 
 var File_gerencia_proto protoreflect.FileDescriptor
 
 var file_gerencia_proto_rawDesc = []byte{
 	0x0a, 0x0e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x12, 0x08, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x22, 0x18, 0x0a, 0x06, 0x43, 0x61,
-	0x6d, 0x65, 0x72, 0x61, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x02, 0x69, 0x64, 0x22, 0x91, 0x01, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12,
-	0x28, 0x0a, 0x06, 0x63, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x10, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x43, 0x61, 0x6d, 0x65, 0x72,
-	0x61, 0x52, 0x06, 0x63, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x12, 0x3e, 0x0a, 0x0b, 0x70, 0x72, 0x6f,
-	0x63, 0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c,
-	0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
-	0x2e, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x52, 0x0b, 0x70, 0x72,
-	0x6f, 0x63, 0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x1a, 0x1d, 0x0a, 0x0b, 0x50, 0x72, 0x6f,
-	0x63, 0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0xcd, 0x01, 0x0a, 0x13, 0x53, 0x74, 0x61,
-	0x74, 0x75, 0x73, 0x41, 0x72, 0x6d, 0x61, 0x7a, 0x65, 0x6e, 0x61, 0x6d, 0x65, 0x6e, 0x74, 0x6f,
-	0x12, 0x3b, 0x0a, 0x06, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b,
-	0x32, 0x23, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x53, 0x74, 0x61, 0x74,
-	0x75, 0x73, 0x41, 0x72, 0x6d, 0x61, 0x7a, 0x65, 0x6e, 0x61, 0x6d, 0x65, 0x6e, 0x74, 0x6f, 0x2e,
-	0x44, 0x69, 0x73, 0x63, 0x6f, 0x52, 0x06, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x73, 0x1a, 0x79, 0x0a,
-	0x05, 0x44, 0x69, 0x73, 0x63, 0x6f, 0x12, 0x1e, 0x0a, 0x0a, 0x64, 0x69, 0x73, 0x70, 0x6f, 0x6e,
-	0x69, 0x76, 0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0a, 0x64, 0x69, 0x73, 0x70,
-	0x6f, 0x6e, 0x69, 0x76, 0x65, 0x6c, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x6c, 0x6f, 0x63, 0x61, 0x64,
-	0x6f, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x07, 0x61, 0x6c, 0x6f, 0x63, 0x61, 0x64, 0x6f,
-	0x12, 0x1c, 0x0a, 0x09, 0x75, 0x74, 0x69, 0x6c, 0x69, 0x7a, 0x61, 0x64, 0x6f, 0x18, 0x03, 0x20,
-	0x01, 0x28, 0x05, 0x52, 0x09, 0x75, 0x74, 0x69, 0x6c, 0x69, 0x7a, 0x61, 0x64, 0x6f, 0x12, 0x18,
-	0x0a, 0x07, 0x63, 0x61, 0x6d, 0x69, 0x6e, 0x68, 0x6f, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x07, 0x63, 0x61, 0x6d, 0x69, 0x6e, 0x68, 0x6f, 0x22, 0x15, 0x0a, 0x13, 0x41, 0x72, 0x6d, 0x61,
-	0x7a, 0x65, 0x6e, 0x61, 0x6d, 0x65, 0x6e, 0x74, 0x6f, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x22,
-	0x0f, 0x0a, 0x0d, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x49, 0x6e, 0x69, 0x63, 0x69, 0x61, 0x72,
-	0x22, 0x0f, 0x0a, 0x0d, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x61,
-	0x72, 0x22, 0x0d, 0x0a, 0x0b, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x50, 0x61, 0x72, 0x61, 0x72,
-	0x22, 0x0f, 0x0a, 0x0d, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65,
-	0x72, 0x32, 0xe5, 0x02, 0x0a, 0x08, 0x47, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x12, 0x3e,
-	0x0a, 0x0f, 0x69, 0x6e, 0x69, 0x63, 0x69, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73,
-	0x6f, 0x12, 0x10, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x50, 0x61, 0x72,
-	0x61, 0x6d, 0x73, 0x1a, 0x17, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x53,
-	0x74, 0x61, 0x74, 0x75, 0x73, 0x49, 0x6e, 0x69, 0x63, 0x69, 0x61, 0x72, 0x22, 0x00, 0x12, 0x3e,
-	0x0a, 0x0f, 0x61, 0x6c, 0x74, 0x65, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73,
-	0x6f, 0x12, 0x10, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x50, 0x61, 0x72,
-	0x61, 0x6d, 0x73, 0x1a, 0x17, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x53,
-	0x74, 0x61, 0x74, 0x75, 0x73, 0x41, 0x6c, 0x74, 0x65, 0x72, 0x61, 0x72, 0x22, 0x00, 0x12, 0x3a,
-	0x0a, 0x0d, 0x70, 0x61, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x12,
-	0x10, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x43, 0x61, 0x6d, 0x65, 0x72,
-	0x61, 0x1a, 0x15, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x53, 0x74, 0x61,
-	0x74, 0x75, 0x73, 0x50, 0x61, 0x72, 0x61, 0x72, 0x22, 0x00, 0x12, 0x3e, 0x0a, 0x0f, 0x72, 0x65,
-	0x6d, 0x6f, 0x76, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x12, 0x10, 0x2e,
-	0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x1a,
-	0x17, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75,
-	0x73, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x72, 0x22, 0x00, 0x12, 0x5d, 0x0a, 0x1b, 0x73, 0x74,
-	0x61, 0x74, 0x75, 0x73, 0x41, 0x72, 0x6d, 0x61, 0x7a, 0x65, 0x6e, 0x61, 0x6d, 0x65, 0x6e, 0x74,
-	0x6f, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x12, 0x1d, 0x2e, 0x67, 0x65, 0x72, 0x65,
-	0x6e, 0x63, 0x69, 0x61, 0x2e, 0x41, 0x72, 0x6d, 0x61, 0x7a, 0x65, 0x6e, 0x61, 0x6d, 0x65, 0x6e,
-	0x74, 0x6f, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x1d, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e,
-	0x63, 0x69, 0x61, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x41, 0x72, 0x6d, 0x61, 0x7a, 0x65,
-	0x6e, 0x61, 0x6d, 0x65, 0x6e, 0x74, 0x6f, 0x22, 0x00, 0x42, 0x13, 0x5a, 0x11, 0x2e, 0x2f, 0x69,
-	0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x12, 0x08, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x22, 0x78, 0x0a, 0x11, 0x47, 0x72,
+	0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x12,
+	0x2b, 0x0a, 0x11, 0x73, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x5f, 0x67, 0x72, 0x61, 0x76,
+	0x61, 0x63, 0x61, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x73, 0x65, 0x72, 0x76,
+	0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x12, 0x36, 0x0a, 0x17,
+	0x70, 0x6f, 0x72, 0x74, 0x61, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x5f, 0x67,
+	0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x15, 0x70,
+	0x6f, 0x72, 0x74, 0x61, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76,
+	0x61, 0x63, 0x61, 0x6f, 0x22, 0xaa, 0x02, 0x0a, 0x12, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61,
+	0x6f, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x12, 0x30, 0x0a, 0x14, 0x73,
+	0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x5f, 0x67, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f,
+	0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x12, 0x73, 0x65, 0x72, 0x76, 0x69,
+	0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x49, 0x64, 0x12, 0x41, 0x0a,
+	0x08, 0x64, 0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x25, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x47, 0x72, 0x61, 0x76, 0x61,
+	0x63, 0x61, 0x6f, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x2e, 0x44, 0x61,
+	0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x52, 0x08, 0x64, 0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65,
+	0x1a, 0x9e, 0x01, 0x0a, 0x08, 0x44, 0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x12, 0x12, 0x0a,
+	0x04, 0x68, 0x6f, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x68, 0x6f, 0x73,
+	0x74, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x04, 0x70, 0x6f, 0x72, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73,
+	0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73,
+	0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x64, 0x62, 0x6e, 0x61, 0x6d, 0x65, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x64, 0x62, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x22, 0x0a,
+	0x0c, 0x70, 0x6f, 0x6f, 0x6c, 0x6d, 0x61, 0x78, 0x63, 0x6f, 0x6e, 0x6e, 0x73, 0x18, 0x06, 0x20,
+	0x01, 0x28, 0x05, 0x52, 0x0c, 0x70, 0x6f, 0x6f, 0x6c, 0x6d, 0x61, 0x78, 0x63, 0x6f, 0x6e, 0x6e,
+	0x73, 0x32, 0x59, 0x0a, 0x08, 0x47, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x12, 0x4d, 0x0a,
+	0x0e, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12,
+	0x1b, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x47, 0x72, 0x61, 0x76, 0x61,
+	0x63, 0x61, 0x6f, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x71, 0x1a, 0x1c, 0x2e, 0x67,
+	0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f,
+	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x42, 0x13, 0x5a, 0x11,
+	0x2e, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76,
+	0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -553,38 +272,21 @@ func file_gerencia_proto_rawDescGZIP() []byte {
 	return file_gerencia_proto_rawDescData
 }
 
-var file_gerencia_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_gerencia_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_gerencia_proto_goTypes = []interface{}{
-	(*Camera)(nil),                    // 0: gerencia.Camera
-	(*Params)(nil),                    // 1: gerencia.Params
-	(*StatusArmazenamento)(nil),       // 2: gerencia.StatusArmazenamento
-	(*ArmazenamentoParams)(nil),       // 3: gerencia.ArmazenamentoParams
-	(*StatusIniciar)(nil),             // 4: gerencia.StatusIniciar
-	(*StatusAlterar)(nil),             // 5: gerencia.StatusAlterar
-	(*StatusParar)(nil),               // 6: gerencia.StatusParar
-	(*StatusRemover)(nil),             // 7: gerencia.StatusRemover
-	(*Params_Processador)(nil),        // 8: gerencia.Params.Processador
-	(*StatusArmazenamento_Disco)(nil), // 9: gerencia.StatusArmazenamento.Disco
+	(*GravacaoConfigReq)(nil),           // 0: gerencia.GravacaoConfigReq
+	(*GravacaoConfigResp)(nil),          // 1: gerencia.GravacaoConfigResp
+	(*GravacaoConfigResp_Database)(nil), // 2: gerencia.GravacaoConfigResp.Database
 }
 var file_gerencia_proto_depIdxs = []int32{
-	0, // 0: gerencia.Params.camera:type_name -> gerencia.Camera
-	8, // 1: gerencia.Params.processador:type_name -> gerencia.Params.Processador
-	9, // 2: gerencia.StatusArmazenamento.discos:type_name -> gerencia.StatusArmazenamento.Disco
-	1, // 3: gerencia.Gerencia.iniciarProcesso:input_type -> gerencia.Params
-	1, // 4: gerencia.Gerencia.alterarProcesso:input_type -> gerencia.Params
-	0, // 5: gerencia.Gerencia.pararProcesso:input_type -> gerencia.Camera
-	0, // 6: gerencia.Gerencia.removerProcesso:input_type -> gerencia.Camera
-	3, // 7: gerencia.Gerencia.statusArmazenamentoGravacao:input_type -> gerencia.ArmazenamentoParams
-	4, // 8: gerencia.Gerencia.iniciarProcesso:output_type -> gerencia.StatusIniciar
-	5, // 9: gerencia.Gerencia.alterarProcesso:output_type -> gerencia.StatusAlterar
-	6, // 10: gerencia.Gerencia.pararProcesso:output_type -> gerencia.StatusParar
-	7, // 11: gerencia.Gerencia.removerProcesso:output_type -> gerencia.StatusRemover
-	2, // 12: gerencia.Gerencia.statusArmazenamentoGravacao:output_type -> gerencia.StatusArmazenamento
-	8, // [8:13] is the sub-list for method output_type
-	3, // [3:8] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	2, // 0: gerencia.GravacaoConfigResp.database:type_name -> gerencia.GravacaoConfigResp.Database
+	0, // 1: gerencia.Gerencia.GravacaoConfig:input_type -> gerencia.GravacaoConfigReq
+	1, // 2: gerencia.Gerencia.GravacaoConfig:output_type -> gerencia.GravacaoConfigResp
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_gerencia_proto_init() }
@@ -594,7 +296,7 @@ func file_gerencia_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_gerencia_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Camera); i {
+			switch v := v.(*GravacaoConfigReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -606,7 +308,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Params); i {
+			switch v := v.(*GravacaoConfigResp); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -618,91 +320,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StatusArmazenamento); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_gerencia_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ArmazenamentoParams); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_gerencia_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StatusIniciar); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_gerencia_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StatusAlterar); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_gerencia_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StatusParar); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_gerencia_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StatusRemover); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_gerencia_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Params_Processador); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_gerencia_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StatusArmazenamento_Disco); i {
+			switch v := v.(*GravacaoConfigResp_Database); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -720,7 +338,7 @@ func file_gerencia_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_gerencia_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

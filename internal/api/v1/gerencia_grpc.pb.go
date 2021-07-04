@@ -18,11 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
-	IniciarProcesso(ctx context.Context, in *Params, opts ...grpc.CallOption) (*StatusIniciar, error)
-	AlterarProcesso(ctx context.Context, in *Params, opts ...grpc.CallOption) (*StatusAlterar, error)
-	PararProcesso(ctx context.Context, in *Camera, opts ...grpc.CallOption) (*StatusParar, error)
-	RemoverProcesso(ctx context.Context, in *Camera, opts ...grpc.CallOption) (*StatusRemover, error)
-	StatusArmazenamentoGravacao(ctx context.Context, in *ArmazenamentoParams, opts ...grpc.CallOption) (*StatusArmazenamento, error)
+	GravacaoConfig(ctx context.Context, in *GravacaoConfigReq, opts ...grpc.CallOption) (*GravacaoConfigResp, error)
 }
 
 type gerenciaClient struct {
@@ -33,45 +29,9 @@ func NewGerenciaClient(cc grpc.ClientConnInterface) GerenciaClient {
 	return &gerenciaClient{cc}
 }
 
-func (c *gerenciaClient) IniciarProcesso(ctx context.Context, in *Params, opts ...grpc.CallOption) (*StatusIniciar, error) {
-	out := new(StatusIniciar)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/iniciarProcesso", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) AlterarProcesso(ctx context.Context, in *Params, opts ...grpc.CallOption) (*StatusAlterar, error) {
-	out := new(StatusAlterar)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/alterarProcesso", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) PararProcesso(ctx context.Context, in *Camera, opts ...grpc.CallOption) (*StatusParar, error) {
-	out := new(StatusParar)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/pararProcesso", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) RemoverProcesso(ctx context.Context, in *Camera, opts ...grpc.CallOption) (*StatusRemover, error) {
-	out := new(StatusRemover)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/removerProcesso", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) StatusArmazenamentoGravacao(ctx context.Context, in *ArmazenamentoParams, opts ...grpc.CallOption) (*StatusArmazenamento, error) {
-	out := new(StatusArmazenamento)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/statusArmazenamentoGravacao", in, out, opts...)
+func (c *gerenciaClient) GravacaoConfig(ctx context.Context, in *GravacaoConfigReq, opts ...grpc.CallOption) (*GravacaoConfigResp, error) {
+	out := new(GravacaoConfigResp)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/GravacaoConfig", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -82,11 +42,7 @@ func (c *gerenciaClient) StatusArmazenamentoGravacao(ctx context.Context, in *Ar
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
-	IniciarProcesso(context.Context, *Params) (*StatusIniciar, error)
-	AlterarProcesso(context.Context, *Params) (*StatusAlterar, error)
-	PararProcesso(context.Context, *Camera) (*StatusParar, error)
-	RemoverProcesso(context.Context, *Camera) (*StatusRemover, error)
-	StatusArmazenamentoGravacao(context.Context, *ArmazenamentoParams) (*StatusArmazenamento, error)
+	GravacaoConfig(context.Context, *GravacaoConfigReq) (*GravacaoConfigResp, error)
 	mustEmbedUnimplementedGerenciaServer()
 }
 
@@ -94,20 +50,8 @@ type GerenciaServer interface {
 type UnimplementedGerenciaServer struct {
 }
 
-func (UnimplementedGerenciaServer) IniciarProcesso(context.Context, *Params) (*StatusIniciar, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IniciarProcesso not implemented")
-}
-func (UnimplementedGerenciaServer) AlterarProcesso(context.Context, *Params) (*StatusAlterar, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AlterarProcesso not implemented")
-}
-func (UnimplementedGerenciaServer) PararProcesso(context.Context, *Camera) (*StatusParar, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PararProcesso not implemented")
-}
-func (UnimplementedGerenciaServer) RemoverProcesso(context.Context, *Camera) (*StatusRemover, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoverProcesso not implemented")
-}
-func (UnimplementedGerenciaServer) StatusArmazenamentoGravacao(context.Context, *ArmazenamentoParams) (*StatusArmazenamento, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StatusArmazenamentoGravacao not implemented")
+func (UnimplementedGerenciaServer) GravacaoConfig(context.Context, *GravacaoConfigReq) (*GravacaoConfigResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GravacaoConfig not implemented")
 }
 func (UnimplementedGerenciaServer) mustEmbedUnimplementedGerenciaServer() {}
 
@@ -122,92 +66,20 @@ func RegisterGerenciaServer(s grpc.ServiceRegistrar, srv GerenciaServer) {
 	s.RegisterService(&Gerencia_ServiceDesc, srv)
 }
 
-func _Gerencia_IniciarProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Params)
+func _Gerencia_GravacaoConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GravacaoConfigReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GerenciaServer).IniciarProcesso(ctx, in)
+		return srv.(GerenciaServer).GravacaoConfig(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/iniciarProcesso",
+		FullMethod: "/gerencia.Gerencia/GravacaoConfig",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).IniciarProcesso(ctx, req.(*Params))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_AlterarProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Params)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).AlterarProcesso(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/alterarProcesso",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).AlterarProcesso(ctx, req.(*Params))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_PararProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Camera)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).PararProcesso(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/pararProcesso",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).PararProcesso(ctx, req.(*Camera))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_RemoverProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Camera)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).RemoverProcesso(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/removerProcesso",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).RemoverProcesso(ctx, req.(*Camera))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_StatusArmazenamentoGravacao_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ArmazenamentoParams)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).StatusArmazenamentoGravacao(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/statusArmazenamentoGravacao",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).StatusArmazenamentoGravacao(ctx, req.(*ArmazenamentoParams))
+		return srv.(GerenciaServer).GravacaoConfig(ctx, req.(*GravacaoConfigReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -220,24 +92,8 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GerenciaServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "iniciarProcesso",
-			Handler:    _Gerencia_IniciarProcesso_Handler,
-		},
-		{
-			MethodName: "alterarProcesso",
-			Handler:    _Gerencia_AlterarProcesso_Handler,
-		},
-		{
-			MethodName: "pararProcesso",
-			Handler:    _Gerencia_PararProcesso_Handler,
-		},
-		{
-			MethodName: "removerProcesso",
-			Handler:    _Gerencia_RemoverProcesso_Handler,
-		},
-		{
-			MethodName: "statusArmazenamentoGravacao",
-			Handler:    _Gerencia_StatusArmazenamentoGravacao_Handler,
+			MethodName: "GravacaoConfig",
+			Handler:    _Gerencia_GravacaoConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
