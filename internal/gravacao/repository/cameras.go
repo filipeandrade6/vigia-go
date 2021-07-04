@@ -11,7 +11,7 @@ type CamerasRepository interface {
 	Save(camera *models.Camera) error
 	GetByID(id string) (camera *models.Camera, err error)
 	GetByIP(id string) (camera *models.Camera, err error)
-	GetAll() (users []*models.Camera, err error)
+	GetAll() ([]*models.Camera, error)
 	Update(camera *models.Camera) error
 	Delete(id string) error
 }

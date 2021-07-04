@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
 	GravacaoConfig(ctx context.Context, in *GravacaoConfigReq, opts ...grpc.CallOption) (*GravacaoConfigResp, error)
+	DatabaseConfig(ctx context.Context, in *DatabaseConfigReq, opts ...grpc.CallOption) (*DatabaseConfigResp, error)
 }
 
 type gerenciaClient struct {
@@ -38,11 +39,21 @@ func (c *gerenciaClient) GravacaoConfig(ctx context.Context, in *GravacaoConfigR
 	return out, nil
 }
 
+func (c *gerenciaClient) DatabaseConfig(ctx context.Context, in *DatabaseConfigReq, opts ...grpc.CallOption) (*DatabaseConfigResp, error) {
+	out := new(DatabaseConfigResp)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/DatabaseConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GerenciaServer is the server API for Gerencia service.
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
 	GravacaoConfig(context.Context, *GravacaoConfigReq) (*GravacaoConfigResp, error)
+	DatabaseConfig(context.Context, *DatabaseConfigReq) (*DatabaseConfigResp, error)
 	mustEmbedUnimplementedGerenciaServer()
 }
 
@@ -52,6 +63,9 @@ type UnimplementedGerenciaServer struct {
 
 func (UnimplementedGerenciaServer) GravacaoConfig(context.Context, *GravacaoConfigReq) (*GravacaoConfigResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GravacaoConfig not implemented")
+}
+func (UnimplementedGerenciaServer) DatabaseConfig(context.Context, *DatabaseConfigReq) (*DatabaseConfigResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DatabaseConfig not implemented")
 }
 func (UnimplementedGerenciaServer) mustEmbedUnimplementedGerenciaServer() {}
 
@@ -84,6 +98,24 @@ func _Gerencia_GravacaoConfig_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gerencia_DatabaseConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DatabaseConfigReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).DatabaseConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/DatabaseConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).DatabaseConfig(ctx, req.(*DatabaseConfigReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Gerencia_ServiceDesc is the grpc.ServiceDesc for Gerencia service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -94,6 +126,10 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GravacaoConfig",
 			Handler:    _Gerencia_GravacaoConfig_Handler,
+		},
+		{
+			MethodName: "DatabaseConfig",
+			Handler:    _Gerencia_DatabaseConfig_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

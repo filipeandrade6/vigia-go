@@ -10,11 +10,11 @@ type ServidorGravacao struct {
 
 func (s *ServidorGravacao) ToProtobuf() *pb.GravacaoConfigReq {
 	return &pb.GravacaoConfigReq{
-		ServidorGravacao:      s.Endereço,
-		PortaServidorGravacao: s.Porta,
+		EnderecoServidorGravacao: s.Endereço,
+		PortaServidorGravacao:    s.Porta,
 	}
 }
 
-// func (s *ServidorGravacao) FromProtobuf(servidor *pb.ServidorGravacao) *pb.GravacaoConfigResp {
-// 	s.ID = servidor.GetId()
-// }
+func (s *ServidorGravacao) FromProtobuf(sv *pb.GravacaoConfigResp) {
+	s.ID = sv.GetServidorGravacaoId()
+}

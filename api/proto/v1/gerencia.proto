@@ -6,12 +6,12 @@ package gerencia;
 
 service Gerencia {
     rpc GravacaoConfig (GravacaoConfigReq) returns (GravacaoConfigResp) {}
+    rpc DatabaseConfig (DatabaseConfigReq) returns (DatabaseConfigResp) {}
 //     rpc Notificar () returns ()  {}
 }
 
 message GravacaoConfigReq {
-    // Identificador do servidor (nome do host ou ip)
-    string servidor_gravacao = 1;
+    string endereco_servidor_gravacao = 1;
     int32 porta_servidor_gravacao = 2;
 }
 
@@ -19,13 +19,15 @@ message GravacaoConfigReq {
 // Configurações necessárias para conectar no banco de dados
 message GravacaoConfigResp {
     int32 servidor_gravacao_id = 1;
-    message Database {
-        string host = 1;
-        int32 port = 2;
-        string user = 3;
-        string password = 4;
-        string dbname = 5;
-        int32 poolmaxconns = 6;
-    }
-    Database database = 2;
+}
+
+message DatabaseConfigReq {}
+
+message DatabaseConfigResp {
+    string host = 1;
+    int32 port = 2;
+    string user = 3;
+    string password = 4;
+    string dbname = 5;
+    int32 poolmaxconns = 6;
 }
