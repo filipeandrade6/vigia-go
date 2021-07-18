@@ -1,13 +1,15 @@
 package main
 
 import (
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/server"
+	"fmt"
+	"os"
+
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/core"
 )
 
 func main() {
-	// if err := core.Main(); err != nil {
-	// 	fmt.Fprintf(os.Stderr, "%v", err)
-	// 	os.Exit(1)
-	// }
-	server.Main()
+	if err := core.Main(); err != nil {
+		fmt.Fprintf(os.Stderr, "%v", err)
+		os.Exit(1)
+	}
 }

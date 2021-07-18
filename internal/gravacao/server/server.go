@@ -37,7 +37,8 @@ func (s *gravacaoServer) InfoServidor(ctx context.Context, in *pb.InfoServidorRe
 	}, nil
 }
 
-func StartServer(tipo, url string) {
+// TODO refatorar
+func StartServer(tipo, url string) *grpc.Server {
 	lis, err := net.Listen(tipo, url)
 	if err != nil {
 		fmt.Println("Erro aqui")
@@ -46,4 +47,6 @@ func StartServer(tipo, url string) {
 	grpcGravacaoServer := grpc.NewServer()
 	pb.RegisterGravacaoServer(grpcGravacaoServer, novoServidor())
 	grpcGravacaoServer.Serve(lis)
+
+	return grpcGravacaoServer
 }

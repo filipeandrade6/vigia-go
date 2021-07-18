@@ -8,7 +8,7 @@ import (
 )
 
 func NewPool(cfg *Config) (*pgxpool.Pool, error) {
-	poolCfg, err := pgxpool.ParseConfig(cfg.dbDSN)
+	poolCfg, err := pgxpool.ParseConfig(cfg.getDSN())
 	if err != nil {
 		return nil, fmt.Errorf("error loading connection pool database config: %w", err)
 	}

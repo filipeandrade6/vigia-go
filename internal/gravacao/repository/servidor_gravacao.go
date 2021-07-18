@@ -60,10 +60,10 @@ func GetServidorGravacaoByEndereco(p *pgxpool.Pool, endereco string) (*models.Se
 	return sv, nil
 }
 
-func GetAllServidorGravacao(p *pgxpool.Pool) ([]*models.ServidorGravacao, error) {
-	query := `SELECT * F`
-	var svs []*models.ServidorGravacao
-	if err := p.Query()
+// func GetAllServidorGravacao(p *pgxpool.Pool) ([]*models.ServidorGravacao, error) {
+// 	query := `SELECT * F`
+// 	var svs []*models.ServidorGravacao
+// 	if err := p.Query()
 
-	return
-}
+// 	return nil, nil
+// }
