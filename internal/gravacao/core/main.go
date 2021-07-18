@@ -39,10 +39,9 @@ func (g *Gravacao) Run() {
 }
 
 func (g *Gravacao) Stop() {
-	fmt.Println("recebido sinal de finalização......")
-	close(g.closed)
-	g.wg.Wait() // wait for all go goroutines to exit
-	fmt.Println("tudo finalizado...")
+	close(g.closed)         // * utilizado no exemplo para finalizar as GOROUTINES
+	g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30 seg
+	fmt.Println("Bye.")
 }
 
 func handle(gravacao *Gravacao) {
@@ -64,8 +63,8 @@ func Main() error {
 		closed: make(chan struct{}),
 		wg:     sync.WaitGroup{},
 		ticker: time.NewTicker(time.Second * 2),
-		server: server.StartServer("tcp", "localhost:12346"),
-		client: client.GetGerenciaClient("localhost:12347"),
+		server: server.NovoServidorGravacao("tcp", "localhost:12346"),
+		client: client.NovoClientGerencia("localhost:12347"),
 	}
 
 	dbCfg := g.client.GetDatabase()
@@ -80,11 +79,10 @@ func Main() error {
 
 	go g.Run()
 
-	// go alguma metodo que nunca finaliza
 	select {
-	case sig := <-c:
-		fmt.Printf("Got %s signal. Finalizando...\n", sig)
-		// metodo de parada graciosa
+	case <-c:
+		fmt.Println("Finalizando aplicação....")
+		g.Stop()
 	}
 
 	return errors.New("finalizou funcao main")

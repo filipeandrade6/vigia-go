@@ -40,15 +40,14 @@ func (g *GerenciaClient) GetDatabase() *database.Config {
 	}
 }
 
-func GetGerenciaClient(url string) *GerenciaClient {
+func NovoClientGerencia(url string) *GerenciaClient {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithBlock())
 
 	conn, err := grpc.Dial(url, opts...)
 	if err != nil {
-		// TODO mudar isso aqui
-		fmt.Println("Erro aqui no client")
+		fmt.Println("Erro aqui no client") // TODO mudar isso aqui
 		panic(err)
 	}
 	defer conn.Close()

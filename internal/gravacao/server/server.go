@@ -18,8 +18,17 @@ type gravacaoServer struct {
 	mu sync.Mutex
 }
 
-func novoServidor() *gravacaoServer {
-	return &gravacaoServer{}
+func NovoServidorGravacao(tipo, url string) *grpc.Server {
+	lis, err := net.Listen(tipo, url)
+	if err != nil {
+		fmt.Println("Erro aqui")
+		panic(err)
+	}
+	grpcGravacaoServer := grpc.NewServer()
+	pb.RegisterGravacaoServer(grpcGravacaoServer, &gravacaoServer{})
+	grpcGravacaoServer.Serve(lis)
+
+	return grpcGravacaoServer
 }
 
 func (s *gravacaoServer) InfoServidor(ctx context.Context, in *pb.InfoServidorReq) (*pb.InfoServidorResp, error) {
@@ -35,18 +44,4 @@ func (s *gravacaoServer) InfoServidor(ctx context.Context, in *pb.InfoServidorRe
 			},
 		},
 	}, nil
-}
-
-// TODO refatorar
-func StartServer(tipo, url string) *grpc.Server {
-	lis, err := net.Listen(tipo, url)
-	if err != nil {
-		fmt.Println("Erro aqui")
-		panic(err)
-	}
-	grpcGravacaoServer := grpc.NewServer()
-	pb.RegisterGravacaoServer(grpcGravacaoServer, novoServidor())
-	grpcGravacaoServer.Serve(lis)
-
-	return grpcGravacaoServer
 }
