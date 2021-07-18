@@ -4,50 +4,56 @@ package client
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/filipeandrade6/vigia-go/internal/database"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/models"
+
 	"google.golang.org/grpc"
 )
 
-func Main() {
+type GerenciaClient struct {
+	c pb.GerenciaClient
+}
+
+func (g *GerenciaClient) GetDatabase() *database.Config {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	databaseConfigResp, err := g.c.DatabaseConfig(ctx, nil)
+	if err != nil {
+		fmt.Println("Erro na chamada da função GravacaoConfig no client")
+		panic(err)
+	}
+
+	var db *models.Database
+	db.FromProtobuf(databaseConfigResp)
+
+	return &database.Config{
+		dbUser:         db.User,
+		dbPass:         db.Password,
+		dbHost:         db.Host,
+		dbPort:         int(db.Port),
+		dbName:         db.DBName,
+		dbPoolMaxConns: int(db.PoolMaxConns),
+	}
+}
+
+func GetGerenciaClient(url string) *GerenciaClient {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithBlock())
 
-	conn, err := grpc.Dial("localhost:12347", opts...)
+	conn, err := grpc.Dial(url, opts...)
 	if err != nil {
+		// TODO mudar isso aqui
 		fmt.Println("Erro aqui no client")
 		panic(err)
 	}
 	defer conn.Close()
-	client := pb.NewGerenciaClient(conn)
 
-	var b []byte = make([]byte, 1)
-	for {
-		os.Stdin.Read(b)
-		teste(
-			client,
-			&pb.GravacaoConfigReq{
-				ServidorGravacao: "localhost",
-			},
-		)
+	return &GerenciaClient{
+		c: pb.NewGerenciaClient(conn),
 	}
-}
-
-func teste(client pb.GerenciaClient, cfg *pb.GravacaoConfigReq) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	GravacaoConfigResp, err := client.GravacaoConfig(ctx, cfg)
-	if err != nil {
-		fmt.Println("Erro na chamado da função InfoServidor no client")
-		panic(err)
-	}
-
-	fmt.Println(
-		GravacaoConfigResp.GetServidorGravacaoId(),
-		GravacaoConfigResp.GetDatabase(),
-	)
 }

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -14,7 +13,7 @@ type Config struct {
 	dbPort         int
 	dbName         string
 	dbPoolMaxConns int
-	dbDSN          string
+	// dbDSN          string
 }
 
 func NewConfig() *Config {
@@ -37,15 +36,15 @@ func NewConfig() *Config {
 		log.Fatalln("Error on load env var", err.Error())
 	}
 
-	cfg.dbDSN = fmt.Sprintf(
-		"user=%s password=%s host=%s port=%d dbname=%s pool_max_conns=%d",
-		cfg.dbUser,
-		cfg.dbPass,
-		cfg.dbHost,
-		cfg.dbPort,
-		cfg.dbName,
-		cfg.dbPoolMaxConns,
-	)
+	// cfg.dbDSN = fmt.Sprintf(
+	// 	"user=%s password=%s host=%s port=%d dbname=%s pool_max_conns=%d",
+	// 	cfg.dbUser,
+	// 	cfg.dbPass,
+	// 	cfg.dbHost,
+	// 	cfg.dbPort,
+	// 	cfg.dbName,
+	// 	cfg.dbPoolMaxConns,
+	// )
 
 	return &cfg
 }

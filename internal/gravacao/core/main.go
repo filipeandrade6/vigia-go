@@ -1,10 +1,10 @@
 package core
 
 import (
-	"fmt"
-
 	"github.com/filipeandrade6/vigia-go/internal/database"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/repository"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/client"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/server"
+
 	"github.com/joho/godotenv"
 )
 
@@ -18,18 +18,15 @@ func Main() error {
 	// logger,  := zap.NewProduction()
 	// defer logger.Sync()
 
-	dbCfg := database.NewConfig()
+	server.StartServer("tcp", "localhost:12346")
+	a := client.GetGerenciaClient("localhost:12347")
+
+	dbCfg := a.GetDatabase()
+
 	p, err := database.NewPool(dbCfg)
 	if err != nil {
 		return err
 	}
-
-	cam, err := repository.GetByID(p, "1")
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(cam)
 
 	return nil
 }

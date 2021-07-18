@@ -18,7 +18,7 @@ type gravacaoServer struct {
 	mu sync.Mutex
 }
 
-func newServer() *gravacaoServer {
+func novoServidor() *gravacaoServer {
 	return &gravacaoServer{}
 }
 
@@ -37,13 +37,13 @@ func (s *gravacaoServer) InfoServidor(ctx context.Context, in *pb.InfoServidorRe
 	}, nil
 }
 
-func Main() {
-	lis, err := net.Listen("tcp", "localhost:12346")
+func StartServer(tipo, url string) {
+	lis, err := net.Listen(tipo, url)
 	if err != nil {
 		fmt.Println("Erro aqui")
 		panic(err)
 	}
 	grpcGravacaoServer := grpc.NewServer()
-	pb.RegisterGravacaoServer(grpcGravacaoServer, newServer())
+	pb.RegisterGravacaoServer(grpcGravacaoServer, novoServidor())
 	grpcGravacaoServer.Serve(lis)
 }

@@ -16,7 +16,7 @@ type CamerasRepository interface {
 	Delete(id string) error
 }
 
-func GetByID(p *pgxpool.Pool, id string) (models.Camera, error) {
+func CameraPeloID(p *pgxpool.Pool, id string) (models.Camera, error) {
 	query := `SELECT * FROM "camera" WHERE id = $1`
 
 	var cam models.Camera
