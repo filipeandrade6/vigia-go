@@ -31,12 +31,12 @@ func (g *GerenciaClient) GetDatabase() *database.Config {
 	db.FromProtobuf(databaseConfigResp)
 
 	return &database.Config{
-		dbUser:         db.User,
-		dbPass:         db.Password,
-		dbHost:         db.Host,
-		dbPort:         int(db.Port),
-		dbName:         db.DBName,
-		dbPoolMaxConns: int(db.PoolMaxConns),
+		DBUser:         db.User,
+		DBPass:         db.Password,
+		DBHost:         db.Host,
+		DBPort:         int(db.Port),
+		DBName:         db.DBName,
+		DBPoolMaxConns: int(db.PoolMaxConns),
 	}
 }
 
