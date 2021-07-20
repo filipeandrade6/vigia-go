@@ -1,7 +1,15 @@
 package main
 
-import "github.com/filipeandrade6/vigia-go/internal/gerencia/client"
+import (
+	"fmt"
+	"os"
+
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/core"
+)
 
 func main() {
-	client.Main()
+	if err := core.Main(); err != nil {
+		fmt.Fprintf(os.Stderr, "%v", err)
+		os.Exit(1)
+	}
 }

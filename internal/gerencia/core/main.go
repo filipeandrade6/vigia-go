@@ -9,20 +9,20 @@ import (
 	"syscall"
 
 	"github.com/filipeandrade6/vigia-go/internal/database"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/client"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/server"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/client"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/server"
 
 	"google.golang.org/grpc"
 )
 
-type Gravacao struct {
+type Gerencia struct {
 	server *grpc.Server
-	client *client.GerenciaClient // TODO verificar se campo privado não interfere em algo
+	client *client.GravacaoClient // TODO verificar se campo privado não interfere em algo
 }
 
-func (g *Gravacao) Stop() {
+func (g *Gerencia) Stop() {
 	fmt.Println("Finalizando aplicação....")
-	g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30 seg
+	// g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30 seg
 	fmt.Println("Bye.")
 }
 
@@ -33,14 +33,15 @@ func Main() error {
 	// logger,  := zap.NewProduction()
 	// defer logger.Sync()
 
-	g := &Gravacao{
-		server: server.NovoServidorGravacao("tcp", "localhost:12346"),
-		client: client.NovoClientGerencia("localhost:12347"),
+	// TODO ser semantico nos nomes, definindo bem qual é client/server de que serviço
+	g := &Gerencia{
+		server: server.NovoServidorGerencia("tcp", "localhost:12347"),
+		client: client.NovoClientGerencia("localhost:12346"),
 	}
 
 	dbCfg := g.client.GetDatabase()
 
-	_, err := database.NewPool(dbCfg) // TODO arrumar aqui
+	_, err := database.NewPool(dbCfg) // TODO arruma aqui
 	if err != nil {
 		return err
 	}
