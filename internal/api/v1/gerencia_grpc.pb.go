@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
-	GravacaoConfig(ctx context.Context, in *GravacaoConfigReq, opts ...grpc.CallOption) (*GravacaoConfigResp, error)
+	RegistrarServidorGravacao(ctx context.Context, in *RegistrarServidorGravacaoReq, opts ...grpc.CallOption) (*RegistrarServidorGravacaoResp, error)
 	DatabaseConfig(ctx context.Context, in *DatabaseConfigReq, opts ...grpc.CallOption) (*DatabaseConfigResp, error)
 }
 
@@ -30,9 +30,9 @@ func NewGerenciaClient(cc grpc.ClientConnInterface) GerenciaClient {
 	return &gerenciaClient{cc}
 }
 
-func (c *gerenciaClient) GravacaoConfig(ctx context.Context, in *GravacaoConfigReq, opts ...grpc.CallOption) (*GravacaoConfigResp, error) {
-	out := new(GravacaoConfigResp)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/GravacaoConfig", in, out, opts...)
+func (c *gerenciaClient) RegistrarServidorGravacao(ctx context.Context, in *RegistrarServidorGravacaoReq, opts ...grpc.CallOption) (*RegistrarServidorGravacaoResp, error) {
+	out := new(RegistrarServidorGravacaoResp)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/RegistrarServidorGravacao", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *gerenciaClient) DatabaseConfig(ctx context.Context, in *DatabaseConfigR
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
-	GravacaoConfig(context.Context, *GravacaoConfigReq) (*GravacaoConfigResp, error)
+	RegistrarServidorGravacao(context.Context, *RegistrarServidorGravacaoReq) (*RegistrarServidorGravacaoResp, error)
 	DatabaseConfig(context.Context, *DatabaseConfigReq) (*DatabaseConfigResp, error)
 	mustEmbedUnimplementedGerenciaServer()
 }
@@ -61,8 +61,8 @@ type GerenciaServer interface {
 type UnimplementedGerenciaServer struct {
 }
 
-func (UnimplementedGerenciaServer) GravacaoConfig(context.Context, *GravacaoConfigReq) (*GravacaoConfigResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GravacaoConfig not implemented")
+func (UnimplementedGerenciaServer) RegistrarServidorGravacao(context.Context, *RegistrarServidorGravacaoReq) (*RegistrarServidorGravacaoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegistrarServidorGravacao not implemented")
 }
 func (UnimplementedGerenciaServer) DatabaseConfig(context.Context, *DatabaseConfigReq) (*DatabaseConfigResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DatabaseConfig not implemented")
@@ -80,20 +80,20 @@ func RegisterGerenciaServer(s grpc.ServiceRegistrar, srv GerenciaServer) {
 	s.RegisterService(&Gerencia_ServiceDesc, srv)
 }
 
-func _Gerencia_GravacaoConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GravacaoConfigReq)
+func _Gerencia_RegistrarServidorGravacao_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegistrarServidorGravacaoReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GerenciaServer).GravacaoConfig(ctx, in)
+		return srv.(GerenciaServer).RegistrarServidorGravacao(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/GravacaoConfig",
+		FullMethod: "/gerencia.Gerencia/RegistrarServidorGravacao",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).GravacaoConfig(ctx, req.(*GravacaoConfigReq))
+		return srv.(GerenciaServer).RegistrarServidorGravacao(ctx, req.(*RegistrarServidorGravacaoReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -124,8 +124,8 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GerenciaServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GravacaoConfig",
-			Handler:    _Gerencia_GravacaoConfig_Handler,
+			MethodName: "RegistrarServidorGravacao",
+			Handler:    _Gerencia_RegistrarServidorGravacao_Handler,
 		},
 		{
 			MethodName: "DatabaseConfig",

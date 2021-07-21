@@ -5,20 +5,20 @@ option go_package = "./internal/api/v1";
 package gerencia;
 
 service Gerencia {
-    rpc GravacaoConfig (GravacaoConfigReq) returns (GravacaoConfigResp) {}
+    rpc RegistrarServidorGravacao (RegistrarServidorGravacaoReq) returns (RegistrarServidorGravacaoResp) {}
     rpc DatabaseConfig (DatabaseConfigReq) returns (DatabaseConfigResp) {}
-//     rpc Notificar () returns ()  {}
 }
 
-message GravacaoConfigReq {
-    string endereco_servidor_gravacao = 1;
-    int32 porta_servidor_gravacao = 2;
+message RegistrarServidorGravacaoReq {
+    string identificador = 1;
+    string endereco_servidor_gravacao = 2;
+    int32 porta_servidor_gravacao = 3;
 }
 
-// TODO separar a aquisição de banco de dados em um serviço proprio e o de registrar
-// Configurações necessárias para conectar no banco de dados
-message GravacaoConfigResp {
-    int32 servidor_gravacao_id = 1;
+// TODO transformar em ENUM os status com informações pertinente
+message RegistrarServidorGravacaoResp {
+    string status = 1;
+    string identificador =2;
 }
 
 message DatabaseConfigReq {}
