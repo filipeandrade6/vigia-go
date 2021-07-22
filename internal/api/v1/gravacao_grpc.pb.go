@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GravacaoClient interface {
-	InfoServidor(ctx context.Context, in *InfoServidorReq, opts ...grpc.CallOption) (*InfoServidorResp, error)
+	InfoProcessos(ctx context.Context, in *InfoProcessosReq, opts ...grpc.CallOption) (*InfoProcessosResp, error)
 	ConfigurarProcesso(ctx context.Context, in *ConfigurarProcessoReq, opts ...grpc.CallOption) (*ConfigurarProcessoResp, error)
 }
 
@@ -30,9 +30,9 @@ func NewGravacaoClient(cc grpc.ClientConnInterface) GravacaoClient {
 	return &gravacaoClient{cc}
 }
 
-func (c *gravacaoClient) InfoServidor(ctx context.Context, in *InfoServidorReq, opts ...grpc.CallOption) (*InfoServidorResp, error) {
-	out := new(InfoServidorResp)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/InfoServidor", in, out, opts...)
+func (c *gravacaoClient) InfoProcessos(ctx context.Context, in *InfoProcessosReq, opts ...grpc.CallOption) (*InfoProcessosResp, error) {
+	out := new(InfoProcessosResp)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/InfoProcessos", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *gravacaoClient) ConfigurarProcesso(ctx context.Context, in *ConfigurarP
 // All implementations must embed UnimplementedGravacaoServer
 // for forward compatibility
 type GravacaoServer interface {
-	InfoServidor(context.Context, *InfoServidorReq) (*InfoServidorResp, error)
+	InfoProcessos(context.Context, *InfoProcessosReq) (*InfoProcessosResp, error)
 	ConfigurarProcesso(context.Context, *ConfigurarProcessoReq) (*ConfigurarProcessoResp, error)
 	mustEmbedUnimplementedGravacaoServer()
 }
@@ -61,8 +61,8 @@ type GravacaoServer interface {
 type UnimplementedGravacaoServer struct {
 }
 
-func (UnimplementedGravacaoServer) InfoServidor(context.Context, *InfoServidorReq) (*InfoServidorResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method InfoServidor not implemented")
+func (UnimplementedGravacaoServer) InfoProcessos(context.Context, *InfoProcessosReq) (*InfoProcessosResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InfoProcessos not implemented")
 }
 func (UnimplementedGravacaoServer) ConfigurarProcesso(context.Context, *ConfigurarProcessoReq) (*ConfigurarProcessoResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConfigurarProcesso not implemented")
@@ -80,20 +80,20 @@ func RegisterGravacaoServer(s grpc.ServiceRegistrar, srv GravacaoServer) {
 	s.RegisterService(&Gravacao_ServiceDesc, srv)
 }
 
-func _Gravacao_InfoServidor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoServidorReq)
+func _Gravacao_InfoProcessos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoProcessosReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).InfoServidor(ctx, in)
+		return srv.(GravacaoServer).InfoProcessos(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/InfoServidor",
+		FullMethod: "/gravacao.Gravacao/InfoProcessos",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).InfoServidor(ctx, req.(*InfoServidorReq))
+		return srv.(GravacaoServer).InfoProcessos(ctx, req.(*InfoProcessosReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -124,8 +124,8 @@ var Gravacao_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GravacaoServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "InfoServidor",
-			Handler:    _Gravacao_InfoServidor_Handler,
+			MethodName: "InfoProcessos",
+			Handler:    _Gravacao_InfoProcessos_Handler,
 		},
 		{
 			MethodName: "ConfigurarProcesso",

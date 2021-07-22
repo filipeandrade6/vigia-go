@@ -5,25 +5,25 @@ option go_package = "./internal/api/v1";
 package gravacao;
 
 service Gravacao {
-    rpc InfoServidor (InfoServidorReq) returns (InfoServidorResp) {}
+    rpc InfoProcessos (InfoProcessosReq) returns (InfoProcessosResp) {}
     rpc ConfigurarProcesso (ConfigurarProcessoReq) returns (ConfigurarProcessoResp) {}
     // rpc statusArmazenamento (StatusArmazenamentoParams) returns (StatusArmazenamento) {}
     // rpc configurarHousekeeping (HousekeepingConfig) returns (StatusHousekeeping) {}
 }
 
-message InfoServidorReq {
+message InfoProcessosReq {
 }
 
-message InfoServidorResp {
+message InfoProcessosResp {
     message Processo {
-        int32 processo_id = 1;
+        int32 id = 1;
         int32 camera_id = 2;
         string processador_caminho = 3;
         enum StatusProcesso {
             PARADO = 0;
             EXECUTANDO = 1;
         }
-        StatusProcesso status_processo = 4;
+        StatusProcesso status = 4;
     }
     repeated Processo processos = 1;
 }
@@ -38,7 +38,7 @@ message ConfigurarProcessoReq {
         INFO = 4;
     }
     Acao acao = 1;
-    int32 processo_id = 2;
+    int32 id = 2;
     int32 camera_id = 3;
     string processador_caminho = 4;
 }

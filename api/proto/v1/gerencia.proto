@@ -6,24 +6,24 @@ package gerencia;
 
 service Gerencia {
     rpc RegistrarServidorGravacao (RegistrarServidorGravacaoReq) returns (RegistrarServidorGravacaoResp) {}
-    rpc DatabaseConfig (DatabaseConfigReq) returns (DatabaseConfigResp) {}
+    rpc ConfigBancoDeDados (ConfigBancoDeDadosReq) returns (ConfigBancoDeDadosResp) {}
 }
 
 message RegistrarServidorGravacaoReq {
-    string identificador = 1;
-    string endereco_servidor_gravacao = 2;
-    int32 porta_servidor_gravacao = 3;
+    string id = 1;
+    string endereco = 2;
+    int32 porta = 3;
 }
 
 // TODO transformar em ENUM os status com informações pertinente
 message RegistrarServidorGravacaoResp {
-    string status = 1;
-    string identificador =2;
+    string id = 1;
+    string status = 2;
 }
 
-message DatabaseConfigReq {}
+message ConfigBancoDeDadosReq {}
 
-message DatabaseConfigResp {
+message ConfigBancoDeDadosResp {
     string host = 1;
     int32 port = 2;
     string user = 3;

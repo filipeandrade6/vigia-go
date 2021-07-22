@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
 	RegistrarServidorGravacao(ctx context.Context, in *RegistrarServidorGravacaoReq, opts ...grpc.CallOption) (*RegistrarServidorGravacaoResp, error)
-	DatabaseConfig(ctx context.Context, in *DatabaseConfigReq, opts ...grpc.CallOption) (*DatabaseConfigResp, error)
+	ConfigBancoDeDados(ctx context.Context, in *ConfigBancoDeDadosReq, opts ...grpc.CallOption) (*ConfigBancoDeDadosResp, error)
 }
 
 type gerenciaClient struct {
@@ -39,9 +39,9 @@ func (c *gerenciaClient) RegistrarServidorGravacao(ctx context.Context, in *Regi
 	return out, nil
 }
 
-func (c *gerenciaClient) DatabaseConfig(ctx context.Context, in *DatabaseConfigReq, opts ...grpc.CallOption) (*DatabaseConfigResp, error) {
-	out := new(DatabaseConfigResp)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/DatabaseConfig", in, out, opts...)
+func (c *gerenciaClient) ConfigBancoDeDados(ctx context.Context, in *ConfigBancoDeDadosReq, opts ...grpc.CallOption) (*ConfigBancoDeDadosResp, error) {
+	out := new(ConfigBancoDeDadosResp)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ConfigBancoDeDados", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *gerenciaClient) DatabaseConfig(ctx context.Context, in *DatabaseConfigR
 // for forward compatibility
 type GerenciaServer interface {
 	RegistrarServidorGravacao(context.Context, *RegistrarServidorGravacaoReq) (*RegistrarServidorGravacaoResp, error)
-	DatabaseConfig(context.Context, *DatabaseConfigReq) (*DatabaseConfigResp, error)
+	ConfigBancoDeDados(context.Context, *ConfigBancoDeDadosReq) (*ConfigBancoDeDadosResp, error)
 	mustEmbedUnimplementedGerenciaServer()
 }
 
@@ -64,8 +64,8 @@ type UnimplementedGerenciaServer struct {
 func (UnimplementedGerenciaServer) RegistrarServidorGravacao(context.Context, *RegistrarServidorGravacaoReq) (*RegistrarServidorGravacaoResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegistrarServidorGravacao not implemented")
 }
-func (UnimplementedGerenciaServer) DatabaseConfig(context.Context, *DatabaseConfigReq) (*DatabaseConfigResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DatabaseConfig not implemented")
+func (UnimplementedGerenciaServer) ConfigBancoDeDados(context.Context, *ConfigBancoDeDadosReq) (*ConfigBancoDeDadosResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigBancoDeDados not implemented")
 }
 func (UnimplementedGerenciaServer) mustEmbedUnimplementedGerenciaServer() {}
 
@@ -98,20 +98,20 @@ func _Gerencia_RegistrarServidorGravacao_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gerencia_DatabaseConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DatabaseConfigReq)
+func _Gerencia_ConfigBancoDeDados_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfigBancoDeDadosReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GerenciaServer).DatabaseConfig(ctx, in)
+		return srv.(GerenciaServer).ConfigBancoDeDados(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/DatabaseConfig",
+		FullMethod: "/gerencia.Gerencia/ConfigBancoDeDados",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).DatabaseConfig(ctx, req.(*DatabaseConfigReq))
+		return srv.(GerenciaServer).ConfigBancoDeDados(ctx, req.(*ConfigBancoDeDadosReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -128,8 +128,8 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Gerencia_RegistrarServidorGravacao_Handler,
 		},
 		{
-			MethodName: "DatabaseConfig",
-			Handler:    _Gerencia_DatabaseConfig_Handler,
+			MethodName: "ConfigBancoDeDados",
+			Handler:    _Gerencia_ConfigBancoDeDados_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
