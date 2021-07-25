@@ -2,8 +2,8 @@ package models
 
 type Camera struct {
 	ID             int
-	IP             string
 	Descricao      string
+	IP             string
 	Porta          int
 	Canal          int
 	UsuarioCamera  string
