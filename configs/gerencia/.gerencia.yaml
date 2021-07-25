@@ -1,0 +1,20 @@
+---
+  # grpc server do serviço de gerência
+  server:
+    conn: "tcp"
+    endereco: "localhost"
+    porta: 12346
+
+  # grpc client do serviço de gravação
+  client:
+    endereco: "localhost"
+    porta: 12347
+
+  # database
+  database:
+    host: "localhost"
+    port: 5432
+    user: "postgres"
+    password: "secret"
+    name: "vigia"
+    poolmaxconns: 5

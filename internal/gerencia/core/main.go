@@ -11,6 +11,7 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/database"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/client"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/server"
+	"github.com/spf13/viper"
 
 	"google.golang.org/grpc"
 )
@@ -26,7 +27,13 @@ func (g *Gerencia) Stop() {
 	fmt.Println("Bye.")
 }
 
-// Main e a funcao principal que inicia o server e client da API que intercomunica
+func (g *Gerencia) SalvarConfiguracoes() {
+	if err := viper.WriteConfigAs(".gerencia.yaml"); err != nil { // TODO colocar o caminho do arquivo de configuração
+		panic(err)
+	}
+}
+
+// Main é a funcao principal que inicia o server e client da API que intercomunica
 // os servicos dos servidores de gerencia e gravacao
 func Main() error {
 
@@ -35,8 +42,8 @@ func Main() error {
 
 	// TODO ser semantico nos nomes, definindo bem qual é client/server de que serviço
 	g := &Gerencia{
-		server: server.NovoServidorGerencia("tcp", "localhost:12347"),
-		client: client.NovoClientGerencia("localhost:12346"),
+		server: server.NovoServidorGerencia(),
+		client: client.NovoClientGravacao(),
 	}
 
 	dbCfg := g.client.GetDatabase()

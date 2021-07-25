@@ -1,0 +1,11 @@
+---
+  # grpc server do serviço de gravacao
+  server:
+    conn: "tcp"
+    endereco: "localhost"
+    porta: "12347"
+
+  # grpc client do serviço de gerencia
+  client:
+    endereco: "localhost"
+    porta: "12346"
