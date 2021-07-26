@@ -21,16 +21,19 @@ type Gerencia struct {
 	client *client.GravacaoClient // TODO verificar se campo privado não interfere em algo
 }
 
+// Stop para a aplicação depois de recebido um sinal de interrupção do sistema
 func (g *Gerencia) Stop() {
 	fmt.Println("Finalizando aplicação....")
-	// g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30 seg
+	g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30 seg
 	fmt.Println("Bye.")
 }
 
+// SalvarConfiguracoes salva as configuroes no arquivo de destino
 func (g *Gerencia) SalvarConfiguracoes() {
 	if err := viper.WriteConfigAs(".gerencia.yaml"); err != nil { // TODO colocar o caminho do arquivo de configuração
 		panic(err)
 	}
+	fmt.Println("salvo.")
 }
 
 // Main é a funcao principal que inicia o server e client da API que intercomunica
@@ -40,15 +43,13 @@ func Main() error {
 	// logger,  := zap.NewProduction()
 	// defer logger.Sync()
 
-	// TODO ser semantico nos nomes, definindo bem qual é client/server de que serviço
 	g := &Gerencia{
 		server: server.NovoServidorGerencia(),
 		client: client.NovoClientGravacao(),
 	}
 
-	dbCfg := g.client.GetDatabase()
-
-	_, err := database.NewPool(dbCfg) // TODO arruma aqui
+	dbCfg := database.NewConfig()
+	_, err := database.NewPool(dbCfg) // TODO implementar
 	if err != nil {
 		return err
 	}

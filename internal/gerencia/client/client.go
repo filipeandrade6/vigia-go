@@ -13,22 +13,6 @@ type GravacaoClient struct {
 	c pb.GravacaoClient
 }
 
-// func (g *GravacaoClient) ConfigurarProcesso(req *pb.ConfigurarProcessoReq) *models. { // TODO arrumar aqui
-// 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-// 	defer cancel()
-
-// 	infoServidorResp, err := g.c.InfoServidor(ctx, nil)
-// 	if err != nil {
-// 		fmt.Println("Erro na chamada do client")
-// 		panic(err)
-// 	}
-
-// 	var sv *models.ServidorGravacao
-// 	sv.FromProtobuf(infoServidorResp)
-
-// 	return &sv
-// }
-
 func NovoClientGravacao() *GravacaoClient {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())

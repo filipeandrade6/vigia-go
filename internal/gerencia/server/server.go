@@ -6,6 +6,7 @@ import (
 	"net"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/models"
 
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -16,15 +17,23 @@ type gerenciaServer struct {
 }
 
 func (s *gerenciaServer) RegistrarServidorGravacao(ctx context.Context, req *pb.RegistrarServidorGravacaoReq) (*pb.RegistrarServidorGravacaoResp, error) {
-	fmt.Println(req)
-
-	return &pb.RegistrarServidorGravacaoResp{}, nil
+	sg := &models.ServidorGravacao{}
+	sg.FromProtobuf(req)
+	// TODO tratar a informação
+	sg.ID = "1"
+	sg.Status = "OK"
+	return sg.ToProtobuf(), nil
 }
 
 func (s *gerenciaServer) ConfigBancoDeDados(ctx context.Context, req *pb.ConfigBancoDeDadosReq) (*pb.ConfigBancoDeDadosResp, error) {
-	fmt.Println(req)
-
-	return &pb.ConfigBancoDeDadosResp{}, nil
+	return &pb.ConfigBancoDeDadosResp{
+		Host:         viper.GetString("database.host"),
+		Port:         int32(viper.GetInt("database.port")),
+		User:         viper.GetString("database.user"),
+		Password:     viper.GetString("database.pass"),
+		Dbname:       viper.GetString("database.name"),
+		Poolmaxconns: int32(viper.GetInt("database.poolmaxconns")),
+	}, nil
 }
 
 func NovoServidorGerencia() *grpc.Server {
