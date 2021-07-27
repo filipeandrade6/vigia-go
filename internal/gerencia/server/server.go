@@ -27,22 +27,22 @@ func (s *gerenciaServer) RegistrarServidorGravacao(ctx context.Context, req *pb.
 
 func (s *gerenciaServer) ConfigBancoDeDados(ctx context.Context, req *pb.ConfigBancoDeDadosReq) (*pb.ConfigBancoDeDadosResp, error) {
 	return &pb.ConfigBancoDeDadosResp{
-		Host:         viper.GetString("database.host"),
-		Port:         int32(viper.GetInt("database.port")),
-		User:         viper.GetString("database.user"),
-		Password:     viper.GetString("database.pass"),
-		Dbname:       viper.GetString("database.name"),
-		Poolmaxconns: int32(viper.GetInt("database.poolmaxconns")),
+		Host:         viper.GetString("DB_HOST"),
+		Port:         int32(viper.GetInt("DB_PORT")),
+		User:         viper.GetString("DB_USER"),
+		Password:     viper.GetString("DB_PASS"),
+		Dbname:       viper.GetString("DB_NAME"),
+		Poolmaxconns: int32(viper.GetInt("DB_POOL")),
 	}, nil
 }
 
 func NovoServidorGerencia() *grpc.Server {
 	lis, err := net.Listen(
-		viper.GetString("server.conn"),
+		viper.GetString("SERVER_CONN"),
 		fmt.Sprintf(
 			"%s:%d",
-			viper.GetString("server.endereco"),
-			viper.GetInt("server.porta"),
+			viper.GetString("SERVER_ENDERECO"),
+			viper.GetInt("SERVER_PORTA"),
 		),
 	) // e.g. "tcp", "localhost:12346"
 	if err != nil {

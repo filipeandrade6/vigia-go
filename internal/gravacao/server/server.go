@@ -7,41 +7,49 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"sync"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
-type gravacaoServer struct {
+type GravacaoServer struct {
 	pb.UnimplementedGravacaoServer
-	mu sync.Mutex
 }
 
-func NovoServidorGravacao(tipo, url string) *grpc.Server {
-	lis, err := net.Listen(tipo, url)
-	if err != nil {
-		fmt.Println("Erro aqui")
-		panic(err)
-	}
-	grpcGravacaoServer := grpc.NewServer()
-	pb.RegisterGravacaoServer(grpcGravacaoServer, &gravacaoServer{})
-	grpcGravacaoServer.Serve(lis)
-
-	return grpcGravacaoServer
-}
-
-func (s *gravacaoServer) InfoServidor(ctx context.Context, in *pb.InfoServidorReq) (*pb.InfoServidorResp, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	fmt.Println("Entrou aqui")
-	return &pb.InfoServidorResp{
-		Processos: []*pb.InfoServidorResp_Processo{
+func (s *GravacaoServer) InfoProcessos(ctx context.Context, req *pb.InfoProcessosReq) (*pb.InfoProcessosResp, error) {
+	return &pb.InfoProcessosResp{
+		Processos: []*pb.InfoProcessosResp_Processo{
 			{
-				CameraId:           1,
-				ProcessadorCaminho: "/usr/local/vigia-go/processadores/proc1",
-				StatusProcesso:     pb.InfoServidorResp_Processo_PARADO,
+				Id:                 10,
+				CameraId:           10,
+				ProcessadorCaminho: "processador_a1",
+				Status:             0, // TODO ver como utilizar nome da variavel no lugar de numero
 			},
 		},
 	}, nil
+}
+
+func (s *GravacaoServer) ConfigurarProcesso(ctx context.Context, req *pb.ConfigurarProcessoReq) (*pb.ConfigurarProcessoResp, error) {
+
+}
+
+func NovoServidorGravacao(tipo, url string) *grpc.Server {
+	lis, err := net.Listen(
+		viper.GetString("SERVER_CONN"),
+		fmt.Sprintf(
+			"%s:%d",
+			viper.GetString("SERVER_ENDERECO"),
+			viper.GetInt("SERVER_PORTA"),
+		),
+	) // e.g. "tcp", "localhost:12346"
+	if err != nil {
+		panic(err)
+	}
+
+	grpcGravacaoServer := grpc.NewServer()
+	pb.RegisterGravacaoServer(grpcGravacaoServer, &GravacaoServer{})
+	grpcGravacaoServer.Serve(lis)
+
+	return grpcGravacaoServer
 }

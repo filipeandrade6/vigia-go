@@ -11,7 +11,7 @@ type Database struct {
 	PoolMaxConns int32
 }
 
-func (d *Database) FromProtobuf(db *pb.DatabaseConfigResp) {
+func (d *Database) FromProtobuf(db *pb.ConfigBancoDeDadosResp) {
 	d.Host = db.GetHost()
 	d.Port = db.GetPort()
 	d.User = db.GetUser()

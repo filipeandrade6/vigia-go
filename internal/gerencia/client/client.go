@@ -21,8 +21,8 @@ func NovoClientGravacao() *GravacaoClient {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(
 			"%s:%d",
-			viper.GetString("client.endereco"),
-			viper.GetInt("client.porta"),
+			viper.GetString("CLIENT_ENDERECO"),
+			viper.GetInt("CLIENT_PORTA"),
 		),
 		opts...)
 	if err != nil {
