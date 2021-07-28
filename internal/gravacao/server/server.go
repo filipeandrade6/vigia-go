@@ -31,7 +31,10 @@ func (s *GravacaoServer) InfoProcessos(ctx context.Context, req *pb.InfoProcesso
 }
 
 func (s *GravacaoServer) ConfigurarProcesso(ctx context.Context, req *pb.ConfigurarProcessoReq) (*pb.ConfigurarProcessoResp, error) {
-
+	fmt.Println(req)
+	return &pb.ConfigurarProcessoResp{
+		Status: 0, // TODO ver como utilizar nome da variavel no lugadr de inteiro
+	}, nil
 }
 
 func NovoServidorGravacao(tipo, url string) *grpc.Server {
