@@ -11,7 +11,6 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/database"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/client"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/server"
-	"github.com/spf13/viper"
 
 	"google.golang.org/grpc"
 )
@@ -26,14 +25,6 @@ func (g *Gerencia) Stop() {
 	fmt.Println("Finalizando aplicação....")
 	g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30 seg
 	fmt.Println("Bye.")
-}
-
-// SalvarConfiguracoes salva as configuroes no arquivo de destino
-func (g *Gerencia) SalvarConfiguracoes() {
-	if err := viper.WriteConfigAs(".gerencia.yaml"); err != nil { // TODO colocar o caminho do arquivo de configuração
-		panic(err)
-	}
-	fmt.Println("salvo.")
 }
 
 // Main é a funcao principal que inicia o server e client da API que intercomunica

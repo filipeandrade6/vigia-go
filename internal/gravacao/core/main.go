@@ -34,8 +34,8 @@ func Main() error {
 	// defer logger.Sync()
 
 	g := &Gravacao{
-		server: server.NovoServidorGravacao("tcp", "localhost:12346"),
-		client: client.NovoClientGerencia("localhost:12347"),
+		server: server.NovoServidorGravacao(),
+		client: client.NovoClientGerencia(),
 	}
 
 	dbCfg := g.client.GetDatabase()

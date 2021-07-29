@@ -1,3 +1,5 @@
+.PHONY: protobuf run test create-postgres create-pgadmin potgres pgadmin docker-stop
+
 protobuf:
 	bash scripts/protobuf-gen.sh
 
