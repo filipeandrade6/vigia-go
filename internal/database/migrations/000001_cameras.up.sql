@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS cameras(
+CREATE TABLE IF NOT EXISTS cameras (
     id serial PRIMARY KEY,
     descricao VARCHAR(100) NOT NULL,
     ip VARCHAR(39) NOT NULL,

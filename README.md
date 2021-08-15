@@ -1,7 +1,14 @@
-- instalar postgres
-- instalar pgadmin4 (ver site oficial) # pode ser necessario acessar como root o server e resetar senha do usuario postgres
+## VIGIA
 
+#### comandos *Makefile*:
 
+- `make protobuf`gera os arquivos protobuf de acordo com os arquivos proto em /api/proto/v1
+- `make run` executa as aplicações de gerencia e gravação
+- `make test` executa os testes
+- `make create-postgres` cria o container Docker de Postgres para desenvolvimento
+- `make create-pgadmin`cria o container Docker de pgAdmin para desenvolvimento
+- `make postgrse` reinicia o container Postgres
+- `make pgadmin` reinicia o container pgAdmin
 
 ### boot
 

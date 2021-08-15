@@ -1,5 +1,2 @@
 # Ignore the dev directory
 /dev
-
-# docker run -d --name --dev-postgres -e POSTGRES_PASSWORD=secret -v ${HOME}/Desenvolvimento/vigia-go/dev/postgresql/:/var/lib/postgresql/data -p 5432:5432 postgre
-# docker run -p 80:80 -e 'PGADMIN_DEFAULT_EMAIL=user@domain.local' -e 'PGADMIN_DEFAULT_PASSWORD=secret' --name dev-pgadmin -d dpage/pgadmin4
