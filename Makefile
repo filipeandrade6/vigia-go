@@ -4,8 +4,7 @@ protobuf:
 	bash scripts/protobuf-gen.sh
 
 run:
-	go run ./cmd/gerencia/main.go
-	go run ./cmd/gravacao/main.go
+	docker-compose -f deployments/docker-compose.yml --env-file configs/.env.dev up
 
 test:
 	# go clean --cache
