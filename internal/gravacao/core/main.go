@@ -15,9 +15,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TODO verificar se campo privado não interfere em algo
 type Gravacao struct {
 	server *grpc.Server
-	client *client.GerenciaClient // TODO verificar se campo privado não interfere em algo
+	client *client.GerenciaClient
 }
 
 func (g *Gravacao) Stop() {
@@ -38,9 +39,9 @@ func Main() error {
 		client: client.NovoClientGerencia(),
 	}
 
-	dbCfg := g.client.GetDatabase()
+	dbCfg := g.client.ConfigBancoDeDados()
 
-	_, err := database.NewPool(dbCfg) // TODO arrumar aqui
+	_, err := database.NewPool(dbCfg)
 	if err != nil {
 		return err
 	}

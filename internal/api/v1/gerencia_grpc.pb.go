@@ -20,6 +20,8 @@ const _ = grpc.SupportPackageIsVersion7
 type GerenciaClient interface {
 	RegistrarServidorGravacao(ctx context.Context, in *RegistrarServidorGravacaoReq, opts ...grpc.CallOption) (*RegistrarServidorGravacaoResp, error)
 	ConfigBancoDeDados(ctx context.Context, in *ConfigBancoDeDadosReq, opts ...grpc.CallOption) (*ConfigBancoDeDadosResp, error)
+	ConfigurarCamera(ctx context.Context, in *ConfigurarCameraReq, opts ...grpc.CallOption) (*ConfigurarCameraResp, error)
+	ConfigurarProcessador(ctx context.Context, in *ConfigurarProcessadorReq, opts ...grpc.CallOption) (*ConfigurarProcessadorResp, error)
 }
 
 type gerenciaClient struct {
@@ -48,12 +50,32 @@ func (c *gerenciaClient) ConfigBancoDeDados(ctx context.Context, in *ConfigBanco
 	return out, nil
 }
 
+func (c *gerenciaClient) ConfigurarCamera(ctx context.Context, in *ConfigurarCameraReq, opts ...grpc.CallOption) (*ConfigurarCameraResp, error) {
+	out := new(ConfigurarCameraResp)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ConfigurarCamera", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) ConfigurarProcessador(ctx context.Context, in *ConfigurarProcessadorReq, opts ...grpc.CallOption) (*ConfigurarProcessadorResp, error) {
+	out := new(ConfigurarProcessadorResp)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ConfigurarProcessador", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GerenciaServer is the server API for Gerencia service.
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
 	RegistrarServidorGravacao(context.Context, *RegistrarServidorGravacaoReq) (*RegistrarServidorGravacaoResp, error)
 	ConfigBancoDeDados(context.Context, *ConfigBancoDeDadosReq) (*ConfigBancoDeDadosResp, error)
+	ConfigurarCamera(context.Context, *ConfigurarCameraReq) (*ConfigurarCameraResp, error)
+	ConfigurarProcessador(context.Context, *ConfigurarProcessadorReq) (*ConfigurarProcessadorResp, error)
 	mustEmbedUnimplementedGerenciaServer()
 }
 
@@ -66,6 +88,12 @@ func (UnimplementedGerenciaServer) RegistrarServidorGravacao(context.Context, *R
 }
 func (UnimplementedGerenciaServer) ConfigBancoDeDados(context.Context, *ConfigBancoDeDadosReq) (*ConfigBancoDeDadosResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConfigBancoDeDados not implemented")
+}
+func (UnimplementedGerenciaServer) ConfigurarCamera(context.Context, *ConfigurarCameraReq) (*ConfigurarCameraResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigurarCamera not implemented")
+}
+func (UnimplementedGerenciaServer) ConfigurarProcessador(context.Context, *ConfigurarProcessadorReq) (*ConfigurarProcessadorResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigurarProcessador not implemented")
 }
 func (UnimplementedGerenciaServer) mustEmbedUnimplementedGerenciaServer() {}
 
@@ -116,6 +144,42 @@ func _Gerencia_ConfigBancoDeDados_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gerencia_ConfigurarCamera_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfigurarCameraReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ConfigurarCamera(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ConfigurarCamera",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ConfigurarCamera(ctx, req.(*ConfigurarCameraReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_ConfigurarProcessador_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfigurarProcessadorReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ConfigurarProcessador(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ConfigurarProcessador",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ConfigurarProcessador(ctx, req.(*ConfigurarProcessadorReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Gerencia_ServiceDesc is the grpc.ServiceDesc for Gerencia service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -130,6 +194,14 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ConfigBancoDeDados",
 			Handler:    _Gerencia_ConfigBancoDeDados_Handler,
+		},
+		{
+			MethodName: "ConfigurarCamera",
+			Handler:    _Gerencia_ConfigurarCamera_Handler,
+		},
+		{
+			MethodName: "ConfigurarProcessador",
+			Handler:    _Gerencia_ConfigurarProcessador_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

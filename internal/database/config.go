@@ -27,6 +27,8 @@ func (c *Config) getDSN() string {
 	)
 }
 
+// TODO add getURL se precisar
+
 func NewConfig() *Config {
 	var cfg Config
 

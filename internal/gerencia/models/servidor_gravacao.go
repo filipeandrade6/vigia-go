@@ -1,5 +1,7 @@
 package models
 
+// TODO duplicado com o gravacao
+
 import pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 
 type ServidorGravacao struct {
@@ -11,7 +13,7 @@ type ServidorGravacao struct {
 
 func (s *ServidorGravacao) FromProtobuf(sg *pb.RegistrarServidorGravacaoReq) {
 	s.ID = sg.GetId()
-	s.Endereco = sg.GetEndereco()
+	s.Endereco = sg.GetEnderecoIp()
 	s.Porta = sg.GetPorta()
 }
 

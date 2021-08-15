@@ -7,12 +7,12 @@ package gravacao;
 service Gravacao {
     rpc InfoProcessos (InfoProcessosReq) returns (InfoProcessosResp) {}
     rpc ConfigurarProcesso (ConfigurarProcessoReq) returns (ConfigurarProcessoResp) {}
+    rpc AtualizarListaVeiculos (AtualizarListaVeiculosReq) returns (AtualizarListaVeiculosResp) {}
     // rpc statusArmazenamento (StatusArmazenamentoParams) returns (StatusArmazenamento) {}
     // rpc configurarHousekeeping (HousekeepingConfig) returns (StatusHousekeeping) {}
 }
 
-message InfoProcessosReq {
-}
+message InfoProcessosReq {}
 
 message InfoProcessosResp {
     message Processo {
@@ -29,7 +29,6 @@ message InfoProcessosResp {
 }
 
 message ConfigurarProcessoReq {
-    // ! zero deve significar alguma coisa
     enum Acao {
         CONFIGURAR = 0;
         INICIAR = 1;
@@ -44,26 +43,41 @@ message ConfigurarProcessoReq {
 }
 
 // TODO colocar info do processo abaixo (consumo armazenamento, veiculos, etc)
+
 message ConfigurarProcessoResp {
     enum Status {
-        CONFIGURADO = 0;
-        INICIADO = 1;
+        INEXSISTENTE = 0;
+        EXECUTANDO = 1;
         PARADO = 2;
-        REMOVIDO = 3;
     }
     Status status = 1;
+    string Armazenamento = 2;
+    int32 contador_capturas = 3;
 }
 
-// message StatusArmazenamento {
-//     message Armazenamento {
-//         string caminho = 1;
-//         int32 disponivel = 2;
-//         int32 alocado = 3;
-//         int32 utilizado = 4;
-//     }
-//     repeated Armazenamento armazenamento = 1;
-// }
+message AtualizarListaVeiculosReq {
+    message Veiculo {
+        string placa = 1;
+        string cor = 2;
+        string marca = 3;
+        string modelo = 4;
+        string tipo = 5;
+    }
+    repeated Veiculo veiculo = 1;
+}
 
-// message StatusArmazenamentoParams {}
+message AtualizarListaVeiculosResp {}
 
-// message StatusArmazenamento {}
+    // message StatusArmazenamento {
+    //     message Armazenamento {
+    //         string caminho = 1;
+    //         int32 disponivel = 2;
+    //         int32 alocado = 3;
+    //         int32 utilizado = 4;
+    //     }
+    //     repeated Armazenamento armazenamento = 1;
+    // }
+
+    // message StatusArmazenamentoParams {}
+
+    // message StatusArmazenamento {}

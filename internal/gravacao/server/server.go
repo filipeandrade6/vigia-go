@@ -37,7 +37,7 @@ func (s *GravacaoServer) ConfigurarProcesso(ctx context.Context, req *pb.Configu
 	}, nil
 }
 
-func NovoServidorGravacao(tipo, url string) *grpc.Server {
+func NovoServidorGravacao() *grpc.Server {
 	lis, err := net.Listen(
 		viper.GetString("SERVER_CONN"),
 		fmt.Sprintf(

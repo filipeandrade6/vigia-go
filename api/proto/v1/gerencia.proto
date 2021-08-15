@@ -7,18 +7,19 @@ package gerencia;
 service Gerencia {
     rpc RegistrarServidorGravacao (RegistrarServidorGravacaoReq) returns (RegistrarServidorGravacaoResp) {}
     rpc ConfigBancoDeDados (ConfigBancoDeDadosReq) returns (ConfigBancoDeDadosResp) {}
+    rpc ConfigurarCamera (ConfigurarCameraReq) returns (ConfigurarCameraResp) {}
+    rpc ConfigurarProcessador (ConfigurarProcessadorReq) returns (ConfigurarProcessadorResp) {}
 }
 
+
 message RegistrarServidorGravacaoReq {
-    string id = 1;
-    string endereco = 2;
+    string id = 1; // Se vazio será gerado,caso contrário autentica no banco de dados
+    string endereco_ip = 2;
     int32 porta = 3;
 }
 
-// TODO transformar em ENUM os status com informações pertinente
 message RegistrarServidorGravacaoResp {
-    string id = 1;
-    string status = 2;
+    string id = 2;
 }
 
 message ConfigBancoDeDadosReq {}
@@ -31,3 +32,13 @@ message ConfigBancoDeDadosResp {
     string dbname = 5;
     int32 poolmaxconns = 6;
 }
+
+// TODO implementar
+
+message ConfigurarCameraReq {}
+
+message ConfigurarCameraResp {}
+
+message ConfigurarProcessadorReq {}
+
+message ConfigurarProcessadorResp {}

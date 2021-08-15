@@ -66,7 +66,6 @@ func (InfoProcessosResp_Processo_StatusProcesso) EnumDescriptor() ([]byte, []int
 	return file_gravacao_proto_rawDescGZIP(), []int{1, 0, 0}
 }
 
-// ! zero deve significar alguma coisa
 type ConfigurarProcessoReq_Acao int32
 
 const (
@@ -125,25 +124,22 @@ func (ConfigurarProcessoReq_Acao) EnumDescriptor() ([]byte, []int) {
 type ConfigurarProcessoResp_Status int32
 
 const (
-	ConfigurarProcessoResp_CONFIGURADO ConfigurarProcessoResp_Status = 0
-	ConfigurarProcessoResp_INICIADO    ConfigurarProcessoResp_Status = 1
-	ConfigurarProcessoResp_PARADO      ConfigurarProcessoResp_Status = 2
-	ConfigurarProcessoResp_REMOVIDO    ConfigurarProcessoResp_Status = 3
+	ConfigurarProcessoResp_INEXSISTENTE ConfigurarProcessoResp_Status = 0
+	ConfigurarProcessoResp_EXECUTANDO   ConfigurarProcessoResp_Status = 1
+	ConfigurarProcessoResp_PARADO       ConfigurarProcessoResp_Status = 2
 )
 
 // Enum value maps for ConfigurarProcessoResp_Status.
 var (
 	ConfigurarProcessoResp_Status_name = map[int32]string{
-		0: "CONFIGURADO",
-		1: "INICIADO",
+		0: "INEXSISTENTE",
+		1: "EXECUTANDO",
 		2: "PARADO",
-		3: "REMOVIDO",
 	}
 	ConfigurarProcessoResp_Status_value = map[string]int32{
-		"CONFIGURADO": 0,
-		"INICIADO":    1,
-		"PARADO":      2,
-		"REMOVIDO":    3,
+		"INEXSISTENTE": 0,
+		"EXECUTANDO":   1,
+		"PARADO":       2,
 	}
 )
 
@@ -330,13 +326,14 @@ func (x *ConfigurarProcessoReq) GetProcessadorCaminho() string {
 	return ""
 }
 
-// TODO colocar info do processo abaixo (consumo armazenamento, veiculos, etc)
 type ConfigurarProcessoResp struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Status ConfigurarProcessoResp_Status `protobuf:"varint,1,opt,name=status,proto3,enum=gravacao.ConfigurarProcessoResp_Status" json:"status,omitempty"`
+	Status           ConfigurarProcessoResp_Status `protobuf:"varint,1,opt,name=status,proto3,enum=gravacao.ConfigurarProcessoResp_Status" json:"status,omitempty"`
+	Armazenamento    string                        `protobuf:"bytes,2,opt,name=Armazenamento,proto3" json:"Armazenamento,omitempty"`
+	ContadorCapturas int32                         `protobuf:"varint,3,opt,name=contador_capturas,json=contadorCapturas,proto3" json:"contador_capturas,omitempty"`
 }
 
 func (x *ConfigurarProcessoResp) Reset() {
@@ -375,7 +372,106 @@ func (x *ConfigurarProcessoResp) GetStatus() ConfigurarProcessoResp_Status {
 	if x != nil {
 		return x.Status
 	}
-	return ConfigurarProcessoResp_CONFIGURADO
+	return ConfigurarProcessoResp_INEXSISTENTE
+}
+
+func (x *ConfigurarProcessoResp) GetArmazenamento() string {
+	if x != nil {
+		return x.Armazenamento
+	}
+	return ""
+}
+
+func (x *ConfigurarProcessoResp) GetContadorCapturas() int32 {
+	if x != nil {
+		return x.ContadorCapturas
+	}
+	return 0
+}
+
+type AtualizarListaVeiculosReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Veiculo []*AtualizarListaVeiculosReq_Veiculo `protobuf:"bytes,1,rep,name=veiculo,proto3" json:"veiculo,omitempty"`
+}
+
+func (x *AtualizarListaVeiculosReq) Reset() {
+	*x = AtualizarListaVeiculosReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gravacao_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AtualizarListaVeiculosReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AtualizarListaVeiculosReq) ProtoMessage() {}
+
+func (x *AtualizarListaVeiculosReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gravacao_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AtualizarListaVeiculosReq.ProtoReflect.Descriptor instead.
+func (*AtualizarListaVeiculosReq) Descriptor() ([]byte, []int) {
+	return file_gravacao_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *AtualizarListaVeiculosReq) GetVeiculo() []*AtualizarListaVeiculosReq_Veiculo {
+	if x != nil {
+		return x.Veiculo
+	}
+	return nil
+}
+
+type AtualizarListaVeiculosResp struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *AtualizarListaVeiculosResp) Reset() {
+	*x = AtualizarListaVeiculosResp{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gravacao_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AtualizarListaVeiculosResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AtualizarListaVeiculosResp) ProtoMessage() {}
+
+func (x *AtualizarListaVeiculosResp) ProtoReflect() protoreflect.Message {
+	mi := &file_gravacao_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AtualizarListaVeiculosResp.ProtoReflect.Descriptor instead.
+func (*AtualizarListaVeiculosResp) Descriptor() ([]byte, []int) {
+	return file_gravacao_proto_rawDescGZIP(), []int{5}
 }
 
 type InfoProcessosResp_Processo struct {
@@ -392,7 +488,7 @@ type InfoProcessosResp_Processo struct {
 func (x *InfoProcessosResp_Processo) Reset() {
 	*x = InfoProcessosResp_Processo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_gravacao_proto_msgTypes[4]
+		mi := &file_gravacao_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -405,7 +501,7 @@ func (x *InfoProcessosResp_Processo) String() string {
 func (*InfoProcessosResp_Processo) ProtoMessage() {}
 
 func (x *InfoProcessosResp_Processo) ProtoReflect() protoreflect.Message {
-	mi := &file_gravacao_proto_msgTypes[4]
+	mi := &file_gravacao_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -449,6 +545,85 @@ func (x *InfoProcessosResp_Processo) GetStatus() InfoProcessosResp_Processo_Stat
 	return InfoProcessosResp_Processo_PARADO
 }
 
+type AtualizarListaVeiculosReq_Veiculo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Placa  string `protobuf:"bytes,1,opt,name=placa,proto3" json:"placa,omitempty"`
+	Cor    string `protobuf:"bytes,2,opt,name=cor,proto3" json:"cor,omitempty"`
+	Marca  string `protobuf:"bytes,3,opt,name=marca,proto3" json:"marca,omitempty"`
+	Modelo string `protobuf:"bytes,4,opt,name=modelo,proto3" json:"modelo,omitempty"`
+	Tipo   string `protobuf:"bytes,5,opt,name=tipo,proto3" json:"tipo,omitempty"`
+}
+
+func (x *AtualizarListaVeiculosReq_Veiculo) Reset() {
+	*x = AtualizarListaVeiculosReq_Veiculo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gravacao_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AtualizarListaVeiculosReq_Veiculo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AtualizarListaVeiculosReq_Veiculo) ProtoMessage() {}
+
+func (x *AtualizarListaVeiculosReq_Veiculo) ProtoReflect() protoreflect.Message {
+	mi := &file_gravacao_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AtualizarListaVeiculosReq_Veiculo.ProtoReflect.Descriptor instead.
+func (*AtualizarListaVeiculosReq_Veiculo) Descriptor() ([]byte, []int) {
+	return file_gravacao_proto_rawDescGZIP(), []int{4, 0}
+}
+
+func (x *AtualizarListaVeiculosReq_Veiculo) GetPlaca() string {
+	if x != nil {
+		return x.Placa
+	}
+	return ""
+}
+
+func (x *AtualizarListaVeiculosReq_Veiculo) GetCor() string {
+	if x != nil {
+		return x.Cor
+	}
+	return ""
+}
+
+func (x *AtualizarListaVeiculosReq_Veiculo) GetMarca() string {
+	if x != nil {
+		return x.Marca
+	}
+	return ""
+}
+
+func (x *AtualizarListaVeiculosReq_Veiculo) GetModelo() string {
+	if x != nil {
+		return x.Modelo
+	}
+	return ""
+}
+
+func (x *AtualizarListaVeiculosReq_Veiculo) GetTipo() string {
+	if x != nil {
+		return x.Tipo
+	}
+	return ""
+}
+
 var File_gravacao_proto protoreflect.FileDescriptor
 
 var file_gravacao_proto_rawDesc = []byte{
@@ -490,17 +665,37 @@ var file_gravacao_proto_rawDesc = []byte{
 	0x49, 0x47, 0x55, 0x52, 0x41, 0x52, 0x10, 0x00, 0x12, 0x0b, 0x0a, 0x07, 0x49, 0x4e, 0x49, 0x43,
 	0x49, 0x41, 0x52, 0x10, 0x01, 0x12, 0x09, 0x0a, 0x05, 0x50, 0x41, 0x52, 0x41, 0x52, 0x10, 0x02,
 	0x12, 0x0b, 0x0a, 0x07, 0x52, 0x45, 0x4d, 0x4f, 0x56, 0x45, 0x52, 0x10, 0x03, 0x12, 0x08, 0x0a,
-	0x04, 0x49, 0x4e, 0x46, 0x4f, 0x10, 0x04, 0x22, 0x9c, 0x01, 0x0a, 0x16, 0x43, 0x6f, 0x6e, 0x66,
+	0x04, 0x49, 0x4e, 0x46, 0x4f, 0x10, 0x04, 0x22, 0xe4, 0x01, 0x0a, 0x16, 0x43, 0x6f, 0x6e, 0x66,
 	0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65,
 	0x73, 0x70, 0x12, 0x3f, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x0e, 0x32, 0x27, 0x2e, 0x67, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x2e, 0x43, 0x6f,
 	0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f,
 	0x52, 0x65, 0x73, 0x70, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x06, 0x73, 0x74, 0x61,
-	0x74, 0x75, 0x73, 0x22, 0x41, 0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x0f, 0x0a,
-	0x0b, 0x43, 0x4f, 0x4e, 0x46, 0x49, 0x47, 0x55, 0x52, 0x41, 0x44, 0x4f, 0x10, 0x00, 0x12, 0x0c,
-	0x0a, 0x08, 0x49, 0x4e, 0x49, 0x43, 0x49, 0x41, 0x44, 0x4f, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06,
-	0x50, 0x41, 0x52, 0x41, 0x44, 0x4f, 0x10, 0x02, 0x12, 0x0c, 0x0a, 0x08, 0x52, 0x45, 0x4d, 0x4f,
-	0x56, 0x49, 0x44, 0x4f, 0x10, 0x03, 0x32, 0xb1, 0x01, 0x0a, 0x08, 0x47, 0x72, 0x61, 0x76, 0x61,
+	0x74, 0x75, 0x73, 0x12, 0x24, 0x0a, 0x0d, 0x41, 0x72, 0x6d, 0x61, 0x7a, 0x65, 0x6e, 0x61, 0x6d,
+	0x65, 0x6e, 0x74, 0x6f, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x41, 0x72, 0x6d, 0x61,
+	0x7a, 0x65, 0x6e, 0x61, 0x6d, 0x65, 0x6e, 0x74, 0x6f, 0x12, 0x2b, 0x0a, 0x11, 0x63, 0x6f, 0x6e,
+	0x74, 0x61, 0x64, 0x6f, 0x72, 0x5f, 0x63, 0x61, 0x70, 0x74, 0x75, 0x72, 0x61, 0x73, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x05, 0x52, 0x10, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x64, 0x6f, 0x72, 0x43, 0x61,
+	0x70, 0x74, 0x75, 0x72, 0x61, 0x73, 0x22, 0x36, 0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73,
+	0x12, 0x10, 0x0a, 0x0c, 0x49, 0x4e, 0x45, 0x58, 0x53, 0x49, 0x53, 0x54, 0x45, 0x4e, 0x54, 0x45,
+	0x10, 0x00, 0x12, 0x0e, 0x0a, 0x0a, 0x45, 0x58, 0x45, 0x43, 0x55, 0x54, 0x41, 0x4e, 0x44, 0x4f,
+	0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x50, 0x41, 0x52, 0x41, 0x44, 0x4f, 0x10, 0x02, 0x22, 0xd7,
+	0x01, 0x0a, 0x19, 0x41, 0x74, 0x75, 0x61, 0x6c, 0x69, 0x7a, 0x61, 0x72, 0x4c, 0x69, 0x73, 0x74,
+	0x61, 0x56, 0x65, 0x69, 0x63, 0x75, 0x6c, 0x6f, 0x73, 0x52, 0x65, 0x71, 0x12, 0x45, 0x0a, 0x07,
+	0x76, 0x65, 0x69, 0x63, 0x75, 0x6c, 0x6f, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2b, 0x2e,
+	0x67, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x2e, 0x41, 0x74, 0x75, 0x61, 0x6c, 0x69, 0x7a,
+	0x61, 0x72, 0x4c, 0x69, 0x73, 0x74, 0x61, 0x56, 0x65, 0x69, 0x63, 0x75, 0x6c, 0x6f, 0x73, 0x52,
+	0x65, 0x71, 0x2e, 0x56, 0x65, 0x69, 0x63, 0x75, 0x6c, 0x6f, 0x52, 0x07, 0x76, 0x65, 0x69, 0x63,
+	0x75, 0x6c, 0x6f, 0x1a, 0x73, 0x0a, 0x07, 0x56, 0x65, 0x69, 0x63, 0x75, 0x6c, 0x6f, 0x12, 0x14,
+	0x0a, 0x05, 0x70, 0x6c, 0x61, 0x63, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x70,
+	0x6c, 0x61, 0x63, 0x61, 0x12, 0x10, 0x0a, 0x03, 0x63, 0x6f, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x63, 0x6f, 0x72, 0x12, 0x14, 0x0a, 0x05, 0x6d, 0x61, 0x72, 0x63, 0x61, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6d, 0x61, 0x72, 0x63, 0x61, 0x12, 0x16, 0x0a, 0x06,
+	0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x6f, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6d, 0x6f,
+	0x64, 0x65, 0x6c, 0x6f, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x69, 0x70, 0x6f, 0x18, 0x05, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x04, 0x74, 0x69, 0x70, 0x6f, 0x22, 0x1c, 0x0a, 0x1a, 0x41, 0x74, 0x75, 0x61,
+	0x6c, 0x69, 0x7a, 0x61, 0x72, 0x4c, 0x69, 0x73, 0x74, 0x61, 0x56, 0x65, 0x69, 0x63, 0x75, 0x6c,
+	0x6f, 0x73, 0x52, 0x65, 0x73, 0x70, 0x32, 0x98, 0x02, 0x0a, 0x08, 0x47, 0x72, 0x61, 0x76, 0x61,
 	0x63, 0x61, 0x6f, 0x12, 0x4a, 0x0a, 0x0d, 0x49, 0x6e, 0x66, 0x6f, 0x50, 0x72, 0x6f, 0x63, 0x65,
 	0x73, 0x73, 0x6f, 0x73, 0x12, 0x1a, 0x2e, 0x67, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x2e,
 	0x49, 0x6e, 0x66, 0x6f, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x73, 0x52, 0x65, 0x71,
@@ -511,9 +706,15 @@ var file_gravacao_proto_rawDesc = []byte{
 	0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65,
 	0x73, 0x73, 0x6f, 0x52, 0x65, 0x71, 0x1a, 0x20, 0x2e, 0x67, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61,
 	0x6f, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63,
-	0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x42, 0x13, 0x5a, 0x11, 0x2e, 0x2f,
-	0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x12, 0x65, 0x0a, 0x16, 0x41, 0x74,
+	0x75, 0x61, 0x6c, 0x69, 0x7a, 0x61, 0x72, 0x4c, 0x69, 0x73, 0x74, 0x61, 0x56, 0x65, 0x69, 0x63,
+	0x75, 0x6c, 0x6f, 0x73, 0x12, 0x23, 0x2e, 0x67, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x2e,
+	0x41, 0x74, 0x75, 0x61, 0x6c, 0x69, 0x7a, 0x61, 0x72, 0x4c, 0x69, 0x73, 0x74, 0x61, 0x56, 0x65,
+	0x69, 0x63, 0x75, 0x6c, 0x6f, 0x73, 0x52, 0x65, 0x71, 0x1a, 0x24, 0x2e, 0x67, 0x72, 0x61, 0x76,
+	0x61, 0x63, 0x61, 0x6f, 0x2e, 0x41, 0x74, 0x75, 0x61, 0x6c, 0x69, 0x7a, 0x61, 0x72, 0x4c, 0x69,
+	0x73, 0x74, 0x61, 0x56, 0x65, 0x69, 0x63, 0x75, 0x6c, 0x6f, 0x73, 0x52, 0x65, 0x73, 0x70, 0x22,
+	0x00, 0x42, 0x13, 0x5a, 0x11, 0x2e, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f,
+	0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -529,7 +730,7 @@ func file_gravacao_proto_rawDescGZIP() []byte {
 }
 
 var file_gravacao_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_gravacao_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_gravacao_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_gravacao_proto_goTypes = []interface{}{
 	(InfoProcessosResp_Processo_StatusProcesso)(0), // 0: gravacao.InfoProcessosResp.Processo.StatusProcesso
 	(ConfigurarProcessoReq_Acao)(0),                // 1: gravacao.ConfigurarProcessoReq.Acao
@@ -538,22 +739,28 @@ var file_gravacao_proto_goTypes = []interface{}{
 	(*InfoProcessosResp)(nil),                      // 4: gravacao.InfoProcessosResp
 	(*ConfigurarProcessoReq)(nil),                  // 5: gravacao.ConfigurarProcessoReq
 	(*ConfigurarProcessoResp)(nil),                 // 6: gravacao.ConfigurarProcessoResp
-	(*InfoProcessosResp_Processo)(nil),             // 7: gravacao.InfoProcessosResp.Processo
+	(*AtualizarListaVeiculosReq)(nil),              // 7: gravacao.AtualizarListaVeiculosReq
+	(*AtualizarListaVeiculosResp)(nil),             // 8: gravacao.AtualizarListaVeiculosResp
+	(*InfoProcessosResp_Processo)(nil),             // 9: gravacao.InfoProcessosResp.Processo
+	(*AtualizarListaVeiculosReq_Veiculo)(nil),      // 10: gravacao.AtualizarListaVeiculosReq.Veiculo
 }
 var file_gravacao_proto_depIdxs = []int32{
-	7, // 0: gravacao.InfoProcessosResp.processos:type_name -> gravacao.InfoProcessosResp.Processo
-	1, // 1: gravacao.ConfigurarProcessoReq.acao:type_name -> gravacao.ConfigurarProcessoReq.Acao
-	2, // 2: gravacao.ConfigurarProcessoResp.status:type_name -> gravacao.ConfigurarProcessoResp.Status
-	0, // 3: gravacao.InfoProcessosResp.Processo.status:type_name -> gravacao.InfoProcessosResp.Processo.StatusProcesso
-	3, // 4: gravacao.Gravacao.InfoProcessos:input_type -> gravacao.InfoProcessosReq
-	5, // 5: gravacao.Gravacao.ConfigurarProcesso:input_type -> gravacao.ConfigurarProcessoReq
-	4, // 6: gravacao.Gravacao.InfoProcessos:output_type -> gravacao.InfoProcessosResp
-	6, // 7: gravacao.Gravacao.ConfigurarProcesso:output_type -> gravacao.ConfigurarProcessoResp
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	9,  // 0: gravacao.InfoProcessosResp.processos:type_name -> gravacao.InfoProcessosResp.Processo
+	1,  // 1: gravacao.ConfigurarProcessoReq.acao:type_name -> gravacao.ConfigurarProcessoReq.Acao
+	2,  // 2: gravacao.ConfigurarProcessoResp.status:type_name -> gravacao.ConfigurarProcessoResp.Status
+	10, // 3: gravacao.AtualizarListaVeiculosReq.veiculo:type_name -> gravacao.AtualizarListaVeiculosReq.Veiculo
+	0,  // 4: gravacao.InfoProcessosResp.Processo.status:type_name -> gravacao.InfoProcessosResp.Processo.StatusProcesso
+	3,  // 5: gravacao.Gravacao.InfoProcessos:input_type -> gravacao.InfoProcessosReq
+	5,  // 6: gravacao.Gravacao.ConfigurarProcesso:input_type -> gravacao.ConfigurarProcessoReq
+	7,  // 7: gravacao.Gravacao.AtualizarListaVeiculos:input_type -> gravacao.AtualizarListaVeiculosReq
+	4,  // 8: gravacao.Gravacao.InfoProcessos:output_type -> gravacao.InfoProcessosResp
+	6,  // 9: gravacao.Gravacao.ConfigurarProcesso:output_type -> gravacao.ConfigurarProcessoResp
+	8,  // 10: gravacao.Gravacao.AtualizarListaVeiculos:output_type -> gravacao.AtualizarListaVeiculosResp
+	8,  // [8:11] is the sub-list for method output_type
+	5,  // [5:8] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_gravacao_proto_init() }
@@ -611,7 +818,43 @@ func file_gravacao_proto_init() {
 			}
 		}
 		file_gravacao_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AtualizarListaVeiculosReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gravacao_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AtualizarListaVeiculosResp); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gravacao_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*InfoProcessosResp_Processo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gravacao_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AtualizarListaVeiculosReq_Veiculo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -629,7 +872,7 @@ func file_gravacao_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_gravacao_proto_rawDesc,
 			NumEnums:      3,
-			NumMessages:   5,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

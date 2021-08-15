@@ -47,8 +47,8 @@ func (g *GerenciaClient) RegistrarServidorGravacao() (string, error) {
 	defer cancel()
 
 	req := &pb.RegistrarServidorGravacaoReq{
-		Endereco: viper.GetString("SERVER_ENDERECO"),
-		Porta:    int32(viper.GetInt("SERVER_PORTA")),
+		EnderecoIp: viper.GetString("SERVER_ENDERECO"),
+		Porta:      int32(viper.GetInt("SERVER_PORTA")),
 	}
 
 	resp, err := g.c.RegistrarServidorGravacao(ctx, req)
