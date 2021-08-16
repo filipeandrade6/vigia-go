@@ -1,5 +1,9 @@
 ## VIGIA
 
+#### STATUS
+
+Parei na criação dos containers
+
 #### TODO
 
 - [ ] Aplicação executando em Docker
