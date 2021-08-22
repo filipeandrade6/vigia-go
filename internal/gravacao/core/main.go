@@ -10,6 +10,7 @@ import (
 
 	"github.com/filipeandrade6/vigia-go/internal/database"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/client"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/models"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/server"
 
 	"google.golang.org/grpc"
@@ -19,6 +20,7 @@ import (
 type Gravacao struct {
 	server *grpc.Server
 	client *client.GerenciaClient
+	models models.Models
 }
 
 func (g *Gravacao) Stop() {
@@ -33,6 +35,8 @@ func Main() error {
 
 	// logger,  := zap.NewProduction()
 	// defer logger.Sync()
+
+	// TODO inicializar os modelos
 
 	g := &Gravacao{
 		server: server.NovoServidorGravacao(),

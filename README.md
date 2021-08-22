@@ -6,10 +6,15 @@ Parei na criação dos containers
 
 #### TODO
 
+- [ ] Colocar interface no querier
 - [ ] Aplicação executando em Docker
-- [ ] Alterar comando `make run`para executar a aplicação em container Docker
-- [ ] Testes executando (iofs deprecated em embed utilizado go-migrations)
+- [ ] Um único Dockerfile para ambos? (https://docs.docker.com/develop/develop-images/multistage-build/#use-an-external-image-as-a-stage)
+- [ ] https://levelup.gitconnected.com/complete-guide-to-create-docker-container-for-your-golang-application-80f3fb59a15e
 - [ ] Multi-stage imagem compartilhada entre Gerencia e Gravação
+- [ ] Testes executando (iofs deprecated em embed utilizado go-migrations)
+- [ ] Como fazer update de sistema
+- [ ] DevOps
+- [ ] Formatar arquivo de Dockerfile
 
 #### comandos *Makefile*:
 

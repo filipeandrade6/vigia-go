@@ -7,6 +7,9 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
+// TODO criar estrutura que tem o pgxpool como campo
+// TODO criar uma interface para query https://github.com/johanbrandhorst/grpc-postgres/tree/master/users
+
 type ServidorGravacaoRepository interface {
 	SaveServidorGravacao(sv *models.ServidorGravacao) (*models.ServidorGravacao, error)
 	GetAllServidorGravacao() ([]*models.ServidorGravacao, error)
