@@ -21,6 +21,7 @@ type GravacaoClient interface {
 	InfoProcessos(ctx context.Context, in *InfoProcessosReq, opts ...grpc.CallOption) (*InfoProcessosResp, error)
 	ConfigurarProcesso(ctx context.Context, in *ConfigurarProcessoReq, opts ...grpc.CallOption) (*ConfigurarProcessoResp, error)
 	AtualizarListaVeiculos(ctx context.Context, in *AtualizarListaVeiculosReq, opts ...grpc.CallOption) (*AtualizarListaVeiculosResp, error)
+	IniciarProcessamento(ctx context.Context, in *IniciarProcessamentoReq, opts ...grpc.CallOption) (*IniciarProcessamentoResp, error)
 }
 
 type gravacaoClient struct {
@@ -58,6 +59,15 @@ func (c *gravacaoClient) AtualizarListaVeiculos(ctx context.Context, in *Atualiz
 	return out, nil
 }
 
+func (c *gravacaoClient) IniciarProcessamento(ctx context.Context, in *IniciarProcessamentoReq, opts ...grpc.CallOption) (*IniciarProcessamentoResp, error) {
+	out := new(IniciarProcessamentoResp)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/IniciarProcessamento", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GravacaoServer is the server API for Gravacao service.
 // All implementations must embed UnimplementedGravacaoServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type GravacaoServer interface {
 	InfoProcessos(context.Context, *InfoProcessosReq) (*InfoProcessosResp, error)
 	ConfigurarProcesso(context.Context, *ConfigurarProcessoReq) (*ConfigurarProcessoResp, error)
 	AtualizarListaVeiculos(context.Context, *AtualizarListaVeiculosReq) (*AtualizarListaVeiculosResp, error)
+	IniciarProcessamento(context.Context, *IniciarProcessamentoReq) (*IniciarProcessamentoResp, error)
 	mustEmbedUnimplementedGravacaoServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedGravacaoServer) ConfigurarProcesso(context.Context, *Configur
 }
 func (UnimplementedGravacaoServer) AtualizarListaVeiculos(context.Context, *AtualizarListaVeiculosReq) (*AtualizarListaVeiculosResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AtualizarListaVeiculos not implemented")
+}
+func (UnimplementedGravacaoServer) IniciarProcessamento(context.Context, *IniciarProcessamentoReq) (*IniciarProcessamentoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IniciarProcessamento not implemented")
 }
 func (UnimplementedGravacaoServer) mustEmbedUnimplementedGravacaoServer() {}
 
@@ -148,6 +162,24 @@ func _Gravacao_AtualizarListaVeiculos_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gravacao_IniciarProcessamento_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IniciarProcessamentoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).IniciarProcessamento(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/IniciarProcessamento",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).IniciarProcessamento(ctx, req.(*IniciarProcessamentoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Gravacao_ServiceDesc is the grpc.ServiceDesc for Gravacao service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var Gravacao_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AtualizarListaVeiculos",
 			Handler:    _Gravacao_AtualizarListaVeiculos_Handler,
+		},
+		{
+			MethodName: "IniciarProcessamento",
+			Handler:    _Gravacao_IniciarProcessamento_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

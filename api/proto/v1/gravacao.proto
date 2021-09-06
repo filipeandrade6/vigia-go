@@ -10,6 +10,15 @@ service Gravacao {
     rpc AtualizarListaVeiculos (AtualizarListaVeiculosReq) returns (AtualizarListaVeiculosResp) {}
     // rpc statusArmazenamento (StatusArmazenamentoParams) returns (StatusArmazenamento) {}
     // rpc configurarHousekeeping (HousekeepingConfig) returns (StatusHousekeeping) {}
+
+
+    rpc IniciarProcessamento (IniciarProcessamentoReq) returns (IniciarProcessamentoResp) {}
+}
+
+message IniciarProcessamentoReq{}
+
+message IniciarProcessamentoResp{
+    string status = 1;
 }
 
 message InfoProcessosReq {}

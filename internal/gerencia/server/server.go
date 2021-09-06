@@ -6,7 +6,6 @@ import (
 	"net"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-	"github.com/filipeandrade6/vigia-go/internal/gerencia/models"
 
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -17,12 +16,13 @@ type gerenciaServer struct {
 }
 
 func (s *gerenciaServer) RegistrarServidorGravacao(ctx context.Context, req *pb.RegistrarServidorGravacaoReq) (*pb.RegistrarServidorGravacaoResp, error) {
-	sg := &models.ServidorGravacao{}
-	sg.FromProtobuf(req)
-	// TODO tratar a informação
-	sg.ID = "1"
-	sg.Status = "OK"
-	return sg.ToProtobuf(), nil
+	// sg := &models.ServidorGravacao{}
+	// sg.FromProtobuf(req)
+	// // TODO tratar a informação
+	// sg.ID = "1"
+	// sg.Status = "OK"
+	// return sg.ToProtobuf(), nil
+	return nil, nil
 }
 
 func (s *gerenciaServer) ConfigBancoDeDados(ctx context.Context, req *pb.ConfigBancoDeDadosReq) (*pb.ConfigBancoDeDadosResp, error) {

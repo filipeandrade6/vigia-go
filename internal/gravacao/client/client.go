@@ -3,7 +3,6 @@ package client
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -56,9 +55,9 @@ func (g *GerenciaClient) RegistrarServidorGravacao() (string, error) {
 		panic(err) // TODO fixme
 	}
 
-	if resp.Status != "ok" {
-		return "", errors.New("status not ok")
-	}
+	// if resp.Status != "ok" {
+	// 	return "", errors.New("status not ok")
+	// }
 
 	return resp.Id, nil
 }
