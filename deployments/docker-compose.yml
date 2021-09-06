@@ -3,14 +3,14 @@ services:
   gerencia:
     build:
       context: ../
-      dockerfile: build/dockerfile.gerencia
+      dockerfile: deployments/dockerfile.gerencia
     ports:
       - "5000:5000"
 
   gravacao:
     build:
       context: ../
-      dockerfile: build/dockerfile.gravacao
+      dockerfile: deployments/dockerfile.gravacao
     ports:
       - "5001:5001"
     links:
