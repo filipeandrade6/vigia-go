@@ -37,6 +37,7 @@ func (s *GravacaoServer) ConfigurarProcesso(ctx context.Context, req *pb.Configu
 	}, nil
 }
 
+// TODO trocar isso aqui - receber config explicitamente
 func NovoServidorGravacao() *grpc.Server {
 	lis, err := net.Listen(
 		viper.GetString("SERVER_CONN"),

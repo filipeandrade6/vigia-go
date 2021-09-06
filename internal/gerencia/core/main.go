@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/filipeandrade6/vigia-go/internal/database"
+	// "github.com/filipeandrade6/vigia-go/internal/database"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/client"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/server"
 
@@ -39,11 +39,11 @@ func Main() error {
 		client: client.NovoClientGravacao(),
 	}
 
-	dbCfg := database.NewConfig()
-	_, err := database.NewPool(dbCfg) // TODO implementar
-	if err != nil {
-		return err
-	}
+	// dbCfg := database.NewConfig()
+	// _, err := database.NewPool(dbCfg) // TODO implementar
+	// if err != nil {
+	// 	return err
+	// }
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)

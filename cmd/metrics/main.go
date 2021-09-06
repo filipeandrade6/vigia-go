@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/ardanlabs/conf"
-	"github.com/ardanlabs/service/app/services/metrics/collector"
-	"github.com/ardanlabs/service/app/services/metrics/publisher"
 	expvarsrv "github.com/ardanlabs/service/app/services/metrics/publisher/expvar"
 	"github.com/ardanlabs/service/foundation/logger"
+	"github.com/filipeandrade6/vigia-go/cmd/metrics/collector"
+	"github.com/filipeandrade6/vigia-go/cmd/metrics/publisher"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 )

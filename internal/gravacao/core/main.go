@@ -8,9 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/filipeandrade6/vigia-go/internal/database"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/client"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/models"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/server"
 
 	"google.golang.org/grpc"
@@ -20,7 +18,7 @@ import (
 type Gravacao struct {
 	server *grpc.Server
 	client *client.GerenciaClient
-	models models.Models
+	// models models.Models
 }
 
 func (g *Gravacao) Stop() {
@@ -43,12 +41,12 @@ func Main() error {
 		client: client.NovoClientGerencia(),
 	}
 
-	dbCfg := g.client.ConfigBancoDeDados()
+	// dbCfg := g.client.ConfigBancoDeDados()
 
-	_, err := database.NewPool(dbCfg)
-	if err != nil {
-		return err
-	}
+	// _, err := database.NewPool(dbCfg)
+	// if err != nil {
+	// 	return err
+	// }
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)

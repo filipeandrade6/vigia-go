@@ -4,7 +4,7 @@ import (
 	"embed" // Calls init function.
 	"testing"
 
-	"github.com/filipeandrade6/vigia-go/foundation/keystore"
+	"github.com/filipeandrade6/vigia-go/internal/keystore"
 )
 
 // Success and failure markers.
