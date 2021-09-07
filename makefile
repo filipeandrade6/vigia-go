@@ -4,7 +4,8 @@ protobuf:
 	bash scripts/protobuf-gen.sh
 
 run:
-	docker-compose -f deployments/docker-compose.yml --env-file configs/.env.dev up
+	# docker-compose -f deployments/docker-compose.yml --env-file configs/.env.dev up
+	docker-compose -f deployments/docker-compose.yml up
 
 test:
 	# go clean --cache

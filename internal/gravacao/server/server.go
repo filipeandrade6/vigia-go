@@ -17,6 +17,12 @@ type GravacaoServer struct {
 	pb.UnimplementedGravacaoServer
 }
 
+func (s *GravacaoServer) IniciarProcessamento(ctx context.Context, req *pb.IniciarProcessamentoReq) (*pb.IniciarProcessamentoResp, error) {
+	return &pb.IniciarProcessamentoResp{
+		Status: "chegou",
+	}, nil
+}
+
 func (s *GravacaoServer) InfoProcessos(ctx context.Context, req *pb.InfoProcessosReq) (*pb.InfoProcessosResp, error) {
 	return &pb.InfoProcessosResp{
 		Processos: []*pb.InfoProcessosResp_Processo{
@@ -40,11 +46,11 @@ func (s *GravacaoServer) ConfigurarProcesso(ctx context.Context, req *pb.Configu
 // TODO trocar isso aqui - receber config explicitamente
 func NovoServidorGravacao() *grpc.Server {
 	lis, err := net.Listen(
-		viper.GetString("SERVER_CONN"),
+		viper.GetString("GRA_SERVER_CONN"),
 		fmt.Sprintf(
 			"%s:%d",
-			viper.GetString("SERVER_ENDERECO"),
-			viper.GetInt("SERVER_PORTA"),
+			viper.GetString("GRA_SERVER_ENDERECO"),
+			viper.GetInt("GRA_SERVER_PORTA"),
 		),
 	) // e.g. "tcp", "localhost:12346"
 	if err != nil {

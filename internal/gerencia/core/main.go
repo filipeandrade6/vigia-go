@@ -2,15 +2,17 @@
 package core
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	// "github.com/filipeandrade6/vigia-go/internal/database"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/client"
-	"github.com/filipeandrade6/vigia-go/internal/gerencia/server"
+	// "github.com/filipeandrade6/vigia-go/internal/gerencia/server"
 
 	"google.golang.org/grpc"
 )
@@ -35,7 +37,7 @@ func Main() error {
 	// defer logger.Sync()
 
 	g := &Gerencia{
-		server: server.NovoServidorGerencia(),
+		// server: server.NovoServidorGerencia(),
 		client: client.NovoClientGravacao(),
 	}
 
@@ -47,6 +49,16 @@ func Main() error {
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	time.Sleep(time.Duration(time.Second * 10))
+	resp, err := g.client.IniciarProcessamento(ctx, nil)
+	if err != nil {
+		fmt.Println("deu erro", err)
+	}
+	fmt.Printf("chegou status: %s", resp.Status)
 
 	<-c
 	g.Stop()

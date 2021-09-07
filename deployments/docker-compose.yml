@@ -4,14 +4,18 @@ services:
     build:
       context: ../
       dockerfile: deployments/dockerfile.gerencia
-    ports:
-      - "5000:5000"
+    env_file:
+      - .env.dev
+    depends_on:
+      - gravacao
+    links:
+      - gravacao
+    command: ["iniciar"]
 
   gravacao:
     build:
       context: ../
       dockerfile: deployments/dockerfile.gravacao
-    ports:
-      - "5001:5001"
-    links:
-      - gerencia
+    env_file:
+      - .env.dev
+    command: ["iniciar"]

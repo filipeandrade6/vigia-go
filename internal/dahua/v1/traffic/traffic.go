@@ -1,4 +1,4 @@
-package main
+package traffic
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/filipeandrade6/vigia-go/internal/dahua/pkg/netsdk"
+	"github.com/filipeandrade6/vigia-go/internal/dahua/v1/traffic/netsdk"
 )
 
 func Test_fDisConnect(lLoginID netsdk.LLONG, pchDVRIP string, nDVRPort int, dwUser netsdk.LLONG) {
