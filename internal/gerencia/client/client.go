@@ -23,17 +23,13 @@ func (g *GravacaoClient) IniciarProcessamento(context.Context, *pb.IniciarProces
 
 func NovoClientGravacao() *GravacaoClient {
 	fmt.Println("chegou no novoclientGravacao")
-	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithBlock())
 
 	conn, err := grpc.Dial(
 		fmt.Sprintf(
 			"%s:%d",
 			viper.GetString("GRA_CLIENT_ENDERECO"),
 			viper.GetInt("GRA_CLIENT_PORTA"),
-		),
-		opts...)
+		), grpc.WithInsecure())
 	if err != nil {
 		fmt.Println("Erro aqui no client") // TODO mudar isso aqui
 		panic(err)
