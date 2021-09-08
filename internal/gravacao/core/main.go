@@ -3,6 +3,7 @@ package core
 import (
 	"expvar"
 	"fmt"
+	"net"
 	"os"
 	"os/signal"
 	"runtime"
@@ -174,46 +175,7 @@ func Run(log *zap.SugaredLogger) error {
 	// }()
 
 	// =========================================================================
-	// Start API Service
-
-	// log.Infow("startup", "status", "initializing API support")
-
-	// // Make a channel to listen for an interrupt or terminate signal from the OS.
-	// // Use a buffered channel because the signal package requires it.
-	// shutdown := make(chan os.Signal, 1)
-	// signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
-
-	// // Construct the mux for the API calls.
-	// apiMux := handlers.APIMux(handlers.APIMuxConfig{
-	// 	Shutdown: shutdown,
-	// 	Log:      log,
-	// 	// Metrics:  metrics.New(),
-	// 	// Auth:     auth,
-	// 	// DB:       db,
-	// })
-
-	// // Construct a server to service the requests against the mux.
-	// api := http.Server{
-	// 	Addr:         cfg.Web.APIHost,
-	// 	Handler:      apiMux,
-	// 	ReadTimeout:  time.Duration(cfg.Web.ReadTimeout) * time.Second,
-	// 	WriteTimeout: time.Duration(cfg.Web.WriteTimeout) * time.Second,
-	// 	IdleTimeout:  time.Duration(cfg.Web.IdleTimeout) * time.Second,
-	// 	ErrorLog:     zap.NewStdLog(log.Desugar()),
-	// }
-
-	// // Make a channel to listen for errors coming from the listener. Use a
-	// // buffered channel so the goroutine can exit if we don't collect this error.
-	// serverErrors := make(chan error, 1)
-
-	// // Start the service listening for api requests.
-	// go func() {
-	// 	log.Infow("startup", "status", "api router started", "host", api.Addr)
-	// 	serverErrors <- api.ListenAndServe()
-	// }()
-
-	// =========================================================================
-	// Start API Service - MEU
+	// Start Service
 
 	log.Infow("startup", "status", "initializing API support")
 
@@ -233,8 +195,22 @@ func Run(log *zap.SugaredLogger) error {
 
 	serverErrors := make(chan error, 1)
 
+	// TODO ver abaixo, tem exemplo toda execução em contexto
+	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
+	go func() {
+		lis, err := net.Listen(cfg.Service.GravServerConn, fmt.Sprintf("%s:%s", cfg.Service.GravServerAddr, cfg.Service.GravServerPort))
+		if err != nil {
+			log.Errorw("startup", "status", "could not open socket", cfg.Service.GravServerConn, cfg.Service.GravServerAddr, cfg.Service.GravServerPort, "ERROR", err)
+		}
+
+		log.Infow("startup", "status", "gRPC server started") // TODO add address
+		serverErrors <- g.server.Serve(lis)
+	}()
+
 	// =========================================================================
 	// Shutdown
+
+	// TODO shutdown antes de grpc.serve????? - pois não esta chegando auqi
 
 	// Blocking main and waiting for shutdown.
 	select {

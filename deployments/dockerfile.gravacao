@@ -1,6 +1,9 @@
 ## Build
 FROM golang:1.16-buster AS build
 
+LABEL project="vigia-go"
+LABEL app="gravacao"
+
 WORKDIR /app
 
 COPY ./go.mod go.sum ./

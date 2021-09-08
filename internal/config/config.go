@@ -16,6 +16,20 @@ type Web struct {
 	ShutdownTimeout time.Duration `mapstructure:"shutdowntimeout"`
 }
 
+type Service struct {
+	GravServerConn string `mapstructure:"gravserverconn"`
+	GravServerAddr string `mapstructure:"gravserveraddr"`
+	GravServerPort string `mapstructure:"gravserverport"`
+	GravClientAddr string `mapstructure:"gravclientaddr"`
+	GravClientPort string `mapstrucutre:"gravclientport"`
+
+	GerServerConn string `mapstructure:"gerserverconn"`
+	GerServerAddr string `mapstructure:"gerserveraddr"`
+	GerServerPort string `mapstructure:"gerserverport"`
+	GerClientAddr string `mapstructure:"gerclientaddr"`
+	GerClientPort string `mapstrucutre:"gerclientport"`
+}
+
 type Auth struct {
 	KeysFolder string `mapstructure:"keysfolder"`
 	ActiveKID  string `mapstructure:"activekid"`
@@ -38,14 +52,25 @@ type Zipkin struct {
 }
 
 type Configuration struct {
-	Build  string
-	Web    `mapstructure:"web"`
-	Auth   `mapstructure:"auth"`
-	DB     `mapstructure:"db"`
-	Zipkin `mapstructure:"zipkin"`
+	Build   string
+	Service `mapstructure:"service"`
+	Web     `mapstructure:"web"`
+	Auth    `mapstructure:"auth"`
+	DB      `mapstructure:"db"`
+	Zipkin  `mapstructure:"zipkin"`
 }
 
 func Load(build string) (Configuration, error) {
+	viper.BindEnv("service.gravserverconn", "GRAV_SERVER_CONN")
+	viper.BindEnv("service.gravserveraddr", "GRAV_SERVER_ADDR")
+	viper.BindEnv("service.gravserverport", "GRAV_SERVER_PORT")
+	viper.BindEnv("service.gravclientaddr", "GRAV_CLIENT_ADDR")
+	viper.BindEnv("service.gravclientport", "GRAV_CLIENT_PORT")
+	viper.BindEnv("service.gerserverconn", "GER_SERVER_CONN")
+	viper.BindEnv("service.gerserveraddr", "GER_SERVER_ADDR")
+	viper.BindEnv("service.gerserverport", "GER_SERVER_PORT")
+	viper.BindEnv("service.gerclientconn", "GER_CLIENT_ADDR")
+	viper.BindEnv("service.gerclientport", "GER_CLIENT_PORT")
 	viper.BindEnv("web.apihost", "WEB_APIHOST")
 	viper.BindEnv("web.debughost", "WEB_DEBUGHOST")
 	viper.BindEnv("web.readtimeout", "WEB_READTIMEOUT")

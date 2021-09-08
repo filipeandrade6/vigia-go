@@ -22,6 +22,7 @@ func (g *GravacaoClient) IniciarProcessamento(context.Context, *pb.IniciarProces
 }
 
 func NovoClientGravacao() *GravacaoClient {
+	fmt.Println("chegou no novoclientGravacao")
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithBlock())
@@ -38,6 +39,8 @@ func NovoClientGravacao() *GravacaoClient {
 		panic(err)
 	}
 	defer conn.Close()
+
+	fmt.Println("quase no final do novoClient")
 
 	return &GravacaoClient{
 		c: pb.NewGravacaoClient(conn),

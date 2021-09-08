@@ -47,21 +47,28 @@ func Main() error {
 	// 	return err
 	// }
 
+	fmt.Println("chegou aqui 1 gerenciaaaa")
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	fmt.Println("chegou aqui 2")
+
 	time.Sleep(time.Duration(time.Second * 10))
 	resp, err := g.client.IniciarProcessamento(ctx, nil)
 	if err != nil {
+
 		fmt.Println("deu erro", err)
 	}
 	fmt.Printf("chegou status: %s", resp.Status)
 
+	fmt.Println("chegou aqui 3")
 	<-c
 	g.Stop()
 
+	fmt.Println("chegou aqui 4")
 	return errors.New("finalizou funcao main")
 }

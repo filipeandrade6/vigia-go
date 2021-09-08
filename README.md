@@ -15,6 +15,7 @@ Parei na criação dos containers
 - [ ] Como fazer update de sistema
 - [ ] DevOps
 - [ ] Formatar arquivo de Dockerfile
+- [ ] Label build
 
 #### comandos *Makefile*:
 

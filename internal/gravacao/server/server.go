@@ -6,10 +6,8 @@ package server
 import (
 	"context"
 	"fmt"
-	"net"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
@@ -45,21 +43,8 @@ func (s *GravacaoServer) ConfigurarProcesso(ctx context.Context, req *pb.Configu
 
 // TODO trocar isso aqui - receber config explicitamente
 func NovoServidorGravacao() *grpc.Server {
-	lis, err := net.Listen(
-		viper.GetString("GRA_SERVER_CONN"),
-		fmt.Sprintf(
-			"%s:%d",
-			viper.GetString("GRA_SERVER_ENDERECO"),
-			viper.GetInt("GRA_SERVER_PORTA"),
-		),
-	) // e.g. "tcp", "localhost:12346"
-	if err != nil {
-		panic(err)
-	}
-
 	grpcGravacaoServer := grpc.NewServer()
 	pb.RegisterGravacaoServer(grpcGravacaoServer, &GravacaoServer{})
-	grpcGravacaoServer.Serve(lis)
 
 	return grpcGravacaoServer
 }
