@@ -2,10 +2,10 @@ package server
 
 import (
 	"context"
-	"fmt"
-	"net"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/filipeandrade6/vigia-go/internal/config"
+	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -13,6 +13,21 @@ import (
 
 type gerenciaServer struct {
 	pb.UnimplementedGerenciaServer
+	cfg config.Gerencia
+	db  config.DB
+}
+
+func NewGerenciaServer(config config) *grpc.Server {
+	grpcGerenciaServer := grpc.NewServer()
+	pb.RegisterGerenciaServer(grpcGerenciaServer, &gerenciaServer{cfg: config.Gerencia, db: config.DB})
+
+	return grpcGerenciaServer
+}
+
+func (s *gerenciaServer) Migrate(ctx context.Context, in *pb.MigrateReq) (*pb.MigrateResp, error) {
+	db, err := database.Open(s.config)
+
+	return &pb.MigrateResp{}, nil
 }
 
 func (s *gerenciaServer) RegistrarServidorGravacao(ctx context.Context, req *pb.RegistrarServidorGravacaoReq) (*pb.RegistrarServidorGravacaoResp, error) {
@@ -34,24 +49,4 @@ func (s *gerenciaServer) ConfigBancoDeDados(ctx context.Context, req *pb.ConfigB
 		Dbname:       viper.GetString("DB_NAME"),
 		Poolmaxconns: int32(viper.GetInt("DB_POOL")),
 	}, nil
-}
-
-func NovoServidorGerencia() *grpc.Server {
-	lis, err := net.Listen(
-		viper.GetString("SERVER_CONN"),
-		fmt.Sprintf(
-			"%s:%d",
-			viper.GetString("SERVER_ENDERECO"),
-			viper.GetInt("SERVER_PORTA"),
-		),
-	) // e.g. "tcp", "localhost:12346"
-	if err != nil {
-		panic(err)
-	}
-
-	grpcGerenciaServer := grpc.NewServer()
-	pb.RegisterGerenciaServer(grpcGerenciaServer, &gerenciaServer{})
-	grpcGerenciaServer.Serve(lis)
-
-	return grpcGerenciaServer
 }

@@ -2,19 +2,26 @@
 package core
 
 import (
+	"expvar"
 	"fmt"
 	"net"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	// "github.com/filipeandrade6/vigia-go/internal/database"
 	"github.com/filipeandrade6/vigia-go/internal/config"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/client"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/server"
+	"github.com/filipeandrade6/vigia-go/internal/sys/database"
+	"github.com/spf13/viper"
+	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
+
+// TODO colocar metricas
 
 type Gerencia struct {
 	server *grpc.Server
@@ -32,6 +39,17 @@ func (g *Gerencia) Stop() {
 var build = "develop"
 
 func Run(log *zap.SugaredLogger) error {
+	// =========================================================================
+	// CPU Quota
+
+	if _, err := maxprocs.Set(); err != nil {
+		log.Errorw("startup", zap.Error(err))
+		os.Exit(1)
+	}
+	log.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
+
+	// =========================================================================
+	// Configuration
 
 	cfg, err := config.Load(build)
 	if err != nil {
@@ -41,6 +59,37 @@ func Run(log *zap.SugaredLogger) error {
 	log.Infow("startup", "config", cfg) // TODO criar um prettyprint para o cfg no log
 
 	// =========================================================================
+	// App Starting
+
+	expvar.NewString("build").Set(build)
+	log.Infow("starting service", "version", build)
+	defer log.Infow("shutdown complete")
+
+	log.Infow("startup", "config", cfg)
+
+	// =========================================================================
+	// Start Database
+
+	log.Infow("startup", "status", "initializing database support", "host", viper.GetString()  cfg.DB.Host)
+
+	db, err := database.Open(database.Config{
+		Host:         cfg.DB.Host,
+		User:         cfg.DB.User,
+		Password:     cfg.DB.Password,
+		Name:         cfg.DB.Name,
+		MaxIdleConns: cfg.DB.MaxIdleConns,
+		MaxOpenConns: cfg.DB.MaxOpenConns,
+		DisableTLS:   cfg.DB.DisableTLS,
+	})
+	if err != nil {
+		return fmt.Errorf("connecting to db: %w", err)
+	}
+	defer func() {
+		log.Infow("shutdown", "status", "stopping database support", "host", cfg.DB.Host)
+		db.Close()
+	}()
+
+	// =========================================================================
 	// Start Service
 
 	log.Infow("startup", "status", "initializing gerencia")
@@ -48,10 +97,14 @@ func Run(log *zap.SugaredLogger) error {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
 
+	// TODO colocar client e database dentro do server?
 	g := &Gerencia{
 		server: server.NovoServidorGerencia(),
 		client: client.NovoClientGravacao(),
+		database: db,
 	}
+
+	g.server.Regis
 
 	serverErrors := make(chan error, 1)
 
@@ -82,28 +135,4 @@ func Run(log *zap.SugaredLogger) error {
 	}
 
 	return nil
-	// fmt.Println("chegou aqui 1 gerenciaaaa")
-
-	// c := make(chan os.Signal, 1)
-	// signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-
-	// ctx, cancel := context.WithCancel(context.Background())
-	// defer cancel()
-
-	// fmt.Println("chegou aqui 2")
-
-	// time.Sleep(time.Duration(time.Second * 10))
-	// resp, err := g.client.IniciarProcessamento(ctx, nil)
-	// if err != nil {
-
-	// 	fmt.Println("deu erro", err)
-	// }
-	// fmt.Printf("chegou status: %s", resp.Status)
-
-	// fmt.Println("chegou aqui 3")
-	// <-c
-	// // g.Stop()
-
-	// fmt.Println("chegou aqui 4")
-	// return errors.New("finalizou funcao main")
 }

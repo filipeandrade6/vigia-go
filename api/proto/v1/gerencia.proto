@@ -5,12 +5,19 @@ option go_package = "./internal/api/v1";
 package gerencia;
 
 service Gerencia {
+    rpc Migrate (MigrateReq) returns (MigrateResp) {}
+
     rpc RegistrarServidorGravacao (RegistrarServidorGravacaoReq) returns (RegistrarServidorGravacaoResp) {}
     rpc ConfigBancoDeDados (ConfigBancoDeDadosReq) returns (ConfigBancoDeDadosResp) {}
     rpc ConfigurarCamera (ConfigurarCameraReq) returns (ConfigurarCameraResp) {}
     rpc ConfigurarProcessador (ConfigurarProcessadorReq) returns (ConfigurarProcessadorResp) {}
 }
 
+message MigrateReq{
+    int32 versao = 1;
+}
+
+message MigrateResp{}
 
 message RegistrarServidorGravacaoReq {
     string id = 1; // Se vazio será gerado,caso contrário autentica no banco de dados

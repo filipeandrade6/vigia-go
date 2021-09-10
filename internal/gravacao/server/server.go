@@ -8,16 +8,18 @@ import (
 	"fmt"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/filipeandrade6/vigia-go/internal/config"
 	"google.golang.org/grpc"
 )
 
 type GravacaoServer struct {
 	pb.UnimplementedGravacaoServer
+	cfg config.Gravacao
 }
 
-func NovoServidorGravacao() *grpc.Server {
+func NewGravacaoServer(config config.Gravacao) *grpc.Server {
 	grpcGravacaoServer := grpc.NewServer()
-	pb.RegisterGravacaoServer(grpcGravacaoServer, &GravacaoServer{})
+	pb.RegisterGravacaoServer(grpcGravacaoServer, &GravacaoServer{cfg: config})
 
 	return grpcGravacaoServer
 }

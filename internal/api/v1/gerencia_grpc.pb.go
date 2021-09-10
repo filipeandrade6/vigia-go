@@ -18,6 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
+	Migrate(ctx context.Context, in *MigrateReq, opts ...grpc.CallOption) (*MigrateResp, error)
 	RegistrarServidorGravacao(ctx context.Context, in *RegistrarServidorGravacaoReq, opts ...grpc.CallOption) (*RegistrarServidorGravacaoResp, error)
 	ConfigBancoDeDados(ctx context.Context, in *ConfigBancoDeDadosReq, opts ...grpc.CallOption) (*ConfigBancoDeDadosResp, error)
 	ConfigurarCamera(ctx context.Context, in *ConfigurarCameraReq, opts ...grpc.CallOption) (*ConfigurarCameraResp, error)
@@ -30,6 +31,15 @@ type gerenciaClient struct {
 
 func NewGerenciaClient(cc grpc.ClientConnInterface) GerenciaClient {
 	return &gerenciaClient{cc}
+}
+
+func (c *gerenciaClient) Migrate(ctx context.Context, in *MigrateReq, opts ...grpc.CallOption) (*MigrateResp, error) {
+	out := new(MigrateResp)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/Migrate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gerenciaClient) RegistrarServidorGravacao(ctx context.Context, in *RegistrarServidorGravacaoReq, opts ...grpc.CallOption) (*RegistrarServidorGravacaoResp, error) {
@@ -72,6 +82,7 @@ func (c *gerenciaClient) ConfigurarProcessador(ctx context.Context, in *Configur
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
+	Migrate(context.Context, *MigrateReq) (*MigrateResp, error)
 	RegistrarServidorGravacao(context.Context, *RegistrarServidorGravacaoReq) (*RegistrarServidorGravacaoResp, error)
 	ConfigBancoDeDados(context.Context, *ConfigBancoDeDadosReq) (*ConfigBancoDeDadosResp, error)
 	ConfigurarCamera(context.Context, *ConfigurarCameraReq) (*ConfigurarCameraResp, error)
@@ -83,6 +94,9 @@ type GerenciaServer interface {
 type UnimplementedGerenciaServer struct {
 }
 
+func (UnimplementedGerenciaServer) Migrate(context.Context, *MigrateReq) (*MigrateResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Migrate not implemented")
+}
 func (UnimplementedGerenciaServer) RegistrarServidorGravacao(context.Context, *RegistrarServidorGravacaoReq) (*RegistrarServidorGravacaoResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegistrarServidorGravacao not implemented")
 }
@@ -106,6 +120,24 @@ type UnsafeGerenciaServer interface {
 
 func RegisterGerenciaServer(s grpc.ServiceRegistrar, srv GerenciaServer) {
 	s.RegisterService(&Gerencia_ServiceDesc, srv)
+}
+
+func _Gerencia_Migrate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MigrateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).Migrate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/Migrate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).Migrate(ctx, req.(*MigrateReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Gerencia_RegistrarServidorGravacao_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -187,6 +219,10 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "gerencia.Gerencia",
 	HandlerType: (*GerenciaServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Migrate",
+			Handler:    _Gerencia_Migrate_Handler,
+		},
 		{
 			MethodName: "RegistrarServidorGravacao",
 			Handler:    _Gerencia_RegistrarServidorGravacao_Handler,

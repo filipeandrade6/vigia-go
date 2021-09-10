@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	log, err := logger.New("GRAVACAO-API")
+	log, err := logger.New("GRAVACAO")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

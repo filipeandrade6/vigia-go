@@ -67,7 +67,7 @@ func Run(log *zap.SugaredLogger) error {
 	if err != nil {
 		return fmt.Errorf("parsing config: %w", err)
 	}
-	fmt.Println(cfg)
+	log.Infow("startup", "config", cfg) // TODO criar um prettyprint para o cfg no log
 
 	// =========================================================================
 	// App Starting
@@ -180,15 +180,8 @@ func Run(log *zap.SugaredLogger) error {
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
 
 	g := &Gravacao{
-		server: server.NovoServidorGravacao(),
+		server: server.NewGravacaoServer(cfg.Gravacao),
 	}
-
-	// dbCfg := g.client.ConfigBancoDeDados()
-
-	// _, err := database.NewPool(dbCfg)
-	// if err != nil {
-	// 	return err
-	// }
 
 	serverErrors := make(chan error, 1)
 
