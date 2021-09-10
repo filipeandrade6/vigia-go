@@ -15,6 +15,13 @@ type GravacaoServer struct {
 	pb.UnimplementedGravacaoServer
 }
 
+func NovoServidorGravacao() *grpc.Server {
+	grpcGravacaoServer := grpc.NewServer()
+	pb.RegisterGravacaoServer(grpcGravacaoServer, &GravacaoServer{})
+
+	return grpcGravacaoServer
+}
+
 func (s *GravacaoServer) IniciarProcessamento(ctx context.Context, req *pb.IniciarProcessamentoReq) (*pb.IniciarProcessamentoResp, error) {
 	return &pb.IniciarProcessamentoResp{
 		Status: "chegou",
@@ -39,12 +46,4 @@ func (s *GravacaoServer) ConfigurarProcesso(ctx context.Context, req *pb.Configu
 	return &pb.ConfigurarProcessoResp{
 		Status: 0, // TODO ver como utilizar nome da variavel no lugadr de inteiro
 	}, nil
-}
-
-// TODO trocar isso aqui - receber config explicitamente
-func NovoServidorGravacao() *grpc.Server {
-	grpcGravacaoServer := grpc.NewServer()
-	pb.RegisterGravacaoServer(grpcGravacaoServer, &GravacaoServer{})
-
-	return grpcGravacaoServer
 }
