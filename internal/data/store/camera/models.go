@@ -15,6 +15,7 @@ type Camera struct {
 	Marca           string
 	Modelo          string
 	Informacao      string
+	Consumo         string // Aggregate field showing total of storatge consuption
 	DataCriacao     time.Time
 	DataAtualizacao time.Time
 }

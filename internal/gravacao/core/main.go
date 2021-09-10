@@ -29,7 +29,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// TODO verificar se campo privado não interfere em algo
 type Gravacao struct {
 	server *grpc.Server
 	// client *client.GerenciaClient
@@ -55,8 +54,6 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// CPU Quota
 
-	// Set the correct number of threads for the service
-	// based on what is available either by the machine or quotas.
 	if _, err := maxprocs.Set(); err != nil {
 		log.Errorw("startup", zap.Error(err))
 		os.Exit(1)
@@ -209,8 +206,6 @@ func Run(log *zap.SugaredLogger) error {
 
 	// =========================================================================
 	// Shutdown
-
-	// TODO shutdown antes de grpc.serve????? - pois não esta chegando auqi
 
 	// Blocking main and waiting for shutdown.
 	select {

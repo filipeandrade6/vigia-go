@@ -1,129 +1,98 @@
 // Package product contains product related CRUD functionality.
 package camera
 
-// import (
-// 	"context"
-// 	"fmt"
-// 	"time"
+import (
+	"context"
+	"fmt"
+	"time"
 
-// 	"github.com/ardanlabs/service/business/sys/auth"
+	"github.com/filipeandrade6/vigia-go/internal/sys/database"
+	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
+	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
+)
 
-// 	// "github.com/ardanlabs/service/business/sys/database"
-// 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
+// Store manages the set of API's for product access.
+type Store struct {
+	log *zap.SugaredLogger
+	db  *sqlx.DB
+}
 
-// 	"github.com/ardanlabs/service/business/sys/validate"
-// 	"github.com/jmoiron/sqlx"
-// 	"go.uber.org/zap"
-// )
+// NewStore constructs a product store for api access.
+func NewStore(log *zap.SugaredLogger, db *sqlx.DB) Store {
+	return Store{
+		log: log,
+		db:  db,
+	}
+}
 
-// // Store manages the set of API's for product access.
-// type Store struct {
-// 	log *zap.SugaredLogger
-// 	db  *sqlx.DB // TODO trocar para pgx
-// }
-
-// // NewStore constructs a product store for api access.
-// func NewStore(log *zap.SugaredLogger, db *sqlx.DB) Store {
-// 	return Store{
-// 		log: log,
-// 		db:  db,
-// 	}
-// }
-
-// Create adds a Product to the database. It returns the created Product with
+// Create adds a Camera to the database. It returns the created Camera with
 // fields like ID and DateCreated populated.
-// func (s Store) Create(ctx context.Context, claims auth.Claims, np NewProduct, now time.Time) (Product, error) {
-// 	if err := validate.Check(np); err != nil {
-// 		return Product{}, fmt.Errorf("validating data: %w", err)
-// 	}
+func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (Camera, error) {
+	// TODO validate
+	// if err := validate.Check(cam); err != nil {
+	// 	return Camera{}, fmt.Errorf("validating data: %w", err)
+	// }
 
-// 	prd := Product{
-// 		ID:          validate.GenerateID(),
-// 		Name:        np.Name,
-// 		Cost:        np.Cost,
-// 		Quantity:    np.Quantity,
-// 		UserID:      claims.Subject,
-// 		DateCreated: now,
-// 		DateUpdated: now,
-// 	}
+	c := Camera{
+		Nome:            cam.Nome,
+		IP:              cam.IP,
+		Porta:           cam.Porta,
+		Canal:           cam.Canal,
+		Usuario:         cam.Usuario,
+		Senha:           cam.Senha,
+		Regiao:          cam.Regiao,
+		Geolocalizacao:  cam.Geolocalizacao,
+		Marca:           cam.Marca,
+		Modelo:          cam.Modelo,
+		Informacao:      cam.Informacao,
+		DataCriacao:     now,
+		DataAtualizacao: now,
+	}
 
-// 	const q = `
-// 	INSERT INTO products
-// 		(product_id, user_id, name, cost, quantity, date_created, date_updated)
-// 	VALUES
-// 		(:product_id, :user_id, :name, :cost, :quantity, :date_created, :date_updated)`
+	const q = `
+	INSERT INTO cameras
+		(camera_id, nome, ip, porta, canal, usuario, senha, regiao, geolocalizacao, marca, modelo, informacao)
+	VALUES
+		(:camera_id, :nome, :ip, :porta, :canal, :usuario, :senha, :regiao, :geolocalizacao, :marca, :modelo, :informacao)`
 
-// 	if err := database.NamedExecContext(ctx, s.log, s.db, q, prd); err != nil {
-// 		return Product{}, fmt.Errorf("inserting product: %w", err)
-// 	}
+	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
+		return Camera{}, fmt.Errorf("inserting camera: %w", err)
+	}
 
-// 	return prd, nil
-// }
+	return cam, nil
+}
 
-// func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera, now time.Time) (Camera, error) {
-// 	if err != validate.Check(np); err != nil {
-// 		return Camera{}, fmt.Errorf("validating data: %w", err)
-// 	}
-
-// 	c := Camera{
-// 		Nome:            cam.Nome,
-// 		IP:              cam.IP,
-// 		Porta:           cam.Porta,
-// 		Canal:           cam.Canal,
-// 		Usuario:         cam.Usuario,
-// 		Senha:           cam.Senha,
-// 		Regiao:          cam.Regiao,
-// 		Geolocalizacao:  cam.Geolocalizacao,
-// 		Marca:           cam.Marca,
-// 		Modelo:          cam.Modelo,
-// 		Informacao:      cam.Informacao,
-// 		DataCriacao:     now,
-// 		DataAtualizacao: now,
-// 	}
-
-// 	const q = `
-// 	INSERT INTO cameras
-// 		(camera_id, nome, ip, porta, canal, usuario, senha, regiao, geolocalizacao, marca, modelo, informacao)
-// 	VALUES
-// 		($1, $2, $)` // TODO
-
-// 	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
-// 		return Camera{}, fmt.Errorf("inserting camera: %w", err)
-// 	}
-
-// 	return cam, nil
-// }
-
-// // Update modifies data about a Product. It will error if the specified ID is
-// // invalid or does not reference an existing Product.
+// TODO UpdateCamera struct?
+// Update modifies data about a Camera. It will error if the specified ID is
+// invalid or does not reference an existing Product.
 // func (s Store) Update(ctx context.Context, claims auth.Claims, productID string, up UpdateProduct, now time.Time) error {
-// 	if err := validate.CheckID(productID); err != nil {
+// func (s Store) Update(ctx context.Context, cameraID string, up Camera, now time.Time) error {
+// 	if err := validate.CheckID(cameraID); err != nil {
 // 		return database.ErrInvalidID
 // 	}
 // 	if err := validate.Check(up); err != nil {
 // 		return fmt.Errorf("validating data: %w", err)
 // 	}
 
-// 	prd, err := s.QueryByID(ctx, productID)
+// 	cam, err := s.QueryByID(ctx, cameraID)
 // 	if err != nil {
-// 		return fmt.Errorf("updating product: %w", err)
+// 		return fmt.Errorf("updating camera cameraID[%s]: %w", cameraID, err)
 // 	}
 
-// 	// If you are not an admin and looking to retrieve someone elses product.
-// 	if !claims.Authorized(auth.RoleAdmin) && prd.UserID != claims.Subject {
-// 		return database.ErrForbidden
+// 	// // If you are not an admin and looking to retrieve someone elses product.
+// 	// if !claims.Authorized(auth.RoleAdmin) && prd.UserID != claims.Subject {
+// 	// 	return database.ErrForbidden
+// 	// }
+
+// 	if up.Nome != nil {
+// 		cam.Name = up.Nome
+// 	}
+// 	if up.IP != nil {
+// 		cam.IP = up.IP
 // 	}
 
-// 	if up.Name != nil {
-// 		prd.Name = *up.Name
-// 	}
-// 	if up.Cost != nil {
-// 		prd.Cost = *up.Cost
-// 	}
-// 	if up.Quantity != nil {
-// 		prd.Quantity = *up.Quantity
-// 	}
-// 	prd.DateUpdated = now
+// 	cam.DataAtualizacao = now
 
 // 	const q = `
 // 	UPDATE
@@ -136,12 +105,43 @@ package camera
 // 	WHERE
 // 		product_id = :product_id`
 
-// 	if err := database.NamedExecContext(ctx, s.log, s.db, q, prd); err != nil {
-// 		return fmt.Errorf("updating product ID[%s]: %w", prd.ID, err)
+// 	if err := database.NamedExecContext(ctx, s.log, s.db, q, cam); err != nil {
+// 		return fmt.Errorf("updating product ID[%s]: %w", cam.ID, err)
 // 	}
 
 // 	return nil
 // }
+
+func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
+	if err := validate.CheckID(cameraID); err != nil {
+		return Camera{}, database.ErrInvalidID
+	}
+
+	data := struct {
+		CameraID string `db: camera_id`
+	}{
+		CameraID: cameraID,
+	}
+
+	// TODO retornoar leituras, consumo de banda, tempo de atividade, etc.
+	const q = `
+	SELECT
+		*
+	FROM
+		cameras
+	WHERE
+		camera_id = :camera_id`
+
+	var cam Camera
+	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &cam); err != nil {
+		if err == database.ErrNotFound {
+			return Camera{}, database.ErrNotFound
+		}
+		return Camera{}, fmt.Errorf("selecting camera ID[%q]: %w", data.CameraID, err)
+	}
+
+	return cam, nil
+}
 
 // // Delete removes the product identified by a given ID.
 // func (s Store) Delete(ctx context.Context, claims auth.Claims, productID string) error {
