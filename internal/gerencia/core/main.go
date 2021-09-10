@@ -2,72 +2,108 @@
 package core
 
 import (
-	"context"
-	"errors"
 	"fmt"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	// "github.com/filipeandrade6/vigia-go/internal/database"
+	"github.com/filipeandrade6/vigia-go/internal/config"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/client"
-	// "github.com/filipeandrade6/vigia-go/internal/gerencia/server"
-	// "google.golang.org/grpc"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/server"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 type Gerencia struct {
-	// server *grpc.Server
-	client *client.GravacaoClient // TODO verificar se campo privado não interfere em algo
+	server *grpc.Server
+	client *client.GravacaoClient
 }
 
-// Stop para a aplicação depois de recebido um sinal de interrupção do sistema
-// func (g *Gerencia) Stop() {
-// 	fmt.Println("Finalizando aplicação....")
-// 	g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30 seg
-// 	fmt.Println("Bye.")
-// }
+func (g *Gerencia) Stop() {
+	fmt.Println("Finalizando aplicação...")
+	g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30seg ou menos
+	fmt.Println("Bye.")
+}
 
-// Main é a funcao principal que inicia o server e client da API que intercomunica
-// os servicos dos servidores de gerencia e gravacao
-func Run() error {
+// TODO colocar gRPC Health Server https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
 
-	// logger,  := zap.NewProduction()
-	// defer logger.Sync()
+var build = "develop"
+
+func Run(log *zap.SugaredLogger) error {
+
+	cfg, err := config.Load(build)
+	if err != nil {
+		return fmt.Errorf("parsing config: %w", err)
+	}
+
+	log.Infow("startup", "config", cfg) // TODO criar um prettyprint para o cfg no log
+
+	// =========================================================================
+	// Start Service
+
+	log.Infow("startup", "status", "initializing gerencia")
+
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
 
 	g := &Gerencia{
-		// server: server.NovoServidorGerencia(),
+		server: server.NovoServidorGerencia(),
 		client: client.NovoClientGravacao(),
 	}
 
-	// dbCfg := database.NewConfig()
-	// _, err := database.NewPool(dbCfg) // TODO implementar
-	// if err != nil {
-	// 	return err
-	// }
+	serverErrors := make(chan error, 1)
 
-	fmt.Println("chegou aqui 1 gerenciaaaa")
+	// TODO ver abaixo, tem exemplo toda execução em contexto
+	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
+	go func() {
+		lis, err := net.Listen(cfg.Gerencia.ServerConn, fmt.Sprintf("%s:%s", cfg.Gerencia.ServerAddr, cfg.Gerencia.ServerPort))
+		if err != nil {
+			log.Errorw("startup", "status", "could not open socket", cfg.Gerencia.ServerConn, cfg.Gerencia.ServerAddr, cfg.Gerencia.ServerPort, "ERROR", err)
+		}
 
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		log.Infow("startup", "status", "gRPC server started") // TODO add address
+		serverErrors <- g.server.Serve(lis)
+	}()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	// =========================================================================
+	// Shutdown
 
-	fmt.Println("chegou aqui 2")
+	select {
+	case err := <-serverErrors:
+		return fmt.Errorf("server error: %w", err)
 
-	time.Sleep(time.Duration(time.Second * 10))
-	resp, err := g.client.IniciarProcessamento(ctx, nil)
-	if err != nil {
+	case sig := <-shutdown:
+		log.Infow("shutdown", "status", "shutdown started", "signal", sig)
+		defer log.Infow("shutdown", "status", "shutdown complete", "signal", sig)
 
-		fmt.Println("deu erro", err)
+		g.server.GracefulStop()
 	}
-	fmt.Printf("chegou status: %s", resp.Status)
 
-	fmt.Println("chegou aqui 3")
-	<-c
-	// g.Stop()
+	return nil
+	// fmt.Println("chegou aqui 1 gerenciaaaa")
 
-	fmt.Println("chegou aqui 4")
-	return errors.New("finalizou funcao main")
+	// c := make(chan os.Signal, 1)
+	// signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+
+	// ctx, cancel := context.WithCancel(context.Background())
+	// defer cancel()
+
+	// fmt.Println("chegou aqui 2")
+
+	// time.Sleep(time.Duration(time.Second * 10))
+	// resp, err := g.client.IniciarProcessamento(ctx, nil)
+	// if err != nil {
+
+	// 	fmt.Println("deu erro", err)
+	// }
+	// fmt.Printf("chegou status: %s", resp.Status)
+
+	// fmt.Println("chegou aqui 3")
+	// <-c
+	// // g.Stop()
+
+	// fmt.Println("chegou aqui 4")
+	// return errors.New("finalizou funcao main")
 }

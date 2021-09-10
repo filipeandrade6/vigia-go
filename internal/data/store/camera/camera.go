@@ -282,3 +282,16 @@ func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
 
 // 	return products, nil
 // }
+
+// TODO aqui so para demonstrar
+// func (s *ServidorGravacao) ToProtobuf() *pb.RegistrarServidorGravacaoReq {
+// 	return &pb.RegistrarServidorGravacaoReq{
+// 		Id:         s.ID,
+// 		EnderecoIp: s.EnderecoIP,
+// 		Porta:      s.Porta,
+// 	}
+// }
+
+// func (s *ServidorGravacao) FromProtobuf(sv *pb.RegistrarServidorGravacaoResp) {
+// 	s.ID = sv.GetId()
+// }
