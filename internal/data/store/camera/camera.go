@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
-	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
@@ -113,9 +112,10 @@ func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (Camera, e
 // }
 
 func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
-	if err := validate.CheckID(cameraID); err != nil {
-		return Camera{}, database.ErrInvalidID
-	}
+	// TODO validate
+	// if err := validate.CheckID(cameraID); err != nil {
+	// 	return Camera{}, database.ErrInvalidID
+	// }
 
 	data := struct {
 		CameraID string `db: camera_id`

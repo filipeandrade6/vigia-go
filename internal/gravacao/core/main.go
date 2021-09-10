@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc"
 
 	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
-	// "github.com/ardanlabs/service/business/sys/database"
+	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	// "github.com/ardanlabs/service/business/sys/metrics"
 	// "github.com/filipeandrade6/vigia-go/business/sys/auth"
 	config "github.com/filipeandrade6/vigia-go/internal/config"
@@ -96,24 +96,24 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Start Database
 
-	// log.Infow("startup", "status", "initializing database support", "host", cfg.DB.Host)
+	log.Infow("startup", "status", "initializing database support", "host", cfg.DB.Host)
 
-	// db, err := database.Open(database.Config{
-	// 	User:         cfg.DB.User,
-	// 	Password:     cfg.DB.Password,
-	// 	Host:         cfg.DB.Host,
-	// 	Name:         cfg.DB.Name,
-	// 	MaxIdleConns: cfg.DB.MaxIdleConns,
-	// 	MaxOpenConns: cfg.DB.MaxOpenConns,
-	// 	DisableTLS:   cfg.DB.DisableTLS,
-	// })
-	// if err != nil {
-	// 	return fmt.Errorf("connecting to db: %w", err)
-	// }
-	// defer func() {
-	// 	log.Infow("shutdown", "status", "stopping database support", "host", cfg.DB.Host)
-	// 	db.Close()
-	// }()
+	db, err := database.Open(database.Config{
+		Host:         cfg.DB.Host,
+		User:         cfg.DB.User,
+		Password:     cfg.DB.Password,
+		Name:         cfg.DB.Name,
+		MaxIdleConns: cfg.DB.MaxIdleConns,
+		MaxOpenConns: cfg.DB.MaxOpenConns,
+		DisableTLS:   cfg.DB.DisableTLS,
+	})
+	if err != nil {
+		return fmt.Errorf("connecting to db: %w", err)
+	}
+	defer func() {
+		log.Infow("shutdown", "status", "stopping database support", "host", cfg.DB.Host)
+		db.Close()
+	}()
 
 	// =========================================================================
 	// Start Tracing Support
@@ -195,9 +195,9 @@ func Run(log *zap.SugaredLogger) error {
 	// TODO ver abaixo, tem exemplo toda execução em contexto
 	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
 	go func() {
-		lis, err := net.Listen(cfg.Service.GravServerConn, fmt.Sprintf("%s:%s", cfg.Service.GravServerAddr, cfg.Service.GravServerPort))
+		lis, err := net.Listen(cfg.Gravacao.ServerConn, fmt.Sprintf("%s:%s", cfg.Gravacao.ServerAddr, cfg.Gravacao.ServerPort))
 		if err != nil {
-			log.Errorw("startup", "status", "could not open socket", cfg.Service.GravServerConn, cfg.Service.GravServerAddr, cfg.Service.GravServerPort, "ERROR", err)
+			log.Errorw("startup", "status", "could not open socket", cfg.Gravacao.ServerConn, cfg.Gravacao.ServerAddr, cfg.Gravacao.ServerPort, "ERROR", err)
 		}
 
 		log.Infow("startup", "status", "gRPC server started") // TODO add address
@@ -207,7 +207,6 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Shutdown
 
-	// Blocking main and waiting for shutdown.
 	select {
 	case err := <-serverErrors:
 		return fmt.Errorf("server error: %w", err)
