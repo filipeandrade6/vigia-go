@@ -67,14 +67,14 @@ func (x *MigrateReq) GetVersao() int32 {
 	return 0
 }
 
-type MigrateResp struct {
+type MigrateRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MigrateResp) Reset() {
-	*x = MigrateResp{}
+func (x *MigrateRes) Reset() {
+	*x = MigrateRes{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -82,13 +82,13 @@ func (x *MigrateResp) Reset() {
 	}
 }
 
-func (x *MigrateResp) String() string {
+func (x *MigrateRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MigrateResp) ProtoMessage() {}
+func (*MigrateRes) ProtoMessage() {}
 
-func (x *MigrateResp) ProtoReflect() protoreflect.Message {
+func (x *MigrateRes) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -100,23 +100,23 @@ func (x *MigrateResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use MigrateResp.ProtoReflect.Descriptor instead.
-func (*MigrateResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use MigrateRes.ProtoReflect.Descriptor instead.
+func (*MigrateRes) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{1}
 }
 
-type RegistrarServidorGravacaoReq struct {
+type CreateServidorGravacaoReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // Se vazio será gerado,caso contrário autentica no banco de dados
-	EnderecoIp string `protobuf:"bytes,2,opt,name=endereco_ip,json=enderecoIp,proto3" json:"endereco_ip,omitempty"`
-	Porta      int32  `protobuf:"varint,3,opt,name=porta,proto3" json:"porta,omitempty"`
+	EnderecoIp string `protobuf:"bytes,1,opt,name=endereco_ip,json=enderecoIp,proto3" json:"endereco_ip,omitempty"`
+	Porta      int32  `protobuf:"varint,2,opt,name=porta,proto3" json:"porta,omitempty"`
+	Host       string `protobuf:"bytes,3,opt,name=host,proto3" json:"host,omitempty"`
 }
 
-func (x *RegistrarServidorGravacaoReq) Reset() {
-	*x = RegistrarServidorGravacaoReq{}
+func (x *CreateServidorGravacaoReq) Reset() {
+	*x = CreateServidorGravacaoReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -124,13 +124,13 @@ func (x *RegistrarServidorGravacaoReq) Reset() {
 	}
 }
 
-func (x *RegistrarServidorGravacaoReq) String() string {
+func (x *CreateServidorGravacaoReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RegistrarServidorGravacaoReq) ProtoMessage() {}
+func (*CreateServidorGravacaoReq) ProtoMessage() {}
 
-func (x *RegistrarServidorGravacaoReq) ProtoReflect() protoreflect.Message {
+func (x *CreateServidorGravacaoReq) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -142,42 +142,42 @@ func (x *RegistrarServidorGravacaoReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RegistrarServidorGravacaoReq.ProtoReflect.Descriptor instead.
-func (*RegistrarServidorGravacaoReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateServidorGravacaoReq.ProtoReflect.Descriptor instead.
+func (*CreateServidorGravacaoReq) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *RegistrarServidorGravacaoReq) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *RegistrarServidorGravacaoReq) GetEnderecoIp() string {
+func (x *CreateServidorGravacaoReq) GetEnderecoIp() string {
 	if x != nil {
 		return x.EnderecoIp
 	}
 	return ""
 }
 
-func (x *RegistrarServidorGravacaoReq) GetPorta() int32 {
+func (x *CreateServidorGravacaoReq) GetPorta() int32 {
 	if x != nil {
 		return x.Porta
 	}
 	return 0
 }
 
-type RegistrarServidorGravacaoResp struct {
+func (x *CreateServidorGravacaoReq) GetHost() string {
+	if x != nil {
+		return x.Host
+	}
+	return ""
+}
+
+type CreateServidorGravacaoRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	ServidorGravacaoId string `protobuf:"bytes,1,opt,name=servidor_gravacao_id,json=servidorGravacaoId,proto3" json:"servidor_gravacao_id,omitempty"`
 }
 
-func (x *RegistrarServidorGravacaoResp) Reset() {
-	*x = RegistrarServidorGravacaoResp{}
+func (x *CreateServidorGravacaoRes) Reset() {
+	*x = CreateServidorGravacaoRes{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -185,13 +185,13 @@ func (x *RegistrarServidorGravacaoResp) Reset() {
 	}
 }
 
-func (x *RegistrarServidorGravacaoResp) String() string {
+func (x *CreateServidorGravacaoRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RegistrarServidorGravacaoResp) ProtoMessage() {}
+func (*CreateServidorGravacaoRes) ProtoMessage() {}
 
-func (x *RegistrarServidorGravacaoResp) ProtoReflect() protoreflect.Message {
+func (x *CreateServidorGravacaoRes) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -203,26 +203,26 @@ func (x *RegistrarServidorGravacaoResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RegistrarServidorGravacaoResp.ProtoReflect.Descriptor instead.
-func (*RegistrarServidorGravacaoResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateServidorGravacaoRes.ProtoReflect.Descriptor instead.
+func (*CreateServidorGravacaoRes) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *RegistrarServidorGravacaoResp) GetId() string {
+func (x *CreateServidorGravacaoRes) GetServidorGravacaoId() string {
 	if x != nil {
-		return x.Id
+		return x.ServidorGravacaoId
 	}
 	return ""
 }
 
-type ConfigBancoDeDadosReq struct {
+type ReadServidorGravacaoReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *ConfigBancoDeDadosReq) Reset() {
-	*x = ConfigBancoDeDadosReq{}
+func (x *ReadServidorGravacaoReq) Reset() {
+	*x = ReadServidorGravacaoReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -230,13 +230,13 @@ func (x *ConfigBancoDeDadosReq) Reset() {
 	}
 }
 
-func (x *ConfigBancoDeDadosReq) String() string {
+func (x *ReadServidorGravacaoReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ConfigBancoDeDadosReq) ProtoMessage() {}
+func (*ReadServidorGravacaoReq) ProtoMessage() {}
 
-func (x *ConfigBancoDeDadosReq) ProtoReflect() protoreflect.Message {
+func (x *ReadServidorGravacaoReq) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -248,26 +248,19 @@ func (x *ConfigBancoDeDadosReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConfigBancoDeDadosReq.ProtoReflect.Descriptor instead.
-func (*ConfigBancoDeDadosReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use ReadServidorGravacaoReq.ProtoReflect.Descriptor instead.
+func (*ReadServidorGravacaoReq) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{4}
 }
 
-type ConfigBancoDeDadosResp struct {
+type ReadServidorGravacaoRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
-
-	Host         string `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
-	Port         int32  `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
-	User         string `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
-	Password     string `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
-	Dbname       string `protobuf:"bytes,5,opt,name=dbname,proto3" json:"dbname,omitempty"`
-	Poolmaxconns int32  `protobuf:"varint,6,opt,name=poolmaxconns,proto3" json:"poolmaxconns,omitempty"`
 }
 
-func (x *ConfigBancoDeDadosResp) Reset() {
-	*x = ConfigBancoDeDadosResp{}
+func (x *ReadServidorGravacaoRes) Reset() {
+	*x = ReadServidorGravacaoRes{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -275,13 +268,13 @@ func (x *ConfigBancoDeDadosResp) Reset() {
 	}
 }
 
-func (x *ConfigBancoDeDadosResp) String() string {
+func (x *ReadServidorGravacaoRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ConfigBancoDeDadosResp) ProtoMessage() {}
+func (*ReadServidorGravacaoRes) ProtoMessage() {}
 
-func (x *ConfigBancoDeDadosResp) ProtoReflect() protoreflect.Message {
+func (x *ReadServidorGravacaoRes) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -293,61 +286,19 @@ func (x *ConfigBancoDeDadosResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConfigBancoDeDadosResp.ProtoReflect.Descriptor instead.
-func (*ConfigBancoDeDadosResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use ReadServidorGravacaoRes.ProtoReflect.Descriptor instead.
+func (*ReadServidorGravacaoRes) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *ConfigBancoDeDadosResp) GetHost() string {
-	if x != nil {
-		return x.Host
-	}
-	return ""
-}
-
-func (x *ConfigBancoDeDadosResp) GetPort() int32 {
-	if x != nil {
-		return x.Port
-	}
-	return 0
-}
-
-func (x *ConfigBancoDeDadosResp) GetUser() string {
-	if x != nil {
-		return x.User
-	}
-	return ""
-}
-
-func (x *ConfigBancoDeDadosResp) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-func (x *ConfigBancoDeDadosResp) GetDbname() string {
-	if x != nil {
-		return x.Dbname
-	}
-	return ""
-}
-
-func (x *ConfigBancoDeDadosResp) GetPoolmaxconns() int32 {
-	if x != nil {
-		return x.Poolmaxconns
-	}
-	return 0
-}
-
-type ConfigurarCameraReq struct {
+type UpdateServidorGravacaoReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *ConfigurarCameraReq) Reset() {
-	*x = ConfigurarCameraReq{}
+func (x *UpdateServidorGravacaoReq) Reset() {
+	*x = UpdateServidorGravacaoReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -355,13 +306,13 @@ func (x *ConfigurarCameraReq) Reset() {
 	}
 }
 
-func (x *ConfigurarCameraReq) String() string {
+func (x *UpdateServidorGravacaoReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ConfigurarCameraReq) ProtoMessage() {}
+func (*UpdateServidorGravacaoReq) ProtoMessage() {}
 
-func (x *ConfigurarCameraReq) ProtoReflect() protoreflect.Message {
+func (x *UpdateServidorGravacaoReq) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -373,19 +324,19 @@ func (x *ConfigurarCameraReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConfigurarCameraReq.ProtoReflect.Descriptor instead.
-func (*ConfigurarCameraReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use UpdateServidorGravacaoReq.ProtoReflect.Descriptor instead.
+func (*UpdateServidorGravacaoReq) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{6}
 }
 
-type ConfigurarCameraResp struct {
+type UpdateServidorGravacaoRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *ConfigurarCameraResp) Reset() {
-	*x = ConfigurarCameraResp{}
+func (x *UpdateServidorGravacaoRes) Reset() {
+	*x = UpdateServidorGravacaoRes{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -393,13 +344,13 @@ func (x *ConfigurarCameraResp) Reset() {
 	}
 }
 
-func (x *ConfigurarCameraResp) String() string {
+func (x *UpdateServidorGravacaoRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ConfigurarCameraResp) ProtoMessage() {}
+func (*UpdateServidorGravacaoRes) ProtoMessage() {}
 
-func (x *ConfigurarCameraResp) ProtoReflect() protoreflect.Message {
+func (x *UpdateServidorGravacaoRes) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -411,19 +362,21 @@ func (x *ConfigurarCameraResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConfigurarCameraResp.ProtoReflect.Descriptor instead.
-func (*ConfigurarCameraResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use UpdateServidorGravacaoRes.ProtoReflect.Descriptor instead.
+func (*UpdateServidorGravacaoRes) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{7}
 }
 
-type ConfigurarProcessadorReq struct {
+type DeleteServidorGravacaoReq struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	ServidorGravacaoId string `protobuf:"bytes,1,opt,name=servidor_gravacao_id,json=servidorGravacaoId,proto3" json:"servidor_gravacao_id,omitempty"`
 }
 
-func (x *ConfigurarProcessadorReq) Reset() {
-	*x = ConfigurarProcessadorReq{}
+func (x *DeleteServidorGravacaoReq) Reset() {
+	*x = DeleteServidorGravacaoReq{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -431,13 +384,13 @@ func (x *ConfigurarProcessadorReq) Reset() {
 	}
 }
 
-func (x *ConfigurarProcessadorReq) String() string {
+func (x *DeleteServidorGravacaoReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ConfigurarProcessadorReq) ProtoMessage() {}
+func (*DeleteServidorGravacaoReq) ProtoMessage() {}
 
-func (x *ConfigurarProcessadorReq) ProtoReflect() protoreflect.Message {
+func (x *DeleteServidorGravacaoReq) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -449,19 +402,26 @@ func (x *ConfigurarProcessadorReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConfigurarProcessadorReq.ProtoReflect.Descriptor instead.
-func (*ConfigurarProcessadorReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use DeleteServidorGravacaoReq.ProtoReflect.Descriptor instead.
+func (*DeleteServidorGravacaoReq) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{8}
 }
 
-type ConfigurarProcessadorResp struct {
+func (x *DeleteServidorGravacaoReq) GetServidorGravacaoId() string {
+	if x != nil {
+		return x.ServidorGravacaoId
+	}
+	return ""
+}
+
+type DeleteServidorGravacaoRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *ConfigurarProcessadorResp) Reset() {
-	*x = ConfigurarProcessadorResp{}
+func (x *DeleteServidorGravacaoRes) Reset() {
+	*x = DeleteServidorGravacaoRes{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_gerencia_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -469,13 +429,13 @@ func (x *ConfigurarProcessadorResp) Reset() {
 	}
 }
 
-func (x *ConfigurarProcessadorResp) String() string {
+func (x *DeleteServidorGravacaoRes) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ConfigurarProcessadorResp) ProtoMessage() {}
+func (*DeleteServidorGravacaoRes) ProtoMessage() {}
 
-func (x *ConfigurarProcessadorResp) ProtoReflect() protoreflect.Message {
+func (x *DeleteServidorGravacaoRes) ProtoReflect() protoreflect.Message {
 	mi := &file_gerencia_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -487,9 +447,751 @@ func (x *ConfigurarProcessadorResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ConfigurarProcessadorResp.ProtoReflect.Descriptor instead.
-func (*ConfigurarProcessadorResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use DeleteServidorGravacaoRes.ProtoReflect.Descriptor instead.
+func (*DeleteServidorGravacaoRes) Descriptor() ([]byte, []int) {
 	return file_gerencia_proto_rawDescGZIP(), []int{9}
+}
+
+type CreateCameraReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Descricao      string `protobuf:"bytes,1,opt,name=descricao,proto3" json:"descricao,omitempty"`
+	EnderecoIp     string `protobuf:"bytes,2,opt,name=endereco_ip,json=enderecoIp,proto3" json:"endereco_ip,omitempty"`
+	Porta          int32  `protobuf:"varint,3,opt,name=porta,proto3" json:"porta,omitempty"`
+	Canal          int32  `protobuf:"varint,4,opt,name=canal,proto3" json:"canal,omitempty"`
+	Usuario        string `protobuf:"bytes,5,opt,name=usuario,proto3" json:"usuario,omitempty"`
+	Senha          string `protobuf:"bytes,6,opt,name=senha,proto3" json:"senha,omitempty"`
+	Geolocalizacao string `protobuf:"bytes,7,opt,name=geolocalizacao,proto3" json:"geolocalizacao,omitempty"`
+}
+
+func (x *CreateCameraReq) Reset() {
+	*x = CreateCameraReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateCameraReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCameraReq) ProtoMessage() {}
+
+func (x *CreateCameraReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCameraReq.ProtoReflect.Descriptor instead.
+func (*CreateCameraReq) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CreateCameraReq) GetDescricao() string {
+	if x != nil {
+		return x.Descricao
+	}
+	return ""
+}
+
+func (x *CreateCameraReq) GetEnderecoIp() string {
+	if x != nil {
+		return x.EnderecoIp
+	}
+	return ""
+}
+
+func (x *CreateCameraReq) GetPorta() int32 {
+	if x != nil {
+		return x.Porta
+	}
+	return 0
+}
+
+func (x *CreateCameraReq) GetCanal() int32 {
+	if x != nil {
+		return x.Canal
+	}
+	return 0
+}
+
+func (x *CreateCameraReq) GetUsuario() string {
+	if x != nil {
+		return x.Usuario
+	}
+	return ""
+}
+
+func (x *CreateCameraReq) GetSenha() string {
+	if x != nil {
+		return x.Senha
+	}
+	return ""
+}
+
+func (x *CreateCameraReq) GetGeolocalizacao() string {
+	if x != nil {
+		return x.Geolocalizacao
+	}
+	return ""
+}
+
+type CreateCameraRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CameraId string `protobuf:"bytes,1,opt,name=camera_id,json=cameraId,proto3" json:"camera_id,omitempty"`
+}
+
+func (x *CreateCameraRes) Reset() {
+	*x = CreateCameraRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateCameraRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCameraRes) ProtoMessage() {}
+
+func (x *CreateCameraRes) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCameraRes.ProtoReflect.Descriptor instead.
+func (*CreateCameraRes) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *CreateCameraRes) GetCameraId() string {
+	if x != nil {
+		return x.CameraId
+	}
+	return ""
+}
+
+type ReadCameraReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *ReadCameraReq) Reset() {
+	*x = ReadCameraReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ReadCameraReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadCameraReq) ProtoMessage() {}
+
+func (x *ReadCameraReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadCameraReq.ProtoReflect.Descriptor instead.
+func (*ReadCameraReq) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{12}
+}
+
+type ReadCameraRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *ReadCameraRes) Reset() {
+	*x = ReadCameraRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ReadCameraRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadCameraRes) ProtoMessage() {}
+
+func (x *ReadCameraRes) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadCameraRes.ProtoReflect.Descriptor instead.
+func (*ReadCameraRes) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{13}
+}
+
+type UpdateCameraReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UpdateCameraReq) Reset() {
+	*x = UpdateCameraReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateCameraReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCameraReq) ProtoMessage() {}
+
+func (x *UpdateCameraReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCameraReq.ProtoReflect.Descriptor instead.
+func (*UpdateCameraReq) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{14}
+}
+
+type UpdateCameraRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UpdateCameraRes) Reset() {
+	*x = UpdateCameraRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateCameraRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCameraRes) ProtoMessage() {}
+
+func (x *UpdateCameraRes) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCameraRes.ProtoReflect.Descriptor instead.
+func (*UpdateCameraRes) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{15}
+}
+
+type DeleteCameraReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CameraId string `protobuf:"bytes,1,opt,name=camera_id,json=cameraId,proto3" json:"camera_id,omitempty"`
+}
+
+func (x *DeleteCameraReq) Reset() {
+	*x = DeleteCameraReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteCameraReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCameraReq) ProtoMessage() {}
+
+func (x *DeleteCameraReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCameraReq.ProtoReflect.Descriptor instead.
+func (*DeleteCameraReq) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *DeleteCameraReq) GetCameraId() string {
+	if x != nil {
+		return x.CameraId
+	}
+	return ""
+}
+
+type DeleteCameraRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *DeleteCameraRes) Reset() {
+	*x = DeleteCameraRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteCameraRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCameraRes) ProtoMessage() {}
+
+func (x *DeleteCameraRes) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCameraRes.ProtoReflect.Descriptor instead.
+func (*DeleteCameraRes) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{17}
+}
+
+type CreateProcessoReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ServidorGravacaoId string `protobuf:"bytes,1,opt,name=servidor_gravacao_id,json=servidorGravacaoId,proto3" json:"servidor_gravacao_id,omitempty"`
+	CameraId           string `protobuf:"bytes,2,opt,name=camera_id,json=cameraId,proto3" json:"camera_id,omitempty"`
+	Processador        int32  `protobuf:"varint,3,opt,name=processador,proto3" json:"processador,omitempty"`
+	Adaptador          int32  `protobuf:"varint,4,opt,name=adaptador,proto3" json:"adaptador,omitempty"`
+	Execucao           bool   `protobuf:"varint,5,opt,name=execucao,proto3" json:"execucao,omitempty"`
+}
+
+func (x *CreateProcessoReq) Reset() {
+	*x = CreateProcessoReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateProcessoReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateProcessoReq) ProtoMessage() {}
+
+func (x *CreateProcessoReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateProcessoReq.ProtoReflect.Descriptor instead.
+func (*CreateProcessoReq) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *CreateProcessoReq) GetServidorGravacaoId() string {
+	if x != nil {
+		return x.ServidorGravacaoId
+	}
+	return ""
+}
+
+func (x *CreateProcessoReq) GetCameraId() string {
+	if x != nil {
+		return x.CameraId
+	}
+	return ""
+}
+
+func (x *CreateProcessoReq) GetProcessador() int32 {
+	if x != nil {
+		return x.Processador
+	}
+	return 0
+}
+
+func (x *CreateProcessoReq) GetAdaptador() int32 {
+	if x != nil {
+		return x.Adaptador
+	}
+	return 0
+}
+
+func (x *CreateProcessoReq) GetExecucao() bool {
+	if x != nil {
+		return x.Execucao
+	}
+	return false
+}
+
+type CreateProcessoRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ProcessoId string `protobuf:"bytes,1,opt,name=processo_id,json=processoId,proto3" json:"processo_id,omitempty"`
+}
+
+func (x *CreateProcessoRes) Reset() {
+	*x = CreateProcessoRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateProcessoRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateProcessoRes) ProtoMessage() {}
+
+func (x *CreateProcessoRes) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateProcessoRes.ProtoReflect.Descriptor instead.
+func (*CreateProcessoRes) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *CreateProcessoRes) GetProcessoId() string {
+	if x != nil {
+		return x.ProcessoId
+	}
+	return ""
+}
+
+type ReadProcessoReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *ReadProcessoReq) Reset() {
+	*x = ReadProcessoReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ReadProcessoReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadProcessoReq) ProtoMessage() {}
+
+func (x *ReadProcessoReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadProcessoReq.ProtoReflect.Descriptor instead.
+func (*ReadProcessoReq) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{20}
+}
+
+type ReadProcessoRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *ReadProcessoRes) Reset() {
+	*x = ReadProcessoRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ReadProcessoRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReadProcessoRes) ProtoMessage() {}
+
+func (x *ReadProcessoRes) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReadProcessoRes.ProtoReflect.Descriptor instead.
+func (*ReadProcessoRes) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{21}
+}
+
+type UpdateProcessoReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UpdateProcessoReq) Reset() {
+	*x = UpdateProcessoReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateProcessoReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateProcessoReq) ProtoMessage() {}
+
+func (x *UpdateProcessoReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateProcessoReq.ProtoReflect.Descriptor instead.
+func (*UpdateProcessoReq) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{22}
+}
+
+type UpdateProcessoRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *UpdateProcessoRes) Reset() {
+	*x = UpdateProcessoRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateProcessoRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateProcessoRes) ProtoMessage() {}
+
+func (x *UpdateProcessoRes) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateProcessoRes.ProtoReflect.Descriptor instead.
+func (*UpdateProcessoRes) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{23}
+}
+
+type DeleteProcessoReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ProcessoId string `protobuf:"bytes,1,opt,name=processo_id,json=processoId,proto3" json:"processo_id,omitempty"`
+}
+
+func (x *DeleteProcessoReq) Reset() {
+	*x = DeleteProcessoReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteProcessoReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteProcessoReq) ProtoMessage() {}
+
+func (x *DeleteProcessoReq) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteProcessoReq.ProtoReflect.Descriptor instead.
+func (*DeleteProcessoReq) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *DeleteProcessoReq) GetProcessoId() string {
+	if x != nil {
+		return x.ProcessoId
+	}
+	return ""
+}
+
+type DeleteProcessoRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *DeleteProcessoRes) Reset() {
+	*x = DeleteProcessoRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_gerencia_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteProcessoRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteProcessoRes) ProtoMessage() {}
+
+func (x *DeleteProcessoRes) ProtoReflect() protoreflect.Message {
+	mi := &file_gerencia_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteProcessoRes.ProtoReflect.Descriptor instead.
+func (*DeleteProcessoRes) Descriptor() ([]byte, []int) {
+	return file_gerencia_proto_rawDescGZIP(), []int{25}
 }
 
 var File_gerencia_proto protoreflect.FileDescriptor
@@ -499,66 +1201,151 @@ var file_gerencia_proto_rawDesc = []byte{
 	0x12, 0x08, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x22, 0x24, 0x0a, 0x0a, 0x4d, 0x69,
 	0x67, 0x72, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x12, 0x16, 0x0a, 0x06, 0x76, 0x65, 0x72, 0x73,
 	0x61, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x76, 0x65, 0x72, 0x73, 0x61, 0x6f,
-	0x22, 0x0d, 0x0a, 0x0b, 0x4d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x22,
-	0x65, 0x0a, 0x1c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x72, 0x53, 0x65, 0x72, 0x76,
-	0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x71, 0x12,
-	0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12,
-	0x1f, 0x0a, 0x0b, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x65, 0x63, 0x6f, 0x5f, 0x69, 0x70, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x65, 0x63, 0x6f, 0x49, 0x70,
-	0x12, 0x14, 0x0a, 0x05, 0x70, 0x6f, 0x72, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52,
-	0x05, 0x70, 0x6f, 0x72, 0x74, 0x61, 0x22, 0x2f, 0x0a, 0x1d, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x72, 0x61, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61,
-	0x63, 0x61, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x17, 0x0a, 0x15, 0x43, 0x6f, 0x6e, 0x66, 0x69,
-	0x67, 0x42, 0x61, 0x6e, 0x63, 0x6f, 0x44, 0x65, 0x44, 0x61, 0x64, 0x6f, 0x73, 0x52, 0x65, 0x71,
-	0x22, 0xac, 0x01, 0x0a, 0x16, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x42, 0x61, 0x6e, 0x63, 0x6f,
-	0x44, 0x65, 0x44, 0x61, 0x64, 0x6f, 0x73, 0x52, 0x65, 0x73, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x68,
-	0x6f, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x68, 0x6f, 0x73, 0x74, 0x12,
-	0x12, 0x0a, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x70,
-	0x6f, 0x72, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77,
-	0x6f, 0x72, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77,
-	0x6f, 0x72, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x64, 0x62, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x05, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x06, 0x64, 0x62, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x22, 0x0a, 0x0c, 0x70,
-	0x6f, 0x6f, 0x6c, 0x6d, 0x61, 0x78, 0x63, 0x6f, 0x6e, 0x6e, 0x73, 0x18, 0x06, 0x20, 0x01, 0x28,
-	0x05, 0x52, 0x0c, 0x70, 0x6f, 0x6f, 0x6c, 0x6d, 0x61, 0x78, 0x63, 0x6f, 0x6e, 0x6e, 0x73, 0x22,
-	0x15, 0x0a, 0x13, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x43, 0x61, 0x6d,
-	0x65, 0x72, 0x61, 0x52, 0x65, 0x71, 0x22, 0x16, 0x0a, 0x14, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67,
-	0x75, 0x72, 0x61, 0x72, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x73, 0x70, 0x22, 0x1a,
-	0x0a, 0x18, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63,
-	0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x52, 0x65, 0x71, 0x22, 0x1b, 0x0a, 0x19, 0x43, 0x6f,
-	0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x61,
-	0x64, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x32, 0xc8, 0x03, 0x0a, 0x08, 0x47, 0x65, 0x72, 0x65,
-	0x6e, 0x63, 0x69, 0x61, 0x12, 0x38, 0x0a, 0x07, 0x4d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x65, 0x12,
-	0x14, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x4d, 0x69, 0x67, 0x72, 0x61,
-	0x74, 0x65, 0x52, 0x65, 0x71, 0x1a, 0x15, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61,
-	0x2e, 0x4d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x12, 0x6e,
-	0x0a, 0x19, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69,
-	0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x12, 0x26, 0x2e, 0x67, 0x65,
-	0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x72,
+	0x22, 0x0c, 0x0a, 0x0a, 0x4d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x22, 0x66,
+	0x0a, 0x19, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72,
+	0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x71, 0x12, 0x1f, 0x0a, 0x0b, 0x65,
+	0x6e, 0x64, 0x65, 0x72, 0x65, 0x63, 0x6f, 0x5f, 0x69, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0a, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x65, 0x63, 0x6f, 0x49, 0x70, 0x12, 0x14, 0x0a, 0x05,
+	0x70, 0x6f, 0x72, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x70, 0x6f, 0x72,
+	0x74, 0x61, 0x12, 0x12, 0x0a, 0x04, 0x68, 0x6f, 0x73, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x68, 0x6f, 0x73, 0x74, 0x22, 0x4d, 0x0a, 0x19, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
 	0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f,
-	0x52, 0x65, 0x71, 0x1a, 0x27, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x52,
-	0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x72, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72,
-	0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x12, 0x59,
-	0x0a, 0x12, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x42, 0x61, 0x6e, 0x63, 0x6f, 0x44, 0x65, 0x44,
-	0x61, 0x64, 0x6f, 0x73, 0x12, 0x1f, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e,
-	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x42, 0x61, 0x6e, 0x63, 0x6f, 0x44, 0x65, 0x44, 0x61, 0x64,
-	0x6f, 0x73, 0x52, 0x65, 0x71, 0x1a, 0x20, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61,
-	0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x42, 0x61, 0x6e, 0x63, 0x6f, 0x44, 0x65, 0x44, 0x61,
-	0x64, 0x6f, 0x73, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x12, 0x53, 0x0a, 0x10, 0x43, 0x6f, 0x6e,
-	0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x12, 0x1d, 0x2e,
-	0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75,
-	0x72, 0x61, 0x72, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x71, 0x1a, 0x1e, 0x2e, 0x67,
-	0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72,
-	0x61, 0x72, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x73, 0x70, 0x22, 0x00, 0x12, 0x62,
-	0x0a, 0x15, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f, 0x63,
-	0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x12, 0x22, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63,
-	0x69, 0x61, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61, 0x72, 0x50, 0x72, 0x6f,
-	0x63, 0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x52, 0x65, 0x71, 0x1a, 0x23, 0x2e, 0x67, 0x65,
-	0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x75, 0x72, 0x61,
-	0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70,
-	0x22, 0x00, 0x42, 0x13, 0x5a, 0x11, 0x2e, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x52, 0x65, 0x73, 0x12, 0x30, 0x0a, 0x14, 0x73, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x5f,
+	0x67, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x12, 0x73, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61,
+	0x63, 0x61, 0x6f, 0x49, 0x64, 0x22, 0x19, 0x0a, 0x17, 0x52, 0x65, 0x61, 0x64, 0x53, 0x65, 0x72,
+	0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x71,
+	0x22, 0x19, 0x0a, 0x17, 0x52, 0x65, 0x61, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72,
+	0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x73, 0x22, 0x1b, 0x0a, 0x19, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61,
+	0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x71, 0x22, 0x1b, 0x0a, 0x19, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63,
+	0x61, 0x6f, 0x52, 0x65, 0x73, 0x22, 0x4d, 0x0a, 0x19, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53,
+	0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52,
+	0x65, 0x71, 0x12, 0x30, 0x0a, 0x14, 0x73, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x5f, 0x67,
+	0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x12, 0x73, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63,
+	0x61, 0x6f, 0x49, 0x64, 0x22, 0x1b, 0x0a, 0x19, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x65,
+	0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65,
+	0x73, 0x22, 0xd4, 0x01, 0x0a, 0x0f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65,
+	0x72, 0x61, 0x52, 0x65, 0x71, 0x12, 0x1c, 0x0a, 0x09, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x63,
+	0x61, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69,
+	0x63, 0x61, 0x6f, 0x12, 0x1f, 0x0a, 0x0b, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x65, 0x63, 0x6f, 0x5f,
+	0x69, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x65,
+	0x63, 0x6f, 0x49, 0x70, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x6f, 0x72, 0x74, 0x61, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x05, 0x52, 0x05, 0x70, 0x6f, 0x72, 0x74, 0x61, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x61,
+	0x6e, 0x61, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x63, 0x61, 0x6e, 0x61, 0x6c,
+	0x12, 0x18, 0x0a, 0x07, 0x75, 0x73, 0x75, 0x61, 0x72, 0x69, 0x6f, 0x18, 0x05, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x75, 0x73, 0x75, 0x61, 0x72, 0x69, 0x6f, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x65,
+	0x6e, 0x68, 0x61, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x73, 0x65, 0x6e, 0x68, 0x61,
+	0x12, 0x26, 0x0a, 0x0e, 0x67, 0x65, 0x6f, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x69, 0x7a, 0x61, 0x63,
+	0x61, 0x6f, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x67, 0x65, 0x6f, 0x6c, 0x6f, 0x63,
+	0x61, 0x6c, 0x69, 0x7a, 0x61, 0x63, 0x61, 0x6f, 0x22, 0x2e, 0x0a, 0x0f, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x73, 0x12, 0x1b, 0x0a, 0x09, 0x63,
+	0x61, 0x6d, 0x65, 0x72, 0x61, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
+	0x63, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x49, 0x64, 0x22, 0x0f, 0x0a, 0x0d, 0x52, 0x65, 0x61, 0x64,
+	0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x71, 0x22, 0x0f, 0x0a, 0x0d, 0x52, 0x65, 0x61,
+	0x64, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x73, 0x22, 0x11, 0x0a, 0x0f, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x71, 0x22, 0x11, 0x0a,
+	0x0f, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x73,
+	0x22, 0x2e, 0x0a, 0x0f, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61,
+	0x52, 0x65, 0x71, 0x12, 0x1b, 0x0a, 0x09, 0x63, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x5f, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x49, 0x64,
+	0x22, 0x11, 0x0a, 0x0f, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61,
+	0x52, 0x65, 0x73, 0x22, 0xbe, 0x01, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x71, 0x12, 0x30, 0x0a, 0x14, 0x73, 0x65, 0x72,
+	0x76, 0x69, 0x64, 0x6f, 0x72, 0x5f, 0x67, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x12, 0x73, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f,
+	0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x49, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x63,
+	0x61, 0x6d, 0x65, 0x72, 0x61, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
+	0x63, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x49, 0x64, 0x12, 0x20, 0x0a, 0x0b, 0x70, 0x72, 0x6f, 0x63,
+	0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0b, 0x70,
+	0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x61, 0x64, 0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x61, 0x64,
+	0x61, 0x70, 0x74, 0x61, 0x64, 0x6f, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05, 0x52, 0x09, 0x61,
+	0x64, 0x61, 0x70, 0x74, 0x61, 0x64, 0x6f, 0x72, 0x12, 0x1a, 0x0a, 0x08, 0x65, 0x78, 0x65, 0x63,
+	0x75, 0x63, 0x61, 0x6f, 0x18, 0x05, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x65, 0x78, 0x65, 0x63,
+	0x75, 0x63, 0x61, 0x6f, 0x22, 0x34, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x73, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x72, 0x6f,
+	0x63, 0x65, 0x73, 0x73, 0x6f, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a,
+	0x70, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x49, 0x64, 0x22, 0x11, 0x0a, 0x0f, 0x52, 0x65,
+	0x61, 0x64, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x71, 0x22, 0x11, 0x0a,
+	0x0f, 0x52, 0x65, 0x61, 0x64, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x73,
+	0x22, 0x13, 0x0a, 0x11, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73,
+	0x73, 0x6f, 0x52, 0x65, 0x71, 0x22, 0x13, 0x0a, 0x11, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50,
+	0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x73, 0x22, 0x34, 0x0a, 0x11, 0x44, 0x65,
+	0x6c, 0x65, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x71, 0x12,
+	0x1f, 0x0a, 0x0b, 0x70, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x5f, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x49, 0x64,
+	0x22, 0x13, 0x0a, 0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73,
+	0x73, 0x6f, 0x52, 0x65, 0x73, 0x32, 0xa1, 0x08, 0x0a, 0x08, 0x47, 0x65, 0x72, 0x65, 0x6e, 0x63,
+	0x69, 0x61, 0x12, 0x37, 0x0a, 0x07, 0x4d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x65, 0x12, 0x14, 0x2e,
+	0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x4d, 0x69, 0x67, 0x72, 0x61, 0x74, 0x65,
+	0x52, 0x65, 0x71, 0x1a, 0x14, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x4d,
+	0x69, 0x67, 0x72, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x64, 0x0a, 0x16, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61,
+	0x76, 0x61, 0x63, 0x61, 0x6f, 0x12, 0x23, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61,
+	0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47,
+	0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x71, 0x1a, 0x23, 0x2e, 0x67, 0x65, 0x72,
+	0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76,
+	0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x73, 0x22,
+	0x00, 0x12, 0x5e, 0x0a, 0x14, 0x52, 0x65, 0x61, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f,
+	0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x12, 0x21, 0x2e, 0x67, 0x65, 0x72, 0x65,
+	0x6e, 0x63, 0x69, 0x61, 0x2e, 0x52, 0x65, 0x61, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f,
+	0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x71, 0x1a, 0x21, 0x2e, 0x67,
+	0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x52, 0x65, 0x61, 0x64, 0x53, 0x65, 0x72, 0x76,
+	0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x73, 0x22,
+	0x00, 0x12, 0x64, 0x0a, 0x16, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69,
+	0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x12, 0x23, 0x2e, 0x67, 0x65,
+	0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x65, 0x72,
+	0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x71,
+	0x1a, 0x23, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63,
+	0x61, 0x6f, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x64, 0x0a, 0x16, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61,
+	0x6f, 0x12, 0x23, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72, 0x47, 0x72, 0x61, 0x76, 0x61,
+	0x63, 0x61, 0x6f, 0x52, 0x65, 0x71, 0x1a, 0x23, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69,
+	0x61, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x64, 0x6f, 0x72,
+	0x47, 0x72, 0x61, 0x76, 0x61, 0x63, 0x61, 0x6f, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x46, 0x0a,
+	0x0c, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x12, 0x19, 0x2e,
+	0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43,
+	0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x71, 0x1a, 0x19, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e,
+	0x63, 0x69, 0x61, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61,
+	0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x40, 0x0a, 0x0a, 0x52, 0x65, 0x61, 0x64, 0x43, 0x61, 0x6d,
+	0x65, 0x72, 0x61, 0x12, 0x17, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x52,
+	0x65, 0x61, 0x64, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x71, 0x1a, 0x17, 0x2e, 0x67,
+	0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x52, 0x65, 0x61, 0x64, 0x43, 0x61, 0x6d, 0x65,
+	0x72, 0x61, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x46, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x12, 0x19, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63,
+	0x69, 0x61, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52,
+	0x65, 0x71, 0x1a, 0x19, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12,
+	0x46, 0x0a, 0x0c, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x12,
+	0x19, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x43, 0x61, 0x6d, 0x65, 0x72, 0x61, 0x52, 0x65, 0x71, 0x1a, 0x19, 0x2e, 0x67, 0x65, 0x72,
+	0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x6d, 0x65,
+	0x72, 0x61, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x4c, 0x0a, 0x0e, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x12, 0x1b, 0x2e, 0x67, 0x65, 0x72, 0x65,
+	0x6e, 0x63, 0x69, 0x61, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x63, 0x65,
+	0x73, 0x73, 0x6f, 0x52, 0x65, 0x71, 0x1a, 0x1b, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69,
+	0x61, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f,
+	0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x46, 0x0a, 0x0c, 0x52, 0x65, 0x61, 0x64, 0x50, 0x72, 0x6f,
+	0x63, 0x65, 0x73, 0x73, 0x6f, 0x12, 0x19, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61,
+	0x2e, 0x52, 0x65, 0x61, 0x64, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x71,
+	0x1a, 0x19, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x52, 0x65, 0x61, 0x64,
+	0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x4c, 0x0a,
+	0x0e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x12,
+	0x1b, 0x2e, 0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x71, 0x1a, 0x1b, 0x2e, 0x67,
+	0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x4c, 0x0a, 0x0e, 0x44,
+	0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x12, 0x1b, 0x2e,
+	0x67, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50,
+	0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x71, 0x1a, 0x1b, 0x2e, 0x67, 0x65, 0x72,
+	0x65, 0x6e, 0x63, 0x69, 0x61, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x63,
+	0x65, 0x73, 0x73, 0x6f, 0x52, 0x65, 0x73, 0x22, 0x00, 0x42, 0x13, 0x5a, 0x11, 0x2e, 0x2f, 0x69,
+	0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -573,35 +1360,67 @@ func file_gerencia_proto_rawDescGZIP() []byte {
 	return file_gerencia_proto_rawDescData
 }
 
-var file_gerencia_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_gerencia_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_gerencia_proto_goTypes = []interface{}{
-	(*MigrateReq)(nil),                    // 0: gerencia.MigrateReq
-	(*MigrateResp)(nil),                   // 1: gerencia.MigrateResp
-	(*RegistrarServidorGravacaoReq)(nil),  // 2: gerencia.RegistrarServidorGravacaoReq
-	(*RegistrarServidorGravacaoResp)(nil), // 3: gerencia.RegistrarServidorGravacaoResp
-	(*ConfigBancoDeDadosReq)(nil),         // 4: gerencia.ConfigBancoDeDadosReq
-	(*ConfigBancoDeDadosResp)(nil),        // 5: gerencia.ConfigBancoDeDadosResp
-	(*ConfigurarCameraReq)(nil),           // 6: gerencia.ConfigurarCameraReq
-	(*ConfigurarCameraResp)(nil),          // 7: gerencia.ConfigurarCameraResp
-	(*ConfigurarProcessadorReq)(nil),      // 8: gerencia.ConfigurarProcessadorReq
-	(*ConfigurarProcessadorResp)(nil),     // 9: gerencia.ConfigurarProcessadorResp
+	(*MigrateReq)(nil),                // 0: gerencia.MigrateReq
+	(*MigrateRes)(nil),                // 1: gerencia.MigrateRes
+	(*CreateServidorGravacaoReq)(nil), // 2: gerencia.CreateServidorGravacaoReq
+	(*CreateServidorGravacaoRes)(nil), // 3: gerencia.CreateServidorGravacaoRes
+	(*ReadServidorGravacaoReq)(nil),   // 4: gerencia.ReadServidorGravacaoReq
+	(*ReadServidorGravacaoRes)(nil),   // 5: gerencia.ReadServidorGravacaoRes
+	(*UpdateServidorGravacaoReq)(nil), // 6: gerencia.UpdateServidorGravacaoReq
+	(*UpdateServidorGravacaoRes)(nil), // 7: gerencia.UpdateServidorGravacaoRes
+	(*DeleteServidorGravacaoReq)(nil), // 8: gerencia.DeleteServidorGravacaoReq
+	(*DeleteServidorGravacaoRes)(nil), // 9: gerencia.DeleteServidorGravacaoRes
+	(*CreateCameraReq)(nil),           // 10: gerencia.CreateCameraReq
+	(*CreateCameraRes)(nil),           // 11: gerencia.CreateCameraRes
+	(*ReadCameraReq)(nil),             // 12: gerencia.ReadCameraReq
+	(*ReadCameraRes)(nil),             // 13: gerencia.ReadCameraRes
+	(*UpdateCameraReq)(nil),           // 14: gerencia.UpdateCameraReq
+	(*UpdateCameraRes)(nil),           // 15: gerencia.UpdateCameraRes
+	(*DeleteCameraReq)(nil),           // 16: gerencia.DeleteCameraReq
+	(*DeleteCameraRes)(nil),           // 17: gerencia.DeleteCameraRes
+	(*CreateProcessoReq)(nil),         // 18: gerencia.CreateProcessoReq
+	(*CreateProcessoRes)(nil),         // 19: gerencia.CreateProcessoRes
+	(*ReadProcessoReq)(nil),           // 20: gerencia.ReadProcessoReq
+	(*ReadProcessoRes)(nil),           // 21: gerencia.ReadProcessoRes
+	(*UpdateProcessoReq)(nil),         // 22: gerencia.UpdateProcessoReq
+	(*UpdateProcessoRes)(nil),         // 23: gerencia.UpdateProcessoRes
+	(*DeleteProcessoReq)(nil),         // 24: gerencia.DeleteProcessoReq
+	(*DeleteProcessoRes)(nil),         // 25: gerencia.DeleteProcessoRes
 }
 var file_gerencia_proto_depIdxs = []int32{
-	0, // 0: gerencia.Gerencia.Migrate:input_type -> gerencia.MigrateReq
-	2, // 1: gerencia.Gerencia.RegistrarServidorGravacao:input_type -> gerencia.RegistrarServidorGravacaoReq
-	4, // 2: gerencia.Gerencia.ConfigBancoDeDados:input_type -> gerencia.ConfigBancoDeDadosReq
-	6, // 3: gerencia.Gerencia.ConfigurarCamera:input_type -> gerencia.ConfigurarCameraReq
-	8, // 4: gerencia.Gerencia.ConfigurarProcessador:input_type -> gerencia.ConfigurarProcessadorReq
-	1, // 5: gerencia.Gerencia.Migrate:output_type -> gerencia.MigrateResp
-	3, // 6: gerencia.Gerencia.RegistrarServidorGravacao:output_type -> gerencia.RegistrarServidorGravacaoResp
-	5, // 7: gerencia.Gerencia.ConfigBancoDeDados:output_type -> gerencia.ConfigBancoDeDadosResp
-	7, // 8: gerencia.Gerencia.ConfigurarCamera:output_type -> gerencia.ConfigurarCameraResp
-	9, // 9: gerencia.Gerencia.ConfigurarProcessador:output_type -> gerencia.ConfigurarProcessadorResp
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: gerencia.Gerencia.Migrate:input_type -> gerencia.MigrateReq
+	2,  // 1: gerencia.Gerencia.CreateServidorGravacao:input_type -> gerencia.CreateServidorGravacaoReq
+	4,  // 2: gerencia.Gerencia.ReadServidorGravacao:input_type -> gerencia.ReadServidorGravacaoReq
+	6,  // 3: gerencia.Gerencia.UpdateServidorGravacao:input_type -> gerencia.UpdateServidorGravacaoReq
+	8,  // 4: gerencia.Gerencia.DeleteServidorGravacao:input_type -> gerencia.DeleteServidorGravacaoReq
+	10, // 5: gerencia.Gerencia.CreateCamera:input_type -> gerencia.CreateCameraReq
+	12, // 6: gerencia.Gerencia.ReadCamera:input_type -> gerencia.ReadCameraReq
+	14, // 7: gerencia.Gerencia.UpdateCamera:input_type -> gerencia.UpdateCameraReq
+	16, // 8: gerencia.Gerencia.DeleteCamera:input_type -> gerencia.DeleteCameraReq
+	18, // 9: gerencia.Gerencia.CreateProcesso:input_type -> gerencia.CreateProcessoReq
+	20, // 10: gerencia.Gerencia.ReadProcesso:input_type -> gerencia.ReadProcessoReq
+	22, // 11: gerencia.Gerencia.UpdateProcesso:input_type -> gerencia.UpdateProcessoReq
+	24, // 12: gerencia.Gerencia.DeleteProcesso:input_type -> gerencia.DeleteProcessoReq
+	1,  // 13: gerencia.Gerencia.Migrate:output_type -> gerencia.MigrateRes
+	3,  // 14: gerencia.Gerencia.CreateServidorGravacao:output_type -> gerencia.CreateServidorGravacaoRes
+	5,  // 15: gerencia.Gerencia.ReadServidorGravacao:output_type -> gerencia.ReadServidorGravacaoRes
+	7,  // 16: gerencia.Gerencia.UpdateServidorGravacao:output_type -> gerencia.UpdateServidorGravacaoRes
+	9,  // 17: gerencia.Gerencia.DeleteServidorGravacao:output_type -> gerencia.DeleteServidorGravacaoRes
+	11, // 18: gerencia.Gerencia.CreateCamera:output_type -> gerencia.CreateCameraRes
+	13, // 19: gerencia.Gerencia.ReadCamera:output_type -> gerencia.ReadCameraRes
+	15, // 20: gerencia.Gerencia.UpdateCamera:output_type -> gerencia.UpdateCameraRes
+	17, // 21: gerencia.Gerencia.DeleteCamera:output_type -> gerencia.DeleteCameraRes
+	19, // 22: gerencia.Gerencia.CreateProcesso:output_type -> gerencia.CreateProcessoRes
+	21, // 23: gerencia.Gerencia.ReadProcesso:output_type -> gerencia.ReadProcessoRes
+	23, // 24: gerencia.Gerencia.UpdateProcesso:output_type -> gerencia.UpdateProcessoRes
+	25, // 25: gerencia.Gerencia.DeleteProcesso:output_type -> gerencia.DeleteProcessoRes
+	13, // [13:26] is the sub-list for method output_type
+	0,  // [0:13] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_gerencia_proto_init() }
@@ -623,7 +1442,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MigrateResp); i {
+			switch v := v.(*MigrateRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -635,7 +1454,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RegistrarServidorGravacaoReq); i {
+			switch v := v.(*CreateServidorGravacaoReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -647,7 +1466,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RegistrarServidorGravacaoResp); i {
+			switch v := v.(*CreateServidorGravacaoRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -659,7 +1478,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigBancoDeDadosReq); i {
+			switch v := v.(*ReadServidorGravacaoReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -671,7 +1490,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigBancoDeDadosResp); i {
+			switch v := v.(*ReadServidorGravacaoRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -683,7 +1502,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigurarCameraReq); i {
+			switch v := v.(*UpdateServidorGravacaoReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -695,7 +1514,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigurarCameraResp); i {
+			switch v := v.(*UpdateServidorGravacaoRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -707,7 +1526,7 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigurarProcessadorReq); i {
+			switch v := v.(*DeleteServidorGravacaoReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -719,7 +1538,199 @@ func file_gerencia_proto_init() {
 			}
 		}
 		file_gerencia_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ConfigurarProcessadorResp); i {
+			switch v := v.(*DeleteServidorGravacaoRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateCameraReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateCameraRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ReadCameraReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ReadCameraRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateCameraReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateCameraRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteCameraReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteCameraRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateProcessoReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateProcessoRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ReadProcessoReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ReadProcessoRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateProcessoReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateProcessoRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteProcessoReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_gerencia_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteProcessoRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -737,7 +1748,7 @@ func file_gerencia_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_gerencia_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
