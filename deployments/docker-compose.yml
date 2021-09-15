@@ -1,11 +1,23 @@
 services:
 
+  gerencia-admin:
+    build:
+      context: ../
+      dockerfile: deployments/dockerfile.gerencia-admin
+    env_file:
+      - .dev.env
+    depends_on:
+      - gerencia
+    links:
+      - gerencia
+    command: ["migrate"]
+
   gerencia:
     build:
       context: ../
       dockerfile: deployments/dockerfile.gerencia
     env_file:
-      - .env.dev
+      - .dev.env
     depends_on:
       - gravacao
     links:
@@ -17,5 +29,5 @@ services:
       context: ../
       dockerfile: deployments/dockerfile.gravacao
     env_file:
-      - .env.dev
+      - .dev.env
     command: ["iniciar"]

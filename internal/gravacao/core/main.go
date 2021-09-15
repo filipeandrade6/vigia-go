@@ -103,7 +103,7 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Start Database
 
-	log.Infow("startup", "status", "initializing database support", "host", viper.GetString("VIGIA_DB_HOST"))
+	log.Infow("startup", "status", "initializing database support", "host", viper.GetString("DB_HOST"))
 
 	db, err := database.Open(database.Config{
 		Host:         viper.GetString("DB_HOST"),

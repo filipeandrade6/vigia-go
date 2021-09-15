@@ -1,0 +1,5 @@
+# Ignore the dev directory
+/dev
+
+# Ignore Dahua so file
+internal/dahua/lib/*

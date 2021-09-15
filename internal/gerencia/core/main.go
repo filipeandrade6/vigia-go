@@ -124,7 +124,7 @@ func Run(log *zap.SugaredLogger) error {
 	// TODO ver abaixo, tem exemplo toda execução em contexto
 	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
 	go func() {
-		lis, err := net.Listen(viper.GetString("GER_SERVER_CONN"), fmt.Sprintf("%s:%s", viper.GetString("GER_SERVER_ADDR"), viper.GetString("GER_SERVER_PORT")))
+		lis, err := net.Listen(viper.GetString("GER_SERVER_CONN"), viper.GetString("GER_SERVER_PORT"))
 		if err != nil {
 			log.Errorw("startup", "status", "could not open socket", viper.GetString("GER_SERVER_CONN"), viper.GetString("GER_SERVER_ADDR"), viper.GetString("GER_SERVER_PORT"), "ERROR", err)
 		}

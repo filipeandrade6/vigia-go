@@ -42,21 +42,28 @@ type GerenciaClient struct {
 // }
 
 func NovoClientGerencia() *GerenciaClient {
+	fmt.Println("chegaste aqui em novoclientgerencia")
+
+	cfg := fmt.Sprintf(
+		"%s:%d",
+		viper.GetString("GER_HOST"), // TODO assim como no DB juntar endereco e porta em uma unica var
+		viper.GetInt("GER_SERVER_PORT"),
+	)
+
+	fmt.Println("as config de conexão é", cfg)
+
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithBlock())
 
-	conn, err := grpc.Dial(
-		fmt.Sprintf(
-			"%s:%d",
-			viper.GetString("GER_CLIENT_ENDERECO"), // TODO assim como no DB juntar endereco e porta em uma unica var
-			viper.GetInt("GER_CLIENT_PORTA"),
-		), opts...)
+	conn, err := grpc.Dial(cfg, opts...)
 	if err != nil {
 		fmt.Println("Erro aqui no client") // TODO mudar isso aqui
 		panic(err)
 	}
 	defer conn.Close()
+
+	fmt.Println("criado client de gerencia")
 
 	return &GerenciaClient{
 		c: pb.NewGerenciaClient(conn),
@@ -66,6 +73,8 @@ func NovoClientGerencia() *GerenciaClient {
 func (g *GerenciaClient) Migrate() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+
+	fmt.Println("chegou asdlfkj")
 
 	if _, err := g.c.Migrate(ctx, nil); err != nil {
 		return err

@@ -25,8 +25,8 @@ func NovoClientGravacao() *GravacaoClient {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(
 			"%s:%d",
-			viper.GetString("GRA_CLIENT_ENDERECO"),
-			viper.GetInt("GRA_CLIENT_PORTA"),
+			viper.GetString("GRA_HOST"),
+			viper.GetInt("GRA_SERVER_PORT"),
 		), grpc.WithInsecure())
 	if err != nil {
 		fmt.Println("Erro aqui no client") // TODO mudar isso aqui
