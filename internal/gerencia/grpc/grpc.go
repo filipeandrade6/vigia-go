@@ -2,8 +2,10 @@ package grpc
 
 import (
 	"context"
+	"fmt"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/filipeandrade6/vigia-go/internal/data/schema"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"go.uber.org/zap"
 )
@@ -35,4 +37,12 @@ func (g *gerenciaGRPCService) CreateCamera(ctx context.Context, req *pb.CreateCa
 
 func (g *gerenciaGRPCService) CreateProcesso(ctx context.Context, req *pb.CreateProcessoReq) (*pb.CreateProcessoRes, error) {
 	return &pb.CreateProcessoRes{ProcessoId: "07c96eee-ab2f-4c17-b345-5634de4e2aac"}, nil
+}
+
+func (g *gerenciaGRPCService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.MigrateRes, error) {
+	fmt.Println(req.Versao)
+	if err := schema.Migrate(context.Background()); err != nil {
+		g.log.Fatalw("failed to migrate")
+	}
+	return &pb.MigrateRes{}, nil
 }

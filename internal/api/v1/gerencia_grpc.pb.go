@@ -18,6 +18,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
+	// Gravacao requests
+	Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error)
+	// Gerencia Client requests
 	Migrate(ctx context.Context, in *MigrateReq, opts ...grpc.CallOption) (*MigrateRes, error)
 	CreateServidorGravacao(ctx context.Context, in *CreateServidorGravacaoReq, opts ...grpc.CallOption) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(ctx context.Context, in *ReadServidorGravacaoReq, opts ...grpc.CallOption) (*ReadServidorGravacaoRes, error)
@@ -39,6 +42,15 @@ type gerenciaClient struct {
 
 func NewGerenciaClient(cc grpc.ClientConnInterface) GerenciaClient {
 	return &gerenciaClient{cc}
+}
+
+func (c *gerenciaClient) Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error) {
+	out := new(MatchRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/Match", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gerenciaClient) Migrate(ctx context.Context, in *MigrateReq, opts ...grpc.CallOption) (*MigrateRes, error) {
@@ -162,6 +174,9 @@ func (c *gerenciaClient) DeleteProcesso(ctx context.Context, in *DeleteProcessoR
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
+	// Gravacao requests
+	Match(context.Context, *MatchReq) (*MatchRes, error)
+	// Gerencia Client requests
 	Migrate(context.Context, *MigrateReq) (*MigrateRes, error)
 	CreateServidorGravacao(context.Context, *CreateServidorGravacaoReq) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(context.Context, *ReadServidorGravacaoReq) (*ReadServidorGravacaoRes, error)
@@ -182,6 +197,9 @@ type GerenciaServer interface {
 type UnimplementedGerenciaServer struct {
 }
 
+func (UnimplementedGerenciaServer) Match(context.Context, *MatchReq) (*MatchRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Match not implemented")
+}
 func (UnimplementedGerenciaServer) Migrate(context.Context, *MigrateReq) (*MigrateRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Migrate not implemented")
 }
@@ -232,6 +250,24 @@ type UnsafeGerenciaServer interface {
 
 func RegisterGerenciaServer(s grpc.ServiceRegistrar, srv GerenciaServer) {
 	s.RegisterService(&Gerencia_ServiceDesc, srv)
+}
+
+func _Gerencia_Match_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MatchReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).Match(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/Match",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).Match(ctx, req.(*MatchReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Gerencia_Migrate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -475,6 +511,10 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "gerencia.Gerencia",
 	HandlerType: (*GerenciaServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Match",
+			Handler:    _Gerencia_Match_Handler,
+		},
 		{
 			MethodName: "Migrate",
 			Handler:    _Gerencia_Migrate_Handler,

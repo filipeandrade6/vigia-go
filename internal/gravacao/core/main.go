@@ -9,11 +9,14 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/client"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/service"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+
+	gravacaoGRPC "github.com/filipeandrade6/vigia-go/internal/gravacao/grpc"
 
 	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
@@ -185,15 +188,13 @@ func Run(log *zap.SugaredLogger) error {
 
 	serverErrors := make(chan error, 1)
 
-	// TODO: renomear tudo...
-
-	cameraStore := camera.NewStore(log, db)       // TODO: necessario?
-	processoStore := processo.NewStore(log, db)   // TODO: necessario?
 	gerenciaClient := client.NovoClientGerencia() // TODO: passar log?
-	svc := service.NewGravacaoService(log, cameraStore)
+	svc := service.NewGravacaoService(log, gerenciaClient)
 
 	grpcServer := grpc.NewServer()
 	gravacaoGRPCService := gravacaoGRPC.NewGravacaoService(log, svc)
+
+	pb.RegisterGravacaoServer(grpcServer, gravacaoGRPCService)
 
 	// TODO ver abaixo, tem exemplo toda execução em contexto
 	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869

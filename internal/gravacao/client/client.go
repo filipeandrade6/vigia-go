@@ -2,7 +2,9 @@
 package client
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	// "github.com/filipeandrade6/vigia-go/internal/database"
@@ -47,8 +49,8 @@ func NovoClientGerencia() *GerenciaClient {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(
 			"%s:%d",
-			viper.GetString("CLIENT_ENDERECO"),
-			viper.GetInt("CLIENT_PORTA"),
+			viper.GetString("GER_CLIENT_ENDERECO"), // TODO assim como no DB juntar endereco e porta em uma unica var
+			viper.GetInt("GER_CLIENT_PORTA"),
 		), opts...)
 	if err != nil {
 		fmt.Println("Erro aqui no client") // TODO mudar isso aqui
@@ -59,4 +61,15 @@ func NovoClientGerencia() *GerenciaClient {
 	return &GerenciaClient{
 		c: pb.NewGerenciaClient(conn),
 	}
+}
+
+func (g *GerenciaClient) Migrate() error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	if _, err := g.c.Migrate(ctx, nil); err != nil {
+		return err
+	}
+
+	return nil
 }
