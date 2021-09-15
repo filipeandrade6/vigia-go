@@ -20,14 +20,11 @@ import (
 	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
-	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/spf13/viper"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
-
-// TODO colocar metricas
 
 type Gerencia struct {
 	server *grpc.Server
@@ -40,9 +37,7 @@ func (g *Gerencia) Stop() {
 	fmt.Println("Bye.")
 }
 
-// TODO colocar gRPC Health Server https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
-
-var build = "develop"
+var build = "develop" // TODO pq isso?
 
 func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
@@ -55,7 +50,7 @@ func Run(log *zap.SugaredLogger) error {
 	log.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
 
 	// =========================================================================
-	// Configuration
+	// Load Configuration
 
 	viper.AutomaticEnv()
 	log.Infow("startup", "config", config.PrettyPrintConfig())
@@ -67,35 +62,34 @@ func Run(log *zap.SugaredLogger) error {
 	log.Infow("starting service", "version", build)
 	defer log.Infow("shutdown complete")
 
-	// log.Infow("startup", "config", cfg)
-
 	// =========================================================================
 	// Start Database
+	// TODO database.Open não funciona
 
-	log.Infow("startup", "status", "initializing database support", "host", viper.GetString("DB_HOST"))
+	// log.Infow("startup", "status", "initializing database support", "host", viper.GetString("DB_HOST"))
 
-	db, err := database.Open(database.Config{
-		Host:         viper.GetString("DB_HOST"),
-		User:         viper.GetString("DB_USER"),
-		Password:     viper.GetString("DB_PASSWORD"),
-		Name:         viper.GetString("DB_NAME"),
-		MaxIdleConns: viper.GetInt("DB_MAXIDLECONNS"),
-		MaxOpenConns: viper.GetInt("DB_MAXOPENCONNS"),
-		DisableTLS:   viper.GetBool("DB_DISABLETLS"),
-	}) // TODO arrumar isso aqui - OPen não funcionando
-	if err != nil {
-		return fmt.Errorf("connecting to db: %w", err)
-	}
-	defer func() {
-		log.Infow("shutdown", "status", "stopping database support", "host", viper.GetString("DB_HOST"))
-		db.Close()
-	}()
+	// db, err := database.Open(database.Config{
+	// 	Host:         viper.GetString("DB_HOST"),
+	// 	User:         viper.GetString("DB_USER"),
+	// 	Password:     viper.GetString("DB_PASSWORD"),
+	// 	Name:         viper.GetString("DB_NAME"),
+	// 	MaxIdleConns: viper.GetInt("DB_MAXIDLECONNS"),
+	// 	MaxOpenConns: viper.GetInt("DB_MAXOPENCONNS"),
+	// 	DisableTLS:   viper.GetBool("DB_DISABLETLS"),
+	// })
+	// if err != nil {
+	// 	return fmt.Errorf("connecting to db: %w", err)
+	// }
+	// defer func() {
+	// 	log.Infow("shutdown", "status", "stopping database support", "host", viper.GetString("DB_HOST"))
+	// 	db.Close()
+	// }()
 
 	// =========================================================================
-	// Start Tracing Support
-	// Start Debug Service
+	// TODO Start Tracing Support
 
-	// Copiar do gravacao
+	// =========================================================================
+	// TODO Start Debug Service
 
 	// =========================================================================
 	// Start Service
@@ -110,7 +104,6 @@ func Run(log *zap.SugaredLogger) error {
 	cameraStore := camera.NewStore(log, db)
 	processoStore := processo.NewStore(log, db)
 	servidorGravacaoStore := servidorgravacao.NewStore(log, db)
-	// gravacaoClient := client.NovoClientGravacao() // TODO: passar log?
 	svc := service.NewGerenciaService(log, cameraStore, processoStore, servidorGravacaoStore)
 
 	grpcServer := grpc.NewServer()
@@ -118,8 +111,6 @@ func Run(log *zap.SugaredLogger) error {
 
 	pb.RegisterGerenciaServer(grpcServer, gerenciaGRPCService)
 
-	// TODO ver abaixo, tem exemplo toda execução em contexto
-	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
 	go func() {
 		lis, err := net.Listen(viper.GetString("GER_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("GER_SERVER_PORT")))
 		if err != nil {

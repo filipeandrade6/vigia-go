@@ -1,8 +1,8 @@
 ## VIGIA
 
-#### STATUS
+#### ONDE PAREI
 
-
+refatorando
 
 #### TODO
 
@@ -16,6 +16,7 @@
 - [ ] DevOps
 - [ ] Formatar arquivo de Dockerfile
 - [ ] Label build
+- [ ] Execução gRPC em contexto e Health Server https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
 
 #### comandos *Makefile*:
 

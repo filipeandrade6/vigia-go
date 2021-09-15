@@ -20,7 +20,6 @@ import (
 
 	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
-	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 
 	// "github.com/ardanlabs/service/business/sys/metrics"
 	// "github.com/filipeandrade6/vigia-go/business/sys/auth"
@@ -49,12 +48,6 @@ func (g *Gravacao) Stop() {
 	fmt.Println("Bye.")
 }
 
-// TODO colocar gRPC Health Server https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
-
-/*
-Need to figure out timeouts for http service.
-*/
-
 // build is the git versin of this program. It is set using build flags in the makefile.
 var build = "develop"
 
@@ -69,7 +62,7 @@ func Run(log *zap.SugaredLogger) error {
 	log.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
 
 	// =========================================================================
-	// Configuration
+	// Load Configuration
 
 	viper.AutomaticEnv()
 	log.Infow("startup", "config", config.PrettyPrintConfig())
@@ -84,44 +77,33 @@ func Run(log *zap.SugaredLogger) error {
 	// log.Infow("startup", "config", cfg)
 
 	// =========================================================================
-	// Initialize authentication support
-
-	// log.Infow("startup", "status", "initializing authentication support")
-
-	// ks, err := keystore.NewFS(os.DirFS(cfg.Auth.KeysFolder))
-	// if err != nil {
-	// 	return fmt.Errorf("reading keys: %w", err)
-	// }
-
-	// auth, err := auth.New(cfg.Auth.ActiveKID, ks)
-	// if err != nil {
-	// 	return fmt.Errorf("constructing auth: %w", err)
-	// }
+	// TODO Initialize Authentication Support
 
 	// =========================================================================
 	// Start Database
+	// TODO database.Open não funciona
 
-	log.Infow("startup", "status", "initializing database support", "host", viper.GetString("DB_HOST"))
+	// log.Infow("startup", "status", "initializing database support", "host", viper.GetString("DB_HOST"))
 
-	db, err := database.Open(database.Config{
-		Host:         viper.GetString("DB_HOST"),
-		User:         viper.GetString("DB_USER"),
-		Password:     viper.GetString("DB_PASSWORD"),
-		Name:         viper.GetString("DB_NAME"),
-		MaxIdleConns: viper.GetInt("DB_MAXIDLECONNS"),
-		MaxOpenConns: viper.GetInt("DB_MAXOPENCONNS"),
-		DisableTLS:   viper.GetBool("DB_DISABLETLS"),
-	}) // TODO: Open não funcionando
-	if err != nil {
-		return fmt.Errorf("connecting to db: %w", err)
-	}
-	defer func() {
-		log.Infow("shutdown", "status", "stopping database support", "host", viper.GetString("DB_HOST"))
-		db.Close()
-	}()
+	// db, err := database.Open(database.Config{
+	// 	Host:         viper.GetString("DB_HOST"),
+	// 	User:         viper.GetString("DB_USER"),
+	// 	Password:     viper.GetString("DB_PASSWORD"),
+	// 	Name:         viper.GetString("DB_NAME"),
+	// 	MaxIdleConns: viper.GetInt("DB_MAXIDLECONNS"),
+	// 	MaxOpenConns: viper.GetInt("DB_MAXOPENCONNS"),
+	// 	DisableTLS:   viper.GetBool("DB_DISABLETLS"),
+	// })
+	// if err != nil {
+	// 	return fmt.Errorf("connecting to db: %w", err)
+	// }
+	// defer func() {
+	// 	log.Infow("shutdown", "status", "stopping database support", "host", viper.GetString("DB_HOST"))
+	// 	db.Close()
+	// }()
 
 	// =========================================================================
-	// Start Tracing Support
+	// TODO Start Tracing Support
 
 	// WARNING: The current Init settings are using defaults which may not be
 	// compatible with your project. Please review the documentation for
@@ -158,7 +140,7 @@ func Run(log *zap.SugaredLogger) error {
 	// defer traceProvider.Shutdown(context.Background())
 
 	// =========================================================================
-	// Start Debug Service
+	// TODO Start Debug Service
 
 	// log.Infow("startup", "status", "debug router started", "host", cfg.Web.DebugHost)
 

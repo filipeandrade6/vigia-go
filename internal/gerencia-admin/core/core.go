@@ -25,7 +25,7 @@ func Run(log *zap.SugaredLogger) error {
 	log.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
 
 	// =========================================================================
-	// Configuration
+	// Load Configuration
 
 	viper.AutomaticEnv()
 	log.Infow("startup", "config", config.PrettyPrintConfig())
