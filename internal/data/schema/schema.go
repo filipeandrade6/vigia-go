@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/johejo/golang-migrate-extra/source/iofs"
 )
 
@@ -25,12 +26,12 @@ func Migrate(ctx context.Context) error {
 	}
 
 	dbURL := fmt.Sprintf(
-		"postgres://%s:%s@%s/%s?sslmode=%t",
+		"postgres://%s:%s@%s/%s?sslmode=%s",
 		viper.GetString("DB_USER"),
 		viper.GetString("DB_PASSWORD"),
 		viper.GetString("DB_HOST"),
 		viper.GetString("DB_NAME"),
-		viper.GetBool("DB_DISABLETLS"),
+		viper.GetString("DB_SSLMODE"),
 	)
 
 	m, err := migrate.NewWithSourceInstance("iofs", d, dbURL)
@@ -40,7 +41,7 @@ func Migrate(ctx context.Context) error {
 
 	err = m.Up()
 	if err != nil {
-		return fmt.Errorf("uping") // TODO arrumar isso aqui
+		return err
 	}
 
 	return nil

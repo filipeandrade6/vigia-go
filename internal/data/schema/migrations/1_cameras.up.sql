@@ -1,5 +1,5 @@
 CREATE TABLE cameras (
-    camera_id UUID,
+    camera_id UUID, -- TODO: POSTGRES tem DEFAULT gen_random_uuid()
     descricao TEXT NOT NULL,
     endereco_ip TEXT NOT NULL,
     porta INTEGER NOT NULL,

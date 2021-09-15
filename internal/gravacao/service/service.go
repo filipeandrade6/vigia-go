@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/client"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/grpc/client"
 	"go.uber.org/zap"
 )
 

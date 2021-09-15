@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/client"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/grpc/client"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/service"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -113,7 +113,7 @@ func Run(log *zap.SugaredLogger) error {
 		MaxIdleConns: viper.GetInt("DB_MAXIDLECONNS"),
 		MaxOpenConns: viper.GetInt("DB_MAXOPENCONNS"),
 		DisableTLS:   viper.GetBool("DB_DISABLETLS"),
-	})
+	}) // TODO: Open não funcionando
 	if err != nil {
 		return fmt.Errorf("connecting to db: %w", err)
 	}
@@ -199,9 +199,9 @@ func Run(log *zap.SugaredLogger) error {
 	// TODO ver abaixo, tem exemplo toda execução em contexto
 	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
 	go func() {
-		lis, err := net.Listen(viper.GetString("GER_SERVER_CONN"), fmt.Sprintf("%s:%s", viper.GetString("GER_SERVER_ADDR"), viper.GetString("GER_SERVER_PORT")))
+		lis, err := net.Listen(viper.GetString("GRA_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("GRA_SERVER_PORT")))
 		if err != nil {
-			log.Errorw("startup", "status", "could not open socket", viper.GetString("GER_SERVER_CONN"), viper.GetString("GER_SERVER_ADDR"), viper.GetString("GER_SERVER_PORT"), "ERROR", err)
+			log.Errorw("startup", "status", "could not open socket", viper.GetString("GRA_SERVER_CONN"), viper.GetString("GRA_SERVER_PORT"), "ERROR", err)
 		}
 
 		log.Infow("startup", "status", "gRPC server started") // TODO add address

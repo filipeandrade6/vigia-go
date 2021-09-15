@@ -2,9 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/filipeandrade6/vigia-go/internal/gerencia-admin/core"
 	"github.com/spf13/cobra"
+
+	"github.com/filipeandrade6/vigia-go/internal/logger"
 )
 
 // migrateCmd represents the migrate command
@@ -18,8 +21,18 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		log, err := logger.New("GRAVACAO")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		defer log.Sync()
+
+		if err := core.Run(log); err != nil {
+			log.Errorw("startup", "ERROR", err)
+			os.Exit(1)
+		}
 		fmt.Println("migrate called")
-		core.Run()
 	},
 }
 

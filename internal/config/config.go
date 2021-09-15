@@ -45,6 +45,7 @@ type DB struct {
 	MaxIdleConns int    `mapstructure:"maxidleconns"`
 	MaxOpenConns int    `mapstructure:"maxopenconns"`
 	DisableTLS   bool   `mapstructure:"disabletls"`
+	SSLMode      string `mapstructure:"sslmode"`
 }
 
 // type Zipkin struct {
@@ -90,7 +91,8 @@ func Load() error {
 	viper.BindEnv("db.name", "DB_NAME")
 	viper.BindEnv("db.maxidleconns", "DB_MAXIDLECONNS")
 	viper.BindEnv("db.maxopenconns", "DB_MAXOPENCONNS")
-	viper.BindEnv("db.disabletls", "DB_DISABLETLS")
+	// viper.BindEnv("db.disabletls", "DB_DISABLETLS")
+	viper.BindEnv("db.sslmode", "DB_SSLMODE")
 	// viper.BindEnv("zipkin.reporteruri", "ZIPKIN_REPORTERURI")
 	// viper.BindEnv("zipkin.servicename", "ZIPKIN_SERVICENAME")
 	// viper.BindEnv("zipkin.probability", "ZIPKIN_PROBABILITY")

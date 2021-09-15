@@ -61,7 +61,7 @@ func NovoClientGerencia() *GerenciaClient {
 		fmt.Println("Erro aqui no client") // TODO mudar isso aqui
 		panic(err)
 	}
-	defer conn.Close()
+	//defer conn.Close() // TODO esse aqui vai dar BO
 
 	fmt.Println("criado client de gerencia")
 
@@ -76,7 +76,8 @@ func (g *GerenciaClient) Migrate() error {
 
 	fmt.Println("chegou asdlfkj")
 
-	if _, err := g.c.Migrate(ctx, nil); err != nil {
+	if _, err := g.c.Migrate(ctx, &pb.MigrateReq{Versao: 5}); err != nil {
+		fmt.Println(err)
 		return err
 	}
 

@@ -16,7 +16,8 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
-	"github.com/filipeandrade6/vigia-go/internal/gerencia/client"
+
+	// "github.com/filipeandrade6/vigia-go/internal/gerencia/client"
 	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
@@ -30,7 +31,7 @@ import (
 
 type Gerencia struct {
 	server *grpc.Server
-	client *client.GravacaoClient
+	// client *client.GravacaoClient
 }
 
 func (g *Gerencia) Stop() {
@@ -75,7 +76,7 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Start Database
 
-	log.Infow("startup", "status", "initializing database support", "host", viper.GetString("VIGIA_DB_HOST"))
+	log.Infow("startup", "status", "initializing database support", "host", viper.GetString("DB_HOST"))
 
 	db, err := database.Open(database.Config{
 		Host:         viper.GetString("DB_HOST"),
@@ -85,7 +86,7 @@ func Run(log *zap.SugaredLogger) error {
 		MaxIdleConns: viper.GetInt("DB_MAXIDLECONNS"),
 		MaxOpenConns: viper.GetInt("DB_MAXOPENCONNS"),
 		DisableTLS:   viper.GetBool("DB_DISABLETLS"),
-	})
+	}) // TODO arrumar isso aqui - OPen não funcionando
 	if err != nil {
 		return fmt.Errorf("connecting to db: %w", err)
 	}
@@ -113,8 +114,8 @@ func Run(log *zap.SugaredLogger) error {
 	cameraStore := camera.NewStore(log, db)
 	processoStore := processo.NewStore(log, db)
 	servidorGravacaoStore := servidorgravacao.NewStore(log, db)
-	gravacaoClient := client.NovoClientGravacao() // TODO: passar log?
-	svc := service.NewGerenciaService(log, cameraStore, processoStore, servidorGravacaoStore, gravacaoClient)
+	// gravacaoClient := client.NovoClientGravacao() // TODO: passar log?
+	svc := service.NewGerenciaService(log, cameraStore, processoStore, servidorGravacaoStore)
 
 	grpcServer := grpc.NewServer()
 	gerenciaGRPCService := gerenciaGRPC.NewGerenciaService(log, svc)
@@ -124,7 +125,7 @@ func Run(log *zap.SugaredLogger) error {
 	// TODO ver abaixo, tem exemplo toda execução em contexto
 	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
 	go func() {
-		lis, err := net.Listen(viper.GetString("GER_SERVER_CONN"), viper.GetString("GER_SERVER_PORT"))
+		lis, err := net.Listen(viper.GetString("GER_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("GER_SERVER_PORT")))
 		if err != nil {
 			log.Errorw("startup", "status", "could not open socket", viper.GetString("GER_SERVER_CONN"), viper.GetString("GER_SERVER_ADDR"), viper.GetString("GER_SERVER_PORT"), "ERROR", err)
 		}

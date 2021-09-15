@@ -40,9 +40,9 @@ func (g *gerenciaGRPCService) CreateProcesso(ctx context.Context, req *pb.Create
 }
 
 func (g *gerenciaGRPCService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.MigrateRes, error) {
-	fmt.Println(req.Versao)
+	fmt.Println(req.GetVersao())
 	if err := schema.Migrate(context.Background()); err != nil {
-		g.log.Fatalw("failed to migrate")
+		g.log.Fatalw("failed to migrate", err)
 	}
 	return &pb.MigrateRes{}, nil
 }

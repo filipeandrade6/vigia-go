@@ -18,8 +18,6 @@ services:
       dockerfile: deployments/dockerfile.gerencia
     env_file:
       - .dev.env
-    depends_on:
-      - gravacao
     links:
       - gravacao
     command: ["iniciar"]
