@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fmt"
+
 	// "time"
 
 	"github.com/spf13/viper"
@@ -54,7 +54,7 @@ type DB struct {
 // }
 
 type Configuration struct {
-	Build    string
+	// Build    string
 	Gravacao `mapstructure:"gravacao"`
 	Gerencia `mapstructure:"gerencia"`
 	// Service `mapstructure:"service"`
@@ -64,7 +64,7 @@ type Configuration struct {
 	// Zipkin  `mapstructure:"zipkin"`
 }
 
-func Load(build string) (Configuration, error) {
+func Load() error {
 	viper.BindEnv("gravacao.vserverconn", "GRAV_SERVER_CONN")
 	viper.BindEnv("gravacao.vserveraddr", "GRAV_SERVER_ADDR")
 	viper.BindEnv("gravacao.vserverport", "GRAV_SERVER_PORT")
@@ -97,11 +97,11 @@ func Load(build string) (Configuration, error) {
 
 	viper.AutomaticEnv()
 
-	cfg := Configuration{Build: build}
+	// cfg := Configuration{Build: build}
 
-	if err := viper.Unmarshal(&cfg); err != nil {
-		return Configuration{}, fmt.Errorf("unmarshalling: %w", err)
-	}
+	// if err := viper.Unmarshal(&cfg); err != nil {
+	// 	return Configuration{}, fmt.Errorf("unmarshalling: %w", err)
+	// }
 
-	return cfg, nil
+	return nil
 }
