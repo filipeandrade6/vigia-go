@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/filipeandrade6/vigia-go/internal/config"
+	"github.com/spf13/viper"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 
@@ -26,10 +26,7 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Configuration
 
-	err := config.Load()
-	if err != nil {
-		return fmt.Errorf("parsing config: %w", err)
-	}
+	viper.AutomaticEnv()
 
 	// ----
 

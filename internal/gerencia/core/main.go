@@ -12,7 +12,6 @@ import (
 
 	// "github.com/filipeandrade6/vigia-go/internal/database"
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-	"github.com/filipeandrade6/vigia-go/internal/config"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
@@ -57,10 +56,7 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Configuration
 
-	err := config.Load()
-	if err != nil {
-		return fmt.Errorf("parsing config: %w", err)
-	}
+	viper.AutomaticEnv()
 
 	// log.Infow("startup", "config", cfg) // TODO criar um prettyprint para o cfg no log
 
