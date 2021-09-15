@@ -2,9 +2,7 @@
 package client
 
 import (
-	"context"
 	"fmt"
-	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	// "github.com/filipeandrade6/vigia-go/internal/database"
@@ -40,27 +38,6 @@ type GerenciaClient struct {
 // 		DBPoolMaxConns: int(db.PoolMaxConns),
 // 	}
 // }
-
-func (g *GerenciaClient) RegistrarServidorGravacao() (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	req := &pb.RegistrarServidorGravacaoReq{
-		EnderecoIp: viper.GetString("SERVER_ENDERECO"),
-		Porta:      int32(viper.GetInt("SERVER_PORTA")),
-	}
-
-	resp, err := g.c.RegistrarServidorGravacao(ctx, req)
-	if err != nil {
-		panic(err) // TODO fixme
-	}
-
-	// if resp.Status != "ok" {
-	// 	return "", errors.New("status not ok")
-	// }
-
-	return resp.Id, nil
-}
 
 func NovoClientGerencia() *GerenciaClient {
 	var opts []grpc.DialOption

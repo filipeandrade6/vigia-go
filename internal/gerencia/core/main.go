@@ -95,6 +95,12 @@ func Run(log *zap.SugaredLogger) error {
 	}()
 
 	// =========================================================================
+	// Start Tracing Support
+	// Start Debug Service
+
+	// Copiar do gravacao
+
+	// =========================================================================
 	// Start Service
 
 	log.Infow("startup", "status", "initializing gerencia")

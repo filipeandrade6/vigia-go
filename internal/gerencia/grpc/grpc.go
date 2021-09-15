@@ -8,6 +8,8 @@ import (
 	"go.uber.org/zap"
 )
 
+// TODO posso ignorar o service e passar tudo para esse aqui
+// TODO ou posso colocar mais uma camada estilo core do ardanlabs/service
 type gerenciaGRPCService struct {
 	pb.UnimplementedGerenciaServer // TODO remover isso aqui se eu implementar todos os serviços
 	log                            *zap.SugaredLogger
