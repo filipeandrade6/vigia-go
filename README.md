@@ -2,7 +2,7 @@
 
 #### STATUS
 
-Parei na criação dos containers
+
 
 #### TODO
 

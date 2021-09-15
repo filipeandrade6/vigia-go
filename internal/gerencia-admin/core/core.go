@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/grpc/client"
+	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 )
 
 func Run(log *zap.SugaredLogger) error {
@@ -27,6 +28,7 @@ func Run(log *zap.SugaredLogger) error {
 	// Configuration
 
 	viper.AutomaticEnv()
+	log.Infow("startup", "config", config.PrettyPrintConfig())
 
 	// ----
 

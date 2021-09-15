@@ -19,7 +19,9 @@ import (
 	gravacaoGRPC "github.com/filipeandrade6/vigia-go/internal/gravacao/grpc"
 
 	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
+	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
+
 	// "github.com/ardanlabs/service/business/sys/metrics"
 	// "github.com/filipeandrade6/vigia-go/business/sys/auth"
 
@@ -70,8 +72,7 @@ func Run(log *zap.SugaredLogger) error {
 	// Configuration
 
 	viper.AutomaticEnv()
-
-	// log.Infow("startup", "config", cfg) // TODO criar um prettyprint para o cfg no log
+	log.Infow("startup", "config", config.PrettyPrintConfig())
 
 	// =========================================================================
 	// App Starting
