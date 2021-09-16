@@ -2,4 +2,4 @@
 dev/
 
 # Ignore Dahua so file
-internal/dahua
+internal/dahua/
