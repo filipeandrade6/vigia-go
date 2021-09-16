@@ -2,7 +2,7 @@
 
 #### ONDE PAREI
 
-refatorando
+Criando FromProto e ToProto nos modelos
 
 #### TODO
 
