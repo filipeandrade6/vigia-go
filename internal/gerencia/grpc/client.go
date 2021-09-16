@@ -1,12 +1,11 @@
-// Client do serviço de gerencia
-package client
+package grpc
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	// "github.com/filipeandrade6/vigia-go/internal/database"
 	// "github.com/filipeandrade6/vigia-go/internal/gravacao/models"
 	"github.com/spf13/viper"

@@ -11,14 +11,14 @@ import (
 	"syscall"
 
 	// "github.com/filipeandrade6/vigia-go/internal/database"
-	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
 
 	// "github.com/filipeandrade6/vigia-go/internal/gerencia/client"
 	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
-	"github.com/filipeandrade6/vigia-go/internal/gerencia/service"
+	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 	"github.com/spf13/viper"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -104,8 +104,7 @@ func Run(log *zap.SugaredLogger) error {
 	cameraStore := camera.NewStore(log, db)
 	processoStore := processo.NewStore(log, db)
 	servidorGravacaoStore := servidorgravacao.NewStore(log, db)
-	svc := service.NewGerenciaService(log, cameraStore, processoStore, servidorGravacaoStore)
-
+	svc := gerenciaService.NewGerenciaService(log, cameraStore, processoStore, servidorGravacaoStore)
 	grpcServer := grpc.NewServer()
 	gerenciaGRPCService := gerenciaGRPC.NewGerenciaService(log, svc)
 

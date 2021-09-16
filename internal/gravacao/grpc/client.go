@@ -1,11 +1,10 @@
-// Client do serviço de gravação
-package client
+package grpc
 
 import (
 	"context"
 	"fmt"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

@@ -7,7 +7,7 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/gerencia-admin/core"
 	"github.com/spf13/cobra"
 
-	"github.com/filipeandrade6/vigia-go/internal/logger"
+	"github.com/filipeandrade6/vigia-go/internal/sys/logger"
 )
 
 // migrateCmd represents the migrate command

@@ -3,22 +3,22 @@ package grpc
 import (
 	"context"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/service"
+	pb "github.com/filipeandrade6/vigia-go/internal/api"
+	gravacaoService "github.com/filipeandrade6/vigia-go/internal/gravacao/service"
 	"go.uber.org/zap"
 )
 
 type gravacaoGRPCService struct {
 	pb.UnimplementedGravacaoServer
 	log             *zap.SugaredLogger
-	gravacaoService service.GravacaoService
+	gravacaoService *gravacaoService.GravacaoService
 }
 
 // TODO ver a necessidade do ponteiro gravacaoService
-func NewGravacaoService(log *zap.SugaredLogger, gravacaoService *service.GravacaoService) *gravacaoGRPCService {
+func NewGravacaoService(log *zap.SugaredLogger, gravacaoService *gravacaoService.GravacaoService) *gravacaoGRPCService {
 	return &gravacaoGRPCService{
 		log:             log,
-		gravacaoService: *gravacaoService,
+		gravacaoService: gravacaoService,
 	}
 }
 

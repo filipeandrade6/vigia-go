@@ -9,4 +9,4 @@ DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
 cd "$DIR"
 
 export PATH="$PATH:$(go env GOPATH)/bin"
-protoc -I=$DIR/api/proto/v1 --go_out=. --go-grpc_out=. $DIR/api/proto/v1/*.proto
+protoc -I=$DIR/internal/api/proto --go_out=. --go-grpc_out=. $DIR/internal/api/proto/*.proto

@@ -1,4 +1,4 @@
-package schema
+package migration
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/johejo/golang-migrate-extra/source/iofs"
 )
 
-//go:embed migrations/*.sql
+//go:embed sql/*.sql
 var fs embed.FS
 
 // Migrate attempts to bring the schema for db up to date with the migrations

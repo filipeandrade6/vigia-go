@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-	"github.com/filipeandrade6/vigia-go/internal/data/schema"
-	"github.com/filipeandrade6/vigia-go/internal/gerencia/service"
+	pb "github.com/filipeandrade6/vigia-go/internal/api"
+	"github.com/filipeandrade6/vigia-go/internal/data/migration"
+	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"go.uber.org/zap"
 )
 
@@ -15,15 +15,15 @@ import (
 type gerenciaGRPCService struct {
 	pb.UnimplementedGerenciaServer // TODO remover isso aqui se eu implementar todos os serviços
 	log                            *zap.SugaredLogger
-	gerenciaService                service.GerenciaService
+	gerenciaService                *gerenciaService.GerenciaService
 	// validator
 }
 
 // TODO ver o necessidade do ponteiro gerenciaService
-func NewGerenciaService(log *zap.SugaredLogger, gerenciaService *service.GerenciaService) *gerenciaGRPCService {
+func NewGerenciaService(log *zap.SugaredLogger, gerenciaService *gerenciaService.GerenciaService) *gerenciaGRPCService {
 	return &gerenciaGRPCService{
 		log:             log,
-		gerenciaService: *gerenciaService,
+		gerenciaService: gerenciaService,
 	}
 }
 
@@ -41,7 +41,7 @@ func (g *gerenciaGRPCService) CreateProcesso(ctx context.Context, req *pb.Create
 
 func (g *gerenciaGRPCService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.MigrateRes, error) {
 	fmt.Println(req.GetVersao())
-	if err := schema.Migrate(context.Background()); err != nil {
+	if err := migration.Migrate(context.Background()); err != nil {
 		g.log.Fatalw("failed to migrate", err)
 	}
 	return &pb.MigrateRes{}, nil

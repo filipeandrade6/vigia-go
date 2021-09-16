@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/core"
-	"github.com/filipeandrade6/vigia-go/internal/logger"
+	"github.com/filipeandrade6/vigia-go/internal/sys/logger"
 )
 
 func main() {

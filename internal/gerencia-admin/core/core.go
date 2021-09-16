@@ -10,7 +10,7 @@ import (
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 
-	"github.com/filipeandrade6/vigia-go/internal/gerencia/grpc/client"
+	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 )
 
@@ -34,7 +34,7 @@ func Run(log *zap.SugaredLogger) error {
 
 	fmt.Println("chegou aqui antes de criar o client de genrecia")
 	time.Sleep(time.Duration(time.Second * 10))
-	gerenciaClient := client.NovoClientGerencia()
+	gerenciaClient := gerenciaGRPC.NovoClientGerencia()
 	fmt.Println("chegou aqui")
 	if err := gerenciaClient.Migrate(); err != nil {
 		log.Fatalf("calling migrate: %w", err)

@@ -9,14 +9,13 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/filipeandrade6/vigia-go/internal/gerencia/grpc/client"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/service"
+	pb "github.com/filipeandrade6/vigia-go/internal/api"
+	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
+	gravacaoGRPC "github.com/filipeandrade6/vigia-go/internal/gravacao/grpc"
+	gravacaoService "github.com/filipeandrade6/vigia-go/internal/gravacao/service"
+
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
-
-	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-
-	gravacaoGRPC "github.com/filipeandrade6/vigia-go/internal/gravacao/grpc"
 
 	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
@@ -168,8 +167,8 @@ func Run(log *zap.SugaredLogger) error {
 
 	serverErrors := make(chan error, 1)
 
-	gerenciaClient := client.NovoClientGerencia() // TODO: passar log?
-	svc := service.NewGravacaoService(log, gerenciaClient)
+	gerenciaClient := gerenciaGRPC.NovoClientGerencia() // TODO: passar log?
+	svc := gravacaoService.NewGravacaoService(log, gerenciaClient)
 
 	grpcServer := grpc.NewServer()
 	gravacaoGRPCService := gravacaoGRPC.NewGravacaoService(log, svc)
