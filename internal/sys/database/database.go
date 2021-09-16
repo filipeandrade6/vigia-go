@@ -96,8 +96,8 @@ func StatusCheck(ctx context.Context, db *sqlx.DB) error {
 // NamedExecContext is a helper function to execute a CUD operation with
 // logging and tracing.
 func NamedExecContext(ctx context.Context, log *zap.SugaredLogger, db *sqlx.DB, query string, data interface{}) error {
-	q := queryString(query, data)
-	log.Infow("database.NamedExecContext", "traceid", web.GetTraceID(ctx), "query", q)
+	// q := queryString(query, data)
+	// log.Infow("database.NamedExecContext", "traceid", web.GetTraceID(ctx), "query", q)
 
 	if _, err := db.NamedExecContext(ctx, query, data); err != nil {
 		return err
@@ -109,8 +109,8 @@ func NamedExecContext(ctx context.Context, log *zap.SugaredLogger, db *sqlx.DB, 
 // NamedQuerySlice is a helper function for executing queries that return a
 // collection of data to be unmarshaled into a slice.
 func NamedQuerySlice(ctx context.Context, log *zap.SugaredLogger, db *sqlx.DB, query string, data interface{}, dest interface{}) error {
-	q := queryString(query, data)
-	log.Infow("database.NamedQuerySlice", "traceid", web.GetTraceID(ctx), "query", q)
+	// q := queryString(query, data)
+	// log.Infow("database.NamedQuerySlice", "traceid", web.GetTraceID(ctx), "query", q)
 
 	val := reflect.ValueOf(dest)
 	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Slice {

@@ -1,6 +1,10 @@
 package service
 
 import (
+	"context"
+	"fmt"
+	"time"
+
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
@@ -24,4 +28,15 @@ func NewGerenciaService(log *zap.SugaredLogger, cameraStore camera.Store, proces
 		servidorGravacaoStore: servidorGravacaoStore,
 		// gravacaoClient:        gravacaoClient,
 	}
+}
+
+func (g *GerenciaService) CreateCamera(ctx context.Context, cam camera.Camera) (string, error) {
+	now := time.Now()
+
+	c, err := g.cameraStore.Create(ctx, cam, now)
+	if err != nil {
+		return "", fmt.Errorf("camera[%+v]: %w", &cam, err)
+	}
+
+	return c.CameraID, nil
 }

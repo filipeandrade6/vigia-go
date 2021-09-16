@@ -2,20 +2,17 @@ package camera
 
 import "time"
 
+// TODO aggregate fields - consumo, leituras, tempo de atividade
+
 type Camera struct {
-	ID              int
-	Nome            string
-	IP              string
-	Porta           int
-	Canal           int
-	Usuario         string
-	Senha           string
-	Regiao          string
-	Geolocalizacao  string
-	Marca           string
-	Modelo          string
-	Informacao      string
-	Consumo         string // Aggregate field showing total of storatge consuption
-	DataCriacao     time.Time
-	DataAtualizacao time.Time
+	CameraID       string    `db:"camera_id"`
+	Descricao      string    `db:"descricao"`
+	IP             string    `db:"ip"`
+	Porta          int       `db:"porta"`
+	Canal          int       `db:"canal"`
+	Usuario        string    `db:"usuario"`
+	Senha          string    `db:"senha"`
+	Geolocalizacao string    `db:"geolocalizao"`
+	CriadoEm       time.Time `db:"criado_em"`
+	EditadoEm      time.Time `db:"editado_em"`
 }
