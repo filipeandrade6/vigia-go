@@ -7,7 +7,7 @@ import "time"
 type Camera struct {
 	CameraID       string    `db:"camera_id"`
 	Descricao      string    `db:"descricao"`
-	IP             string    `db:"ip"`
+	EnderecoIP     string    `db:"endereco_ip"`
 	Porta          int       `db:"porta"`
 	Canal          int       `db:"canal"`
 	Usuario        string    `db:"usuario"`

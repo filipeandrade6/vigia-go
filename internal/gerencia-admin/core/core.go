@@ -40,5 +40,9 @@ func Run(log *zap.SugaredLogger) error {
 		log.Fatalf("calling migrate: %w", err)
 	}
 
+	if err := gerenciaClient.CreateCamera(); err != nil {
+		log.Fatalf("creating camera: %w", err)
+	}
+
 	return nil
 }

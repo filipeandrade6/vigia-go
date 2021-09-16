@@ -73,12 +73,34 @@ func (g *GerenciaClient) Migrate() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	fmt.Println("chegou asdlfkj")
-
 	if _, err := g.c.Migrate(ctx, &pb.MigrateReq{Versao: 5}); err != nil {
 		fmt.Println(err)
 		return err
 	}
+
+	return nil
+}
+
+func (g *GerenciaClient) CreateCamera() error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	cam := &pb.CreateCameraReq{
+		Descricao:      "Teste",
+		EnderecoIp:     "10.0.0.1",
+		Porta:          12,
+		Canal:          1,
+		Usuario:        "admin",
+		Senha:          "admin",
+		Geolocalizacao: "-12.3242, -45.1234",
+	}
+
+	camID, err := g.c.CreateCamera(ctx, cam)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(camID.GetCameraId())
 
 	return nil
 }

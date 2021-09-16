@@ -27,7 +27,7 @@ func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (Camera, e
 	c := Camera{
 		CameraID:       validate.GenerateID(),
 		Descricao:      cam.Descricao,
-		IP:             cam.IP,
+		EnderecoIP:     cam.EnderecoIP,
 		Porta:          cam.Porta,
 		Canal:          cam.Canal,
 		Usuario:        cam.Usuario,
@@ -38,9 +38,9 @@ func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (Camera, e
 
 	const q = `
 	INSERT INTO cameras
-		(camera_id, descricao, ip, porta, canal, usuario, senha, geolocalizacao, criado_em)
+		(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao, criado_em)
 	VALUES
-		(:camera_id, :descricao, :ip, :porta, :canal, :usuario, :senha, :geolocalizacao, :criado_em)`
+		(:camera_id, :descricao, :endereco_ip, :porta, :canal, :usuario, :senha, :geolocalizacao, :criado_em)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
 		return Camera{}, fmt.Errorf("inserting camera: %w", err)

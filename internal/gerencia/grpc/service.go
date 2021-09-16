@@ -6,6 +6,7 @@ import (
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	"github.com/filipeandrade6/vigia-go/internal/data/migration"
+	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"go.uber.org/zap"
 )
@@ -32,7 +33,24 @@ func (g *gerenciaGRPCService) CreateServidorGravacao(ctx context.Context, req *p
 }
 
 func (g *gerenciaGRPCService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
-	return &pb.CreateCameraRes{CameraId: "83aba2e4-6be2-4f50-93ec-66bc0be611ee"}, nil
+
+	// TODO criar metodos FromProto ToProto
+	cam := camera.Camera{
+		Descricao:      req.GetDescricao(),
+		EnderecoIP:     req.GetEnderecoIp(),
+		Porta:          int(req.GetPorta()),
+		Canal:          int(req.GetCanal()),
+		Usuario:        req.GetUsuario(),
+		Senha:          req.GetSenha(),
+		Geolocalizacao: req.GetGeolocalizacao(),
+	}
+
+	camID, err := g.gerenciaService.CreateCamera(ctx, cam)
+	if err != nil {
+		return &pb.CreateCameraRes{}, err
+	}
+
+	return &pb.CreateCameraRes{CameraId: camID}, nil
 }
 
 func (g *gerenciaGRPCService) CreateProcesso(ctx context.Context, req *pb.CreateProcessoReq) (*pb.CreateProcessoRes, error) {
