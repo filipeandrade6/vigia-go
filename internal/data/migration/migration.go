@@ -15,14 +15,10 @@ import (
 //go:embed sql/*.sql
 var fs embed.FS
 
-// Migrate attempts to bring the schema for db up to date with the migrations
-// defined in this package.
-
-// TODO: verificar se esta conectado o banco de dados - Status Check e seed
 func Migrate(ctx context.Context) error {
 	d, err := iofs.New(fs, "sql")
 	if err != nil {
-		return err // TODO arrumar isso aqui
+		return fmt.Errorf("getting new driver from io/fs: %w", err)
 	}
 
 	dbURL := fmt.Sprintf(
@@ -41,7 +37,7 @@ func Migrate(ctx context.Context) error {
 
 	err = m.Up()
 	if err != nil {
-		return err
+		return fmt.Errorf("applying migrations: %w", err)
 	}
 
 	return nil

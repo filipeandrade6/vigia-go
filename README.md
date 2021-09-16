@@ -17,6 +17,7 @@ refatorando
 - [ ] Formatar arquivo de Dockerfile
 - [ ] Label build
 - [ ] Execução gRPC em contexto e Health Server https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
+- [ ] Verificar timezone na aplicação e quando abre o banco de dados
 
 #### comandos *Makefile*:
 

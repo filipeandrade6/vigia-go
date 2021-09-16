@@ -35,18 +35,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type Gravacao struct {
-	server *grpc.Server
-	// client *client.GerenciaClient
-	// models models.Models
-}
-
-func (g *Gravacao) Stop() {
-	fmt.Println("Finalizando aplicação....")
-	g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30 seg
-	fmt.Println("Bye.")
-}
-
 // build is the git versin of this program. It is set using build flags in the makefile.
 var build = "develop"
 
@@ -72,8 +60,6 @@ func Run(log *zap.SugaredLogger) error {
 	expvar.NewString("build").Set(build)
 	log.Infow("starting service", "version", build)
 	defer log.Infow("shutdown complete")
-
-	// log.Infow("startup", "config", cfg)
 
 	// =========================================================================
 	// TODO Initialize Authentication Support
@@ -175,15 +161,13 @@ func Run(log *zap.SugaredLogger) error {
 
 	pb.RegisterGravacaoServer(grpcServer, gravacaoGRPCService)
 
-	// TODO ver abaixo, tem exemplo toda execução em contexto
-	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
 	go func() {
 		lis, err := net.Listen(viper.GetString("VIGIA_GRA_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("VIGIA_GRA_SERVER_PORT")))
 		if err != nil {
 			log.Errorw("startup", "status", "could not open socket", viper.GetString("VIGIA_GRA_SERVER_CONN"), viper.GetString("VIGIA_GRA_SERVER_PORT"), "ERROR", err)
 		}
 
-		log.Infow("startup", "status", "gRPC server started") // TODO add address
+		log.Infow("startup", "status", "gRPC server started", viper.GetString("VIGIA_GRA_SERVER_HOST"))
 		serverErrors <- grpcServer.Serve(lis)
 	}()
 
@@ -199,16 +183,6 @@ func Run(log *zap.SugaredLogger) error {
 		defer log.Infow("shutdown", "status", "shutdown complete", "signal", sig)
 
 		grpcServer.GracefulStop()
-
-		// Give outstanding requests a deadline for completion.
-		// ctx, cancel := context.WithTimeout(context.Background(), cfg.Web.ShutdownTimeout)
-		// defer cancel()
-
-		// // Asking listener to shutdown and shed load.
-		// if err := api.Shutdown(ctx); err != nil {
-		// 	api.Close()
-		// 	return fmt.Errorf("could not stop server gracefully: %w", err)
-		// }
 	}
 
 	return nil

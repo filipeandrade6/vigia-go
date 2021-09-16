@@ -10,36 +10,22 @@ import (
 	"runtime"
 	"syscall"
 
-	// "github.com/filipeandrade6/vigia-go/internal/database"
 	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
-
-	// "github.com/filipeandrade6/vigia-go/internal/gerencia/client"
 	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
 	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
+	"github.com/filipeandrade6/vigia-go/internal/sys/database"
+
 	"github.com/spf13/viper"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-
-	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 )
 
-type Gerencia struct {
-	server *grpc.Server
-	// client *client.GravacaoClient
-}
-
-func (g *Gerencia) Stop() {
-	fmt.Println("Finalizando aplicação...")
-	g.server.GracefulStop() // TODO colocar context e finalizar forçado com 30seg ou menos
-	fmt.Println("Bye.")
-}
-
-var build = "develop" // TODO pq isso?
+var build = "develop"
 
 func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
@@ -66,9 +52,8 @@ func Run(log *zap.SugaredLogger) error {
 
 	// =========================================================================
 	// Start Database
-	// TODO database.Open não funciona
 
-	// log.Infow("startup", "status", "initializing database support", "host", viper.GetString("DB_HOST"))
+	log.Infow("startup", "status", "initializing database support", "host", viper.GetString("VIGIA_DB_HOST"))
 
 	db, err := database.Open(database.Config{
 		Host:         viper.GetString("VIGIA_DB_HOST"),
@@ -118,7 +103,7 @@ func Run(log *zap.SugaredLogger) error {
 			log.Errorw("startup", "status", "could not open socket", viper.GetString("VIGIA_GER_SERVER_CONN"), viper.GetString("VIGIA_GER_SERVER_ADDR"), viper.GetString("VIGIA_GER_SERVER_PORT"), "ERROR", err)
 		}
 
-		log.Infow("startup", "status", "gRPC server started") // TODO add address
+		log.Infow("startup", "status", "gRPC server started", viper.GetString("VIGIA_GER_SERVER_HOST"))
 		serverErrors <- grpcServer.Serve(lis)
 	}()
 
