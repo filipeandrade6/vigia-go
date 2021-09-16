@@ -32,18 +32,19 @@ type Config struct {
 	Name         string
 	MaxIdleConns int
 	MaxOpenConns int
-	DisableTLS   bool
+	// DisableTLS   bool
+	SSLMode string
 }
 
 // Open knows how to open a database connection based on the configuration.
 func Open(cfg Config) (*sqlx.DB, error) {
-	sslMode := "require"
-	if cfg.DisableTLS {
-		sslMode = "disable"
-	}
+	// sslMode := "require"
+	// if cfg.DisableTLS {
+	// 	sslMode = "disable"
+	// }
 
 	q := make(url.Values)
-	q.Set("sslmode", sslMode)
+	q.Set("sslmode", cfg.SSLMode)
 	q.Set("timezone", "utc")
 
 	u := url.URL{

@@ -24,6 +24,8 @@ import (
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+
+	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 )
 
 type Gerencia struct {
@@ -68,22 +70,22 @@ func Run(log *zap.SugaredLogger) error {
 
 	// log.Infow("startup", "status", "initializing database support", "host", viper.GetString("DB_HOST"))
 
-	// db, err := database.Open(database.Config{
-	// 	Host:         viper.GetString("DB_HOST"),
-	// 	User:         viper.GetString("DB_USER"),
-	// 	Password:     viper.GetString("DB_PASSWORD"),
-	// 	Name:         viper.GetString("DB_NAME"),
-	// 	MaxIdleConns: viper.GetInt("DB_MAXIDLECONNS"),
-	// 	MaxOpenConns: viper.GetInt("DB_MAXOPENCONNS"),
-	// 	DisableTLS:   viper.GetBool("DB_DISABLETLS"),
-	// })
-	// if err != nil {
-	// 	return fmt.Errorf("connecting to db: %w", err)
-	// }
-	// defer func() {
-	// 	log.Infow("shutdown", "status", "stopping database support", "host", viper.GetString("DB_HOST"))
-	// 	db.Close()
-	// }()
+	db, err := database.Open(database.Config{
+		Host:         viper.GetString("VIGIA_DB_HOST"),
+		User:         viper.GetString("VIGIA_DB_USER"),
+		Password:     viper.GetString("VIGIA_DB_PASSWORD"),
+		Name:         viper.GetString("VIGIA_DB_NAME"),
+		MaxIdleConns: viper.GetInt("VIGIA_DB_MAXIDLECONNS"),
+		MaxOpenConns: viper.GetInt("VIGIA_DB_MAXOPENCONNS"),
+		SSLMode:      viper.GetString("VIGIA_DB_SSLMODE"),
+	})
+	if err != nil {
+		return fmt.Errorf("connecting to db: %w", err)
+	}
+	defer func() {
+		log.Infow("shutdown", "status", "stopping database support", "host", viper.GetString("VIGIA_DB_HOST"))
+		db.Close()
+	}()
 
 	// =========================================================================
 	// TODO Start Tracing Support
@@ -111,9 +113,9 @@ func Run(log *zap.SugaredLogger) error {
 	pb.RegisterGerenciaServer(grpcServer, gerenciaGRPCService)
 
 	go func() {
-		lis, err := net.Listen(viper.GetString("GER_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("GER_SERVER_PORT")))
+		lis, err := net.Listen(viper.GetString("VIGIA_GER_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("VIGIA_GER_SERVER_PORT")))
 		if err != nil {
-			log.Errorw("startup", "status", "could not open socket", viper.GetString("GER_SERVER_CONN"), viper.GetString("GER_SERVER_ADDR"), viper.GetString("GER_SERVER_PORT"), "ERROR", err)
+			log.Errorw("startup", "status", "could not open socket", viper.GetString("VIGIA_GER_SERVER_CONN"), viper.GetString("VIGIA_GER_SERVER_ADDR"), viper.GetString("VIGIA_GER_SERVER_PORT"), "ERROR", err)
 		}
 
 		log.Infow("startup", "status", "gRPC server started") // TODO add address

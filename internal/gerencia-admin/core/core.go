@@ -36,12 +36,16 @@ func Run(log *zap.SugaredLogger) error {
 	time.Sleep(time.Duration(time.Second * 10))
 	gerenciaClient := gerenciaGRPC.NovoClientGerencia()
 	fmt.Println("chegou aqui")
-	if err := gerenciaClient.Migrate(); err != nil {
-		log.Fatalf("calling migrate: %w", err)
-	}
+	// if err := gerenciaClient.Migrate(); err != nil {
+	// 	if errors.Is(err, migrate.ErrNoChange) {
+	// 		fmt.Println("Sem alterações")
+	// 	} else {
+	// 		log.Fatalf("calling migrate: %w", err)
+	// 	}
+	// }
 
 	if err := gerenciaClient.CreateCamera(); err != nil {
-		log.Fatalf("creating camera: %w", err)
+		log.Fatal(err)
 	}
 
 	return nil

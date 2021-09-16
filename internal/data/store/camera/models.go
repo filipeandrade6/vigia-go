@@ -12,7 +12,7 @@ type Camera struct {
 	Canal          int       `db:"canal"`
 	Usuario        string    `db:"usuario"`
 	Senha          string    `db:"senha"`
-	Geolocalizacao string    `db:"geolocalizao"`
+	Geolocalizacao string    `db:"geolocalizacao"`
 	CriadoEm       time.Time `db:"criado_em"`
 	EditadoEm      time.Time `db:"editado_em"`
 }

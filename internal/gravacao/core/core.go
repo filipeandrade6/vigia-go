@@ -178,9 +178,9 @@ func Run(log *zap.SugaredLogger) error {
 	// TODO ver abaixo, tem exemplo toda execução em contexto
 	// https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
 	go func() {
-		lis, err := net.Listen(viper.GetString("GRA_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("GRA_SERVER_PORT")))
+		lis, err := net.Listen(viper.GetString("VIGIA_GRA_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("VIGIA_GRA_SERVER_PORT")))
 		if err != nil {
-			log.Errorw("startup", "status", "could not open socket", viper.GetString("GRA_SERVER_CONN"), viper.GetString("GRA_SERVER_PORT"), "ERROR", err)
+			log.Errorw("startup", "status", "could not open socket", viper.GetString("VIGIA_GRA_SERVER_CONN"), viper.GetString("VIGIA_GRA_SERVER_PORT"), "ERROR", err)
 		}
 
 		log.Infow("startup", "status", "gRPC server started") // TODO add address

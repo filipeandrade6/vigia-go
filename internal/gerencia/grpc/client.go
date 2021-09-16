@@ -45,8 +45,8 @@ func NovoClientGerencia() *GerenciaClient {
 
 	cfg := fmt.Sprintf(
 		"%s:%d",
-		viper.GetString("GER_HOST"), // TODO assim como no DB juntar endereco e porta em uma unica var
-		viper.GetInt("GER_SERVER_PORT"),
+		viper.GetString("VIGIA_GER_HOST"), // TODO assim como no DB juntar endereco e porta em uma unica var
+		viper.GetInt("VIGIA_GER_SERVER_PORT"),
 	)
 
 	fmt.Println("as config de conexão é", cfg)
