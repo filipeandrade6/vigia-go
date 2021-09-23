@@ -34,3 +34,7 @@ Criando FromProto e ToProto nos modelos
 - docker-compose up informando qual o tipo de ambiente (dev, test, staging, prod)
 - no docker-compose tem variaveis de ambiente que sobrescrevem o arquivo de configuracao
 - carrega o arquivo de configuracao
+
+### FEDORA
+
+- Na instalação do protobuf - não instale com dnf install protoc - siga a respota... https://stackoverflow.com/questions/40025602/how-to-use-predifined-protobuf-type-i-e-google-protobuf-timestamp-proto-wit

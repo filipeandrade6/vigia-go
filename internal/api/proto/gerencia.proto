@@ -4,6 +4,8 @@ option go_package = "./internal/api";
 
 package gerencia;
 
+import "google/protobuf/timestamp.proto";
+
 service Gerencia {
     // Gravacao requests
     rpc Match (MatchReq) returns (MatchRes) {} // TODO streaming de informação de placa e o gerencia processa tudo?
@@ -72,34 +74,34 @@ message DeleteServidorGravacaoRes{}
 
 
 
-
-message CreateCameraReq{
-    string descricao = 1;
-    string endereco_ip = 2;
-    int32 porta = 3;
-    int32 canal = 4;
-    string usuario = 5;
-    string senha = 6;
-    string geolocalizacao = 7;
-}
-
-message CreateCameraRes{
+message Camera {
     string camera_id = 1;
+    string descricao = 2;
+    string endereco_ip = 3;
+    int32 porta = 4;
+    int32 canal = 5;
+    string usuario = 6;
+    string senha = 7;
+    string geolocalizacao = 8;
+    google.protobuf.Timestamp criado_em = 9;
+    google.protobuf.Timestamp editado_em = 10;
 }
 
-message ReadCameraReq{}
+message CreateCameraReq{Camera camera = 1;}
 
-message ReadCameraRes{}
+message CreateCameraRes{Camera camera = 1;}
 
-message UpdateCameraReq{}
+message ReadCameraReq{Camera camera = 1;}
 
-message UpdateCameraRes{}
+message ReadCameraRes{Camera camera = 1;}
 
-message DeleteCameraReq{
-    string camera_id = 1;
-}
+message UpdateCameraReq{Camera camera = 1;}
 
-message DeleteCameraRes{}
+message UpdateCameraRes{Camera camera = 1;}
+
+message DeleteCameraReq{Camera camera = 1;}
+
+message DeleteCameraRes{Camera camera = 1;}
 
 
 

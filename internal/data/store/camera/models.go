@@ -4,6 +4,7 @@ import (
 	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // TODO aggregate fields - consumo, leituras, tempo de atividade
@@ -21,10 +22,32 @@ type Camera struct {
 	EditadoEm      time.Time `db:"editado_em"`
 }
 
-func ToProto(camera Camera) *pb.CreateCameraReq {
-
+func ToProto(c Camera) *pb.Camera {
+	return &pb.Camera{
+		CameraId:       c.CameraID,
+		Descricao:      c.Descricao,
+		EnderecoIp:     c.EnderecoIP,
+		Porta:          int32(c.Porta),
+		Canal:          int32(c.Canal),
+		Usuario:        c.Usuario,
+		Senha:          c.Senha,
+		Geolocalizacao: c.Geolocalizacao,
+		CriadoEm:       timestamppb.New(c.CriadoEm),
+		EditadoEm:      timestamppb.New(c.EditadoEm),
+	}
 }
 
-func FromProto(camera *pb.CreateCameraReq) Camera {
-
+func FromProto(c *pb.Camera) Camera {
+	return Camera{
+		CameraID:       c.GetCameraId(),
+		Descricao:      c.GetDescricao(),
+		EnderecoIP:     c.GetEnderecoIp(),
+		Porta:          int(c.GetPorta()),
+		Canal:          int(c.GetCanal()),
+		Usuario:        c.GetUsuario(),
+		Senha:          c.GetSenha(),
+		Geolocalizacao: c.GetGeolocalizacao(),
+		CriadoEm:       c.GetCriadoEm().AsTime(),
+		EditadoEm:      c.GetEditadoEm().AsTime(),
+	}
 }
