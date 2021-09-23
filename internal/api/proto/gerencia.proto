@@ -47,30 +47,30 @@ message MigrateReq{
 
 message MigrateRes{}
 
-
-message CreateServidorGravacaoReq {
-    string endereco_ip = 1;
-    int32 porta = 2;
-    string host = 3;
-}
-
-message CreateServidorGravacaoRes {
+message ServidorGravacao {
     string servidor_gravacao_id = 1;
+    string endereco_ip = 2;
+    int32 porta = 3;
+    string host = 4;
+    google.protobuf.Timestamp criado_em = 5;
+    google.protobuf.Timestamp editado_em = 6;
 }
 
-message ReadServidorGravacaoReq{}
+message CreateServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
 
-message ReadServidorGravacaoRes{}
+message CreateServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
 
-message UpdateServidorGravacaoReq{}
+message ReadServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
 
-message UpdateServidorGravacaoRes{}
+message ReadServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
 
-message DeleteServidorGravacaoReq{
-    string servidor_gravacao_id = 1;
-}
+message UpdateServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
 
-message DeleteServidorGravacaoRes{}
+message UpdateServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
+
+message DeleteServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
+
+message DeleteServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
 
 
 
@@ -104,7 +104,9 @@ message DeleteCameraReq{Camera camera = 1;}
 message DeleteCameraRes{Camera camera = 1;}
 
 
+message Processo {
 
+}
 
 message CreateProcessoReq{
     string servidor_gravacao_id = 1;

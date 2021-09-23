@@ -4,6 +4,7 @@ import (
 	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api"
+
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -22,7 +23,7 @@ type Camera struct {
 	EditadoEm      time.Time `db:"editado_em"`
 }
 
-func ToProto(c Camera) *pb.Camera {
+func (c Camera) ToProto() *pb.Camera {
 	return &pb.Camera{
 		CameraId:       c.CameraID,
 		Descricao:      c.Descricao,
