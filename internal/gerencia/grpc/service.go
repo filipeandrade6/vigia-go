@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/data/migration"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
+	"github.com/golang-migrate/migrate/v4"
 	"go.uber.org/zap"
 )
 
@@ -34,7 +36,11 @@ func (g *gerenciaGRPCService) Migrate(ctx context.Context, req *pb.MigrateReq) (
 	fmt.Println(req.GetVersao()) // TODO remover isso aqui
 
 	if err := migration.Migrate(context.Background()); err != nil {
-		g.log.Fatalw("failed to migrate", err)
+		if errors.As(err, &migrate.ErrNoChange) {
+			g.log.Infow("no change in migration")
+		} else {
+			g.log.Fatalf("failed to migrate", err)
+		}
 	}
 	return &pb.MigrateRes{}, nil
 }
@@ -73,7 +79,7 @@ func (g *gerenciaGRPCService) ReadCameras(ctx context.Context, req *pb.ReadCamer
 		return &pb.ReadCamerasRes{}, err
 	}
 
-	return &pb.ReadCamerasRes{Camera: c.ToProto()}, nil
+	return &pb.ReadCamerasRes{Cameras: c.ToProto()}, nil
 }
 
 func (g *gerenciaGRPCService) UpdateCamera(ctx context.Context, req *pb.UpdateCameraReq) (*pb.UpdateCameraRes, error) {

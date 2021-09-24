@@ -13,26 +13,22 @@ import (
 	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
 	gravacaoGRPC "github.com/filipeandrade6/vigia-go/internal/gravacao/grpc"
 	gravacaoService "github.com/filipeandrade6/vigia-go/internal/gravacao/service"
-
-	"github.com/spf13/viper"
-	"google.golang.org/grpc"
-
-	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 
+	"github.com/spf13/viper"
+	"go.uber.org/automaxprocs/maxprocs"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
 	// "github.com/ardanlabs/service/business/sys/metrics"
 	// "github.com/filipeandrade6/vigia-go/business/sys/auth"
-
 	// "github.com/filipeandrade6/vigia-go/internal/keystore"
-
 	// "go.opentelemetry.io/otel"
 	// "go.opentelemetry.io/otel/attribute"
 	// "go.opentelemetry.io/otel/exporters/zipkin"
 	// "go.opentelemetry.io/otel/sdk/resource"
 	// "go.opentelemetry.io/otel/sdk/trace"
 	// semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
-	"go.uber.org/automaxprocs/maxprocs"
-	"go.uber.org/zap"
 )
 
 // build is the git versin of this program. It is set using build flags in the makefile.
@@ -153,7 +149,7 @@ func Run(log *zap.SugaredLogger) error {
 
 	serverErrors := make(chan error, 1)
 
-	gerenciaClient := gerenciaGRPC.NovoClientGerencia() // TODO: passar log?
+	gerenciaClient := gerenciaGRPC.NewClientGerencia() // TODO: passar log?
 	svc := gravacaoService.NewGravacaoService(log, gerenciaClient)
 
 	grpcServer := grpc.NewServer()

@@ -12,9 +12,9 @@ import (
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 
+	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 )
 
 func Run(log *zap.SugaredLogger) error {
@@ -37,16 +37,18 @@ func Run(log *zap.SugaredLogger) error {
 
 	fmt.Println("chegou aqui antes de criar o client de genrecia")
 	time.Sleep(time.Duration(time.Second * 10))
-	gerenciaClient := gerenciaGRPC.NovoClientGerencia()
+	gerenciaClient := gerenciaGRPC.NewClientGerencia()
 	fmt.Println("chegou aqui")
 
 	if err := gerenciaClient.Migrate(); err != nil {
-		if errors.Is(err, migrate.ErrNoChange) {
+		if errors.As(err, &migrate.ErrNoChange) {
 			fmt.Println("Sem alterações")
 		} else {
-			log.Fatalf("calling migrate: %w", err)
+			log.Fatalf("calling migrate: %s", err)
 		}
 	}
+
+	// TODO na migracao
 
 	c := camera.Camera{
 		Descricao:      "Camera 1",
@@ -58,28 +60,52 @@ func Run(log *zap.SugaredLogger) error {
 		Geolocalizacao: "-12.3242, -45.1234",
 	}
 
-	if err := gerenciaClient.CreateCamera(c); err != nil {
+	cam1, err := gerenciaClient.CreateCamera(c)
+	if err != nil {
 		log.Fatal(err)
 	}
 
 	c.Descricao = "Camera 2"
 	c.EnderecoIP = "10.0.0.2"
 
-	if err := gerenciaClient.CreateCamera(c); err != nil {
+	if _, err := gerenciaClient.CreateCamera(c); err != nil {
 		log.Fatal(err)
 	}
 
 	c.Descricao = "Camera 3"
 	c.EnderecoIP = "10.0.0.3"
 
-	if err := gerenciaClient.CreateCamera(c); err != nil {
+	cam3, err := gerenciaClient.CreateCamera(c)
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := gerenciaClient.UpdateCamera
+	fmt.Println("criado 3 câmeras... segue abaixo")
 
+	cRes, err := gerenciaClient.ReadCameras()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(cRes)
 
+	c.CameraID = cam1
+	c.Descricao = "Camera Updatada"
 
+	if err = gerenciaClient.UpdateCamera(c); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := gerenciaClient.DeleteCamera(cam3); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("câmera 3 deletada e câmera 1 atualizada... segue abaixo")
+
+	cRes, err = gerenciaClient.ReadCameras()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(cRes)
 
 	return nil
 }

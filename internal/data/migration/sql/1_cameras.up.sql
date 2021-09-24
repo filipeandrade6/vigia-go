@@ -7,8 +7,6 @@ CREATE TABLE cameras (
     usuario TEXT NOT NULL,
     senha TEXT NOT NULL,
     geolocalizacao TEXT NOT NULL,
-    criado_em TIMESTAMP NOT NULL,
-    editado_em TIMESTAMP,
 
     PRIMARY KEY (camera_id)
 );

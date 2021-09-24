@@ -33,14 +33,13 @@ func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (string, e
 		Usuario:        cam.Usuario,
 		Senha:          cam.Senha,
 		Geolocalizacao: cam.Geolocalizacao,
-		CriadoEm:       now,
 	}
 
 	const q = `
 	INSERT INTO cameras
-		(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao, criado_em)
+		(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao)
 	VALUES
-		(:camera_id, :descricao, :endereco_ip, :porta, :canal, :usuario, :senha, :geolocalizacao, :criado_em)`
+		(:camera_id, :descricao, :endereco_ip, :porta, :canal, :usuario, :senha, :geolocalizacao)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
 		return "", fmt.Errorf("inserting camera: %w", err)
@@ -123,20 +122,17 @@ func (s Store) Update(ctx context.Context, cam Camera, now time.Time) error {
 		return fmt.Errorf("updating camera cameraID[%s]: %w", cam.CameraID, err)
 	}
 
-	c.EditadoEm = now
-
 	const q = `
 	UPDATE
 		cameras
 	SET
 		"descricao" = :descricao,
-		"ip" = :ip,
+		"endereco_ip" = :endereco_ip,
 		"porta" = :porta,
 		"canal" = :canal,
 		"usuario" = :usuario,
 		"senha" = :senha,
-		"geolocalizacao" = :geolocalizacao,
-		"editado_em" = :editado_em,
+		"geolocalizacao" = :geolocalizacao
 	WHERE
 		camera_id = :camera_id`
 
