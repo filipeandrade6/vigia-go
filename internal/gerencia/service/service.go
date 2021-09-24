@@ -32,28 +32,68 @@ func NewGerenciaService(log *zap.SugaredLogger, cameraStore camera.Store, proces
 
 func (g *GerenciaService) CreateCamera(ctx context.Context, cam camera.Camera, now time.Time) (string, error) {
 
-	c, err := g.cameraStore.Create(ctx, cam, now)
+	// PERFORM PRE BUSINESS OPERATIONS
+
+	cameraID, err := g.cameraStore.Create(ctx, cam, now)
 	if err != nil {
 		return "", fmt.Errorf("create: %w", err)
 	}
 
-	return c.CameraID, nil
+	// PERFORM POST BUSINESS OPERATIONS
+
+	return cameraID, nil
+}
+
+func (g *GerenciaService) ReadCameras(ctx context.Context, pageNumber int, rowsPerPage int) ([]camera.Camera, error) {
+
+	// PERFORM PRE BUSINESS OPERATIONS
+
+	cameras, err := g.cameraStore.Query(ctx, pageNumber, rowsPerPage)
+	if err != nil {
+		return nil, fmt.Errorf("query: %w", err)
+	}
+
+	// PERFORM POST BUSINESS OPERATIONS
+
+	return cameras, nil
 }
 
 func (g *GerenciaService) ReadCamera(ctx context.Context, cameraID string) (camera.Camera, error) {
+
+	// PERFORM PRE BUSINESS OPERATIONS
 
 	c, err := g.cameraStore.QueryByID(ctx, cameraID)
 	if err != nil {
 		return camera.Camera{}, fmt.Errorf("query: %w", err)
 	}
 
+	// PERFORM POST BUSINESS OPERATIONS
+
 	return c, nil
 }
 
-func (g *GerenciaService) UpdateCamera(ctx context.Context, cam camera.Camera, now time.Time) {
+func (g *GerenciaService) UpdateCamera(ctx context.Context, cam camera.Camera, now time.Time) error {
 
+	// PERFORM PRE BUSINESS OPERATIONS:
+
+	if err := g.cameraStore.Update(ctx, cam, now); err != nil {
+		return fmt.Errorf("update: %w", err)
+	}
+
+	// PERFORM POST BUSINESS OPERATIONS
+
+	return nil
 }
 
-func (g *GerenciaService) DeleteCamera(ctx context.Context, cam camera.Camera) {
+func (g *GerenciaService) DeleteCamera(ctx context.Context, cameraID string) error {
 
+	// PERFORM PRE BUSINESS OPERATIONS
+
+	if err := g.cameraStore.Delete(ctx, cameraID); err != nil {
+		return fmt.Errorf("delete: %w", err)
+	}
+
+	// PERFORM POST BUSINESS OPERATIONS
+
+	return nil
 }

@@ -23,7 +23,7 @@ func NewStore(log *zap.SugaredLogger, db *sqlx.DB) Store {
 	}
 }
 
-func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (Camera, error) {
+func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (string, error) {
 	c := Camera{
 		CameraID:       validate.GenerateID(),
 		Descricao:      cam.Descricao,
@@ -43,10 +43,10 @@ func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (Camera, e
 		(:camera_id, :descricao, :endereco_ip, :porta, :canal, :usuario, :senha, :geolocalizacao, :criado_em)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
-		return Camera{}, fmt.Errorf("inserting camera: %w", err)
+		return "", fmt.Errorf("inserting camera: %w", err)
 	}
 
-	return cam, nil
+	return c.CameraID, nil
 }
 
 func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Camera, error) {
@@ -108,9 +108,9 @@ func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
 	return cam, nil
 }
 
-func (s Store) Update(ctx context.Context, cam Camera, now time.Time) (Camera, error) {
+func (s Store) Update(ctx context.Context, cam Camera, now time.Time) error {
 	if err := validate.CheckID(cam.CameraID); err != nil {
-		return Camera{}, database.ErrInvalidID
+		return database.ErrInvalidID
 	}
 
 	// TODO implementar validate.Check
@@ -120,7 +120,7 @@ func (s Store) Update(ctx context.Context, cam Camera, now time.Time) (Camera, e
 
 	c, err := s.QueryByID(ctx, cam.CameraID)
 	if err != nil {
-		return Camera{}, fmt.Errorf("updating camera cameraID[%s]: %w", cam.CameraID, err)
+		return fmt.Errorf("updating camera cameraID[%s]: %w", cam.CameraID, err)
 	}
 
 	c.EditadoEm = now
@@ -141,10 +141,10 @@ func (s Store) Update(ctx context.Context, cam Camera, now time.Time) (Camera, e
 		camera_id = :camera_id`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
-		return Camera{}, fmt.Errorf("updating cameraID[%s]: %w", cam.CameraID, err)
+		return fmt.Errorf("updating cameraID[%s]: %w", cam.CameraID, err)
 	}
 
-	return c, nil
+	return nil
 }
 
 func (s Store) Delete(ctx context.Context, cameraID string) error {
