@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	"github.com/filipeandrade6/vigia-go/internal/data/migration"
@@ -28,15 +29,23 @@ func NewGerenciaService(log *zap.SugaredLogger, gerenciaService *gerenciaService
 	}
 }
 
-func (g *gerenciaGRPCService) CreateServidorGravacao(ctx context.Context, req *pb.CreateServidorGravacaoReq) (*pb.CreateServidorGravacaoRes, error) {
-	return &pb.CreateServidorGravacaoRes{}, nil
+func (g *gerenciaGRPCService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.MigrateRes, error) {
+
+	fmt.Println(req.GetVersao()) // TODO remover isso aqui
+
+	if err := migration.Migrate(context.Background()); err != nil {
+		g.log.Fatalw("failed to migrate", err)
+	}
+	return &pb.MigrateRes{}, nil
 }
 
 func (g *gerenciaGRPCService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
 
 	cam := camera.FromProto(req.Camera)
 
-	camID, err := g.gerenciaService.CreateCamera(ctx, cam)
+	now := time.Now() // TODO pegar do contexto?
+
+	camID, err := g.gerenciaService.CreateCamera(ctx, cam, now)
 	if err != nil {
 		return &pb.CreateCameraRes{}, err
 	}
@@ -44,14 +53,49 @@ func (g *gerenciaGRPCService) CreateCamera(ctx context.Context, req *pb.CreateCa
 	return &pb.CreateCameraRes{Camera: &pb.Camera{CameraId: camID}}, nil
 }
 
-func (g *gerenciaGRPCService) CreateProcesso(ctx context.Context, req *pb.CreateProcessoReq) (*pb.CreateProcessoRes, error) {
-	return &pb.CreateProcessoRes{ProcessoId: "07c96eee-ab2f-4c17-b345-5634de4e2aac"}, nil
+func (g *gerenciaGRPCService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq) (*pb.ReadCameraRes, error) {
+
+	cam := camera.FromProto(req.Camera)
+
+	c, err := g.gerenciaService.ReadCamera(ctx, cam.CameraID)
+	if err != nil {
+		return &pb.ReadCameraRes{}, err
+	}
+
+	return &pb.ReadCameraRes{Camera: c.ToProto()}, err
 }
 
-func (g *gerenciaGRPCService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.MigrateRes, error) {
-	fmt.Println(req.GetVersao())
-	if err := migration.Migrate(context.Background()); err != nil {
-		g.log.Fatalw("failed to migrate", err)
+// TODO colocar pageNumer e rowsPerPage no proto
+func (g *gerenciaGRPCService) ReadCameras(ctx context.Context, req *pb.ReadCamerasReq) (*pb.ReadCamerasRes, error) {
+
+	c, err := g.gerenciaService.ReadCameras(ctx, 1, 1000)
+	if err != nil {
+		return &pb.ReadCamerasRes{}, err
 	}
-	return &pb.MigrateRes{}, nil
+
+	return &pb.ReadCamerasRes{Camera: c.ToProto()}, nil
+}
+
+func (g *gerenciaGRPCService) UpdateCamera(ctx context.Context, req *pb.UpdateCameraReq) (*pb.UpdateCameraRes, error) {
+
+	now := time.Now()
+
+	cam := camera.FromProto(req.Camera)
+
+	if err := g.gerenciaService.UpdateCamera(ctx, cam, now); err != nil {
+		return &pb.UpdateCameraRes{}, err
+	}
+
+	return &pb.UpdateCameraRes{}, nil
+}
+
+func (g *gerenciaGRPCService) DeleteCamera(ctx context.Context, req *pb.DeleteCameraReq) (*pb.DeleteCameraRes, error) {
+
+	cam := camera.FromProto(req.Camera)
+
+	if err := g.gerenciaService.DeleteCamera(ctx, cam.CameraID); err != nil {
+		return &pb.DeleteCameraRes{}, err
+	}
+
+	return &pb.DeleteCameraRes{}, nil
 }

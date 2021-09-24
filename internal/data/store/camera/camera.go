@@ -49,7 +49,7 @@ func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (string, e
 	return c.CameraID, nil
 }
 
-func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Camera, error) {
+func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) (Cameras, error) {
 	data := struct {
 		Offset      int `db:"offset"`
 		RowsPerPage int `db:"rows_per_page"`
@@ -67,7 +67,7 @@ func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) ([]Ca
 		camera_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
 
-	var cams []Camera
+	var cams Cameras
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &cams); err != nil {
 		if err == database.ErrNotFound {
 			return nil, database.ErrNotFound

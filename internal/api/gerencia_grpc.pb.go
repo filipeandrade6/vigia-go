@@ -28,6 +28,7 @@ type GerenciaClient interface {
 	DeleteServidorGravacao(ctx context.Context, in *DeleteServidorGravacaoReq, opts ...grpc.CallOption) (*DeleteServidorGravacaoRes, error)
 	CreateCamera(ctx context.Context, in *CreateCameraReq, opts ...grpc.CallOption) (*CreateCameraRes, error)
 	ReadCamera(ctx context.Context, in *ReadCameraReq, opts ...grpc.CallOption) (*ReadCameraRes, error)
+	ReadCameras(ctx context.Context, in *ReadCamerasReq, opts ...grpc.CallOption) (*ReadCamerasRes, error)
 	UpdateCamera(ctx context.Context, in *UpdateCameraReq, opts ...grpc.CallOption) (*UpdateCameraRes, error)
 	DeleteCamera(ctx context.Context, in *DeleteCameraReq, opts ...grpc.CallOption) (*DeleteCameraRes, error)
 	CreateProcesso(ctx context.Context, in *CreateProcessoReq, opts ...grpc.CallOption) (*CreateProcessoRes, error)
@@ -116,6 +117,15 @@ func (c *gerenciaClient) ReadCamera(ctx context.Context, in *ReadCameraReq, opts
 	return out, nil
 }
 
+func (c *gerenciaClient) ReadCameras(ctx context.Context, in *ReadCamerasReq, opts ...grpc.CallOption) (*ReadCamerasRes, error) {
+	out := new(ReadCamerasRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ReadCameras", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gerenciaClient) UpdateCamera(ctx context.Context, in *UpdateCameraReq, opts ...grpc.CallOption) (*UpdateCameraRes, error) {
 	out := new(UpdateCameraRes)
 	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/UpdateCamera", in, out, opts...)
@@ -184,6 +194,7 @@ type GerenciaServer interface {
 	DeleteServidorGravacao(context.Context, *DeleteServidorGravacaoReq) (*DeleteServidorGravacaoRes, error)
 	CreateCamera(context.Context, *CreateCameraReq) (*CreateCameraRes, error)
 	ReadCamera(context.Context, *ReadCameraReq) (*ReadCameraRes, error)
+	ReadCameras(context.Context, *ReadCamerasReq) (*ReadCamerasRes, error)
 	UpdateCamera(context.Context, *UpdateCameraReq) (*UpdateCameraRes, error)
 	DeleteCamera(context.Context, *DeleteCameraReq) (*DeleteCameraRes, error)
 	CreateProcesso(context.Context, *CreateProcessoReq) (*CreateProcessoRes, error)
@@ -220,6 +231,9 @@ func (UnimplementedGerenciaServer) CreateCamera(context.Context, *CreateCameraRe
 }
 func (UnimplementedGerenciaServer) ReadCamera(context.Context, *ReadCameraReq) (*ReadCameraRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadCamera not implemented")
+}
+func (UnimplementedGerenciaServer) ReadCameras(context.Context, *ReadCamerasReq) (*ReadCamerasRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadCameras not implemented")
 }
 func (UnimplementedGerenciaServer) UpdateCamera(context.Context, *UpdateCameraReq) (*UpdateCameraRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCamera not implemented")
@@ -396,6 +410,24 @@ func _Gerencia_ReadCamera_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gerencia_ReadCameras_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadCamerasReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ReadCameras(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ReadCameras",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ReadCameras(ctx, req.(*ReadCamerasReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Gerencia_UpdateCamera_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateCameraReq)
 	if err := dec(in); err != nil {
@@ -542,6 +574,10 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReadCamera",
 			Handler:    _Gerencia_ReadCamera_Handler,
+		},
+		{
+			MethodName: "ReadCameras",
+			Handler:    _Gerencia_ReadCameras_Handler,
 		},
 		{
 			MethodName: "UpdateCamera",

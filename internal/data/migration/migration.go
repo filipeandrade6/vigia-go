@@ -9,7 +9,7 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	"github.com/johejo/golang-migrate-extra/source/iofs"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 )
 
 //go:embed sql/*.sql

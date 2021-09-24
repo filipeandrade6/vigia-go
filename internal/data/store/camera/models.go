@@ -52,3 +52,25 @@ func FromProto(c *pb.Camera) Camera {
 		EditadoEm:      c.GetEditadoEm().AsTime(),
 	}
 }
+
+type Cameras []Camera
+
+func (c Cameras) ToProto() []*pb.Camera {
+	var cams []*pb.Camera
+
+	for _, cam := range c {
+		cams = append(cams, cam.ToProto())
+	}
+
+	return cams
+}
+
+func CamerasFromProto(c []*pb.Camera) Cameras {
+	var cams Cameras
+
+	for _, cam := range c {
+		cams = append(cams, FromProto(cam))
+	}
+
+	return cams
+}

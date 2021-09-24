@@ -44,7 +44,7 @@ func (g *GerenciaService) CreateCamera(ctx context.Context, cam camera.Camera, n
 	return cameraID, nil
 }
 
-func (g *GerenciaService) ReadCameras(ctx context.Context, pageNumber int, rowsPerPage int) ([]camera.Camera, error) {
+func (g *GerenciaService) ReadCameras(ctx context.Context, pageNumber int, rowsPerPage int) (camera.Cameras, error) {
 
 	// PERFORM PRE BUSINESS OPERATIONS
 

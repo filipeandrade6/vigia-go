@@ -75,6 +75,7 @@ func (g *GerenciaClient) Migrate() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
+	// TODO refatorar aqui
 	if _, err := g.c.Migrate(ctx, &pb.MigrateReq{Versao: 5}); err != nil {
 		fmt.Println(err)
 		return err
@@ -83,30 +84,16 @@ func (g *GerenciaClient) Migrate() error {
 	return nil
 }
 
-func (g *GerenciaClient) CreateCamera() error {
+func (g *GerenciaClient) CreateCamera(cam camera.Camera) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	// TODO: parse from flags... not hardcoded
-	camReq := &pb.CreateCameraReq{
-		Camera: camera.Camera{
-			Descricao:      "Teste",
-			EnderecoIP:     "10.0.0.1",
-			Porta:          12,
-			Canal:          1,
-			Usuario:        "admin",
-			Senha:          "admin",
-			Geolocalizacao: "-12.3242, -45.1234",
-		}.ToProto(),
-	}
-
-	camRes, err := g.c.CreateCamera(ctx, camReq)
+	c, err := g.c.CreateCamera(ctx, &pb.CreateCameraReq{Camera: cam.ToProto()})
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	// TODO remove this
-	fmt.Println(camera.FromProto(camRes.Camera))
+	camRes := camera.FromProto(c.Camera)
 
-	return nil
+	return camRes.CameraID, nil
 }

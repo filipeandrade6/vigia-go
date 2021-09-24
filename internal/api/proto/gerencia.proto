@@ -25,6 +25,7 @@ service Gerencia {
 
     rpc CreateCamera (CreateCameraReq) returns (CreateCameraRes) {}
     rpc ReadCamera (ReadCameraReq) returns (ReadCameraRes) {}
+    rpc ReadCameras (ReadCamerasReq) returns (ReadCamerasRes) {}
     rpc UpdateCamera (UpdateCameraReq) returns (UpdateCameraRes) {}
     rpc DeleteCamera (DeleteCameraReq) returns (DeleteCameraRes) {}
 
@@ -94,6 +95,10 @@ message CreateCameraRes{Camera camera = 1;}
 message ReadCameraReq{Camera camera = 1;}
 
 message ReadCameraRes{Camera camera = 1;}
+
+message ReadCamerasReq{Camera camera = 1;}
+
+message ReadCamerasRes{repeated Camera camera = 1;}
 
 message UpdateCameraReq{Camera camera = 1;}
 
