@@ -98,7 +98,7 @@ message ReadCameraRes{Camera camera = 1;}
 
 message ReadCamerasReq{Camera camera = 1;}
 
-message ReadCamerasRes{repeated Camera camera = 1;}
+message ReadCamerasRes{repeated Camera cameras = 1;}
 
 message UpdateCameraReq{Camera camera = 1;}
 

@@ -97,3 +97,51 @@ func (g *GerenciaClient) CreateCamera(cam camera.Camera) (string, error) {
 
 	return camRes.CameraID, nil
 }
+
+func (g *GerenciaClient) ReadCamera(cameraID string) (camera.Camera, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	c, err := g.c.ReadCamera(ctx, &pb.ReadCameraReq{Camera: camera.Camera{CameraID: cameraID}.ToProto()})
+	if err != nil {
+		return camera.Camera{}, err
+	}
+
+	return camera.FromProto(c.Camera), nil
+}
+
+func (g *GerenciaClient) ReadCameras(cam camera.Camera) (camera.Cameras, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	c, err := g.c.ReadCameras(ctx, &pb.ReadCamerasReq{})
+	if err != nil {
+		return camera.Cameras{}, err
+	}
+
+	cameras := camera.CamerasFromProto(c.Cameras)
+
+	return cameras, nil
+}
+
+func (g *GerenciaClient) UpdateCamera(cam camera.Camera) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	if _, err := g.c.UpdateCamera(ctx, &pb.UpdateCameraReq{Camera: cam.ToProto()}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (g *GerenciaClient) DeleteCamera(cam camera.Camera) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	if _, err := g.c.CreateCamera(ctx, &pb.CreateCameraReq{Camera: cam.ToProto()}); err != nil {
+		return err
+	}
+
+	return nil
+}
