@@ -1,5 +1,4 @@
-
-## Deplopackage camera_test
+package camera_test
 
 // import (
 // 	"context"
