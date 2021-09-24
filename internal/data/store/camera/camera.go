@@ -108,42 +108,44 @@ func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
 	return cam, nil
 }
 
-// func (s Store) Update(ctx context.Context, cameraID string, cam Camera, now time.Time) error {
-// 	if err := validate.CheckID(cameraID); err != nil {
-// 		return database.ErrInvalidID
-// 	}
-// 	if err := validate.Check(camera); err != nil {
-// 		return fmt.Errorf("validating data: %w", err)
-// 	}
+func (s Store) Update(ctx context.Context, cam Camera, now time.Time) (Camera, error) {
+	if err := validate.CheckID(cam.CameraID); err != nil {
+		return Camera{}, database.ErrInvalidID
+	}
 
-// 	c, err := s.QueryByID(ctx, cameraID)
-// 	if err != nil {
-// 		return fmt.Errorf("updating camera cameraID[%s]: %w", cameraID, err)
-// 	}
+	// TODO implementar validate.Check
+	// if err := validate.Check(camera); err != nil {
+	// 	return fmt.Errorf("validating data: %w", err)
+	// }
 
-// 	c.EditadoEm = now
+	c, err := s.QueryByID(ctx, cam.CameraID)
+	if err != nil {
+		return Camera{}, fmt.Errorf("updating camera cameraID[%s]: %w", cam.CameraID, err)
+	}
 
-// 	const q = `
-// 	UPDATE
-// 		cameras
-// 	SET
-// 		"descricao" = :descricao,
-// 		"ip" = :ip,
-// 		"porta" = :porta,
-// 		"canal" = :canal,
-// 		"usuario" = :usuario,
-// 		"senha" = :senha,
-// 		"geolocalizacao" = :geolocalizacao,
-// 		"editado_em" = :editado_em,
-// 	WHERE
-// 		camera_id = :camera_id`
+	c.EditadoEm = now
 
-// 	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
-// 		return fmt.Errorf("updating cameraID[%s]: %w", cameraID, err)
-// 	}
+	const q = `
+	UPDATE
+		cameras
+	SET
+		"descricao" = :descricao,
+		"ip" = :ip,
+		"porta" = :porta,
+		"canal" = :canal,
+		"usuario" = :usuario,
+		"senha" = :senha,
+		"geolocalizacao" = :geolocalizacao,
+		"editado_em" = :editado_em,
+	WHERE
+		camera_id = :camera_id`
 
-// 	return nil
-// }
+	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
+		return Camera{}, fmt.Errorf("updating cameraID[%s]: %w", cam.CameraID, err)
+	}
+
+	return c, nil
+}
 
 func (s Store) Delete(ctx context.Context, cameraID string) error {
 	if err := validate.CheckID(cameraID); err != nil {

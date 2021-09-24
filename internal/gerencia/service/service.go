@@ -30,13 +30,30 @@ func NewGerenciaService(log *zap.SugaredLogger, cameraStore camera.Store, proces
 	}
 }
 
-func (g *GerenciaService) CreateCamera(ctx context.Context, cam camera.Camera) (string, error) {
-	now := time.Now()
+func (g *GerenciaService) CreateCamera(ctx context.Context, cam camera.Camera, now time.Time) (string, error) {
 
 	c, err := g.cameraStore.Create(ctx, cam, now)
 	if err != nil {
-		return "", fmt.Errorf("camera[%+v]: %w", &cam, err)
+		return "", fmt.Errorf("create: %w", err)
 	}
 
 	return c.CameraID, nil
+}
+
+func (g *GerenciaService) ReadCamera(ctx context.Context, cameraID string) (camera.Camera, error) {
+
+	c, err := g.cameraStore.QueryByID(ctx, cameraID)
+	if err != nil {
+		return camera.Camera{}, fmt.Errorf("query: %w", err)
+	}
+
+	return c, nil
+}
+
+func (g *GerenciaService) UpdateCamera(ctx context.Context, cam camera.Camera, now time.Time) {
+
+}
+
+func (g *GerenciaService) DeleteCamera(ctx context.Context, cam camera.Camera) {
+
 }

@@ -6,6 +6,8 @@ import (
 	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api"
+	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
+
 	// "github.com/filipeandrade6/vigia-go/internal/database"
 	// "github.com/filipeandrade6/vigia-go/internal/gravacao/models"
 	"github.com/spf13/viper"
@@ -85,22 +87,26 @@ func (g *GerenciaClient) CreateCamera() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	cam := &pb.CreateCameraReq{
-		Descricao:      "Teste",
-		EnderecoIp:     "10.0.0.1",
-		Porta:          12,
-		Canal:          1,
-		Usuario:        "admin",
-		Senha:          "admin",
-		Geolocalizacao: "-12.3242, -45.1234",
+	// TODO: parse from flags... not hardcoded
+	camReq := &pb.CreateCameraReq{
+		Camera: camera.Camera{
+			Descricao:      "Teste",
+			EnderecoIP:     "10.0.0.1",
+			Porta:          12,
+			Canal:          1,
+			Usuario:        "admin",
+			Senha:          "admin",
+			Geolocalizacao: "-12.3242, -45.1234",
+		}.ToProto(),
 	}
 
-	camID, err := g.c.CreateCamera(ctx, cam)
+	camRes, err := g.c.CreateCamera(ctx, camReq)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(camID.GetCameraId())
+	// TODO remove this
+	fmt.Println(camera.FromProto(camRes.Camera))
 
 	return nil
 }

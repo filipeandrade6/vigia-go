@@ -29,28 +29,19 @@ func NewGerenciaService(log *zap.SugaredLogger, gerenciaService *gerenciaService
 }
 
 func (g *gerenciaGRPCService) CreateServidorGravacao(ctx context.Context, req *pb.CreateServidorGravacaoReq) (*pb.CreateServidorGravacaoRes, error) {
-	return &pb.CreateServidorGravacaoRes{ServidorGravacaoId: "61900366-1e99-4528-9ab9-3330718a96ec"}, nil
+	return &pb.CreateServidorGravacaoRes{}, nil
 }
 
 func (g *gerenciaGRPCService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
 
-	// TODO criar metodos FromProto ToProto
-	cam := camera.Camera{
-		Descricao:      req.GetDescricao(),
-		EnderecoIP:     req.GetEnderecoIp(),
-		Porta:          int(req.GetPorta()),
-		Canal:          int(req.GetCanal()),
-		Usuario:        req.GetUsuario(),
-		Senha:          req.GetSenha(),
-		Geolocalizacao: req.GetGeolocalizacao(),
-	}
+	cam := camera.FromProto(req.Camera)
 
 	camID, err := g.gerenciaService.CreateCamera(ctx, cam)
 	if err != nil {
 		return &pb.CreateCameraRes{}, err
 	}
 
-	return &pb.CreateCameraRes{CameraId: camID}, nil
+	return &pb.CreateCameraRes{Camera: &pb.Camera{CameraId: camID}}, nil
 }
 
 func (g *gerenciaGRPCService) CreateProcesso(ctx context.Context, req *pb.CreateProcessoReq) (*pb.CreateProcessoRes, error) {
