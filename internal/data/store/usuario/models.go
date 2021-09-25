@@ -8,7 +8,7 @@ type Usuario struct {
 	UsuarioID string   `db:"usuario_id"`
 	Email     string   `db:"email"`
 	Funcao    []string `db:"funcao"`
-	SenhaHash string   `db:senha_hash`
+	Senha     string   `db:senha_hash`
 }
 
 func (u Usuario) ToProto() *pb.Usuario {
@@ -16,7 +16,7 @@ func (u Usuario) ToProto() *pb.Usuario {
 		UsuarioId: u.UsuarioID,
 		Email:     u.Email,
 		Funcao:    u.Funcao,
-		SenhaHash: u.SenhaHash,
+		Senha:     u.Senha,
 	}
 }
 
@@ -25,7 +25,7 @@ func FromProto(u *pb.Usuario) Usuario {
 		UsuarioID: u.GetUsuarioId(),
 		Email:     u.GetEmail(),
 		Funcao:    u.GetFuncao(),
-		SenhaHash: u.GetSenhaHash(),
+		Senha:     u.GetSenha(),
 	}
 }
 

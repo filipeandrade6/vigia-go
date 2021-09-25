@@ -80,9 +80,9 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 	var cams Cameras
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &cams); err != nil {
 		if err == database.ErrNotFound {
-			return nil, database.ErrNotFound
+			return Cameras{}, database.ErrNotFound
 		}
-		return nil, fmt.Errorf("selecting cameras: %w", err)
+		return Cameras{}, fmt.Errorf("selecting cameras: %w", err)
 	}
 
 	return cams, nil
@@ -112,7 +112,7 @@ func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
 		if err == database.ErrNotFound {
 			return Camera{}, database.ErrNotFound
 		}
-		return Camera{}, fmt.Errorf("selecting camera ID[%q]: %w", data.CameraID, err)
+		return Camera{}, fmt.Errorf("selecting cameraID[%q]: %w", cameraID, err)
 	}
 
 	return cam, nil

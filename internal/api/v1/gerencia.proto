@@ -59,7 +59,7 @@ message Usuario {
     string usuario_id = 1;
     string email = 2;
     repeated string funcao = 3;
-    string senha_hash = 4;
+    string senha = 4;
 }
 
 message CreateUsuarioReq {
