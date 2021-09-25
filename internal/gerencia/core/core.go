@@ -10,14 +10,16 @@ import (
 	"runtime"
 	"syscall"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
 	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia"
+	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia/pb"
+	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
+	"github.com/filipeandrade6/vigia-go/internal/sys/keystore"
 
 	"github.com/spf13/viper"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -51,7 +53,22 @@ func Run(log *zap.SugaredLogger) error {
 	defer log.Infow("shutdown complete")
 
 	// =========================================================================
-	// Start Database
+	// Authentication Support
+
+	log.Infow("startup", "status", "initializing authentication support")
+
+	ks, err := keystore.NewFS(os.DirFS(viper.GetString("VIGIA_AUTH_DIR")))
+	if err != nil {
+		return fmt.Errorf("reading keys: %w", err)
+	}
+
+	auth, err := auth.New(viper.GetString("VIGIA_AUTH_ACTIVEKID"), ks)
+	if err != nil {
+		return fmt.Errorf("constructing auth: %w", err)
+	}
+
+	// =========================================================================
+	// Database Support
 
 	log.Infow("startup", "status", "initializing database support", "host", viper.GetString("VIGIA_DB_HOST"))
 

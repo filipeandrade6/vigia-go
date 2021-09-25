@@ -9,10 +9,10 @@ import (
 	"runtime"
 	"syscall"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	gravacaoService "github.com/filipeandrade6/vigia-go/internal/gravacao/service"
 	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia"
 	"github.com/filipeandrade6/vigia-go/internal/grpc/gravacao"
+	"github.com/filipeandrade6/vigia-go/internal/grpc/gravacao/pb"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 
 	"github.com/spf13/viper"
