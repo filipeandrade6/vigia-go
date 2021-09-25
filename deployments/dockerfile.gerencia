@@ -17,11 +17,13 @@ COPY ./internal ./internal
 
 RUN go build -o ./build/gerencia ./cmd/gerencia
 
+## Deploy
 FROM gcr.io/distroless/base-debian10
 
 WORKDIR /app
 
 COPY --from=build_gerencia /app/build/gerencia ./gerencia
+COPY ./deployments/keys ./deployments/keys
 
 USER nonroot:nonroot
 

@@ -41,12 +41,13 @@ func (g *GerenciaService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.
 			g.log.Infow("no change in migration")
 		} else {
 			g.log.Errorw("migrate", err)
+			return &pb.MigrateRes{}, err
 		}
 	}
 
 	g.log.Infow(fmt.Sprintf("migrate to version %d", version))
 
-	return nil, nil
+	return &pb.MigrateRes{}, nil
 }
 
 func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
@@ -55,13 +56,13 @@ func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCamera
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
 		g.log.Errorw("auth", "claims missing from context")
-		return nil, errors.New("claims missing from context")
+		return &pb.CreateCameraRes{}, errors.New("claims missing from context")
 	}
 
 	camID, err := g.cameraStore.Create(ctx, claims, cam)
 	if err != nil {
 		g.log.Errorw("create camera", err)
-		return nil, fmt.Errorf("create: %w", err)
+		return &pb.CreateCameraRes{}, fmt.Errorf("create: %w", err)
 	}
 
 	return &pb.CreateCameraRes{CameraId: camID}, nil
@@ -72,7 +73,7 @@ func (g *GerenciaService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq)
 	cam, err := g.cameraStore.QueryByID(ctx, req.GetCameraId())
 	if err != nil {
 		g.log.Errorw("query camera", err)
-		return nil, fmt.Errorf("query: %w", err)
+		return &pb.ReadCameraRes{}, fmt.Errorf("query: %w", err)
 	}
 
 	return &pb.ReadCameraRes{Camera: cam.ToProto()}, err
@@ -87,7 +88,7 @@ func (g *GerenciaService) ReadCameras(ctx context.Context, req *pb.ReadCamerasRe
 	cameras, err := g.cameraStore.Query(ctx, query, pageNumber, rowsPerPage)
 	if err != nil {
 		g.log.Errorw("query cameras", err)
-		return nil, fmt.Errorf("query: %w", err)
+		return &pb.ReadCamerasRes{}, fmt.Errorf("query: %w", err)
 	}
 
 	return &pb.ReadCamerasRes{Cameras: cameras.ToProto()}, nil
@@ -99,17 +100,17 @@ func (g *GerenciaService) UpdateCamera(ctx context.Context, req *pb.UpdateCamera
 
 	if err := g.cameraStore.Update(ctx, cam); err != nil {
 		g.log.Errorw("update camera", err)
-		return nil, fmt.Errorf("update: %w", err)
+		return &pb.UpdateCameraRes{}, fmt.Errorf("update: %w", err)
 	}
-	return nil, nil
+	return &pb.UpdateCameraRes{}, nil
 }
 
 func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCameraReq) (*pb.DeleteCameraRes, error) {
 
 	if err := g.cameraStore.Delete(ctx, req.GetCameraId()); err != nil {
 		g.log.Errorw("delete camera", err)
-		return nil, fmt.Errorf("delete: %w", err)
+		return &pb.DeleteCameraRes{}, fmt.Errorf("delete: %w", err)
 	}
 
-	return nil, nil
+	return &pb.DeleteCameraRes{}, nil
 }

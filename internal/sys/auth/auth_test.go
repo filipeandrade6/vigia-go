@@ -22,7 +22,7 @@ func TestAuth(t *testing.T) {
 		testID := 0
 		t.Logf("\tTest %d:\tWhen handling a single user.", testID)
 		{
-			const keyID = "54bb2165-71e1-41a6-af3e-7da4a0e1e2c1"
+			const keyID = "54bb2165-71e1-41a6-af3e-7da4a0e1e2c1" // TODO era o nome do arquivo que substitui...
 			privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 			if err != nil {
 				t.Fatalf("\t%s\tTest %d:\tShould be able to create a private key: %v", failed, testID, err)

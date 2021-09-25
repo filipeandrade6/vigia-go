@@ -23,6 +23,7 @@ FROM gcr.io/distroless/base-debian10
 WORKDIR /app
 
 COPY --from=build_gerencia_admin /app/build/gerencia-admin ./gerencia-admin
+COPY ./deployments/keys ./deployments/keys
 
 USER nonroot:nonroot
 

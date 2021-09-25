@@ -50,7 +50,7 @@ func (g *GerenciaClient) Migrate() error {
 	defer cancel()
 
 	// TODO refatorar aqui
-	if _, err := g.c.Migrate(ctx, &pb.MigrateReq{Versao: 5}); err != nil {
+	if _, err := g.c.Migrate(ctx, &pb.MigrateReq{Versao: 6}); err != nil {
 		fmt.Println(err)
 		return err
 	}

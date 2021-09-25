@@ -17,11 +17,13 @@ COPY ./internal ./internal
 
 RUN go build -o ./build/gravacao ./cmd/gravacao
 
+## Deploy
 FROM gcr.io/distroless/base-debian10
 
 WORKDIR /app
 
 COPY --from=build_gravacao /app/build/gravacao ./gravacao
+COPY ./deployments/keys ./deployments/keys
 
 USER nonroot:nonroot
 
