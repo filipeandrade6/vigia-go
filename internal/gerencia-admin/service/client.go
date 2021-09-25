@@ -17,15 +17,12 @@ type GerenciaClient struct {
 }
 
 func NewClientGerencia() *GerenciaClient {
-	fmt.Println("chegaste aqui em novoclientgerencia")
 
 	cfg := fmt.Sprintf(
 		"%s:%d",
 		viper.GetString("VIGIA_GER_HOST"), // TODO assim como no DB juntar endereco e porta em uma unica var
 		viper.GetInt("VIGIA_GER_SERVER_PORT"),
 	)
-
-	fmt.Println("as config de conexão é", cfg)
 
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
@@ -37,8 +34,6 @@ func NewClientGerencia() *GerenciaClient {
 		panic(err)
 	}
 	//defer conn.Close() // TODO esse aqui vai dar BO
-
-	fmt.Println("criado client de gerencia")
 
 	return &GerenciaClient{
 		c: pb.NewGerenciaClient(conn),

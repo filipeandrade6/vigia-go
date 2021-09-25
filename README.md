@@ -2,6 +2,10 @@
 
 #### ONDE PAREI
 
+INSERT INTO usuarios (usuario_id, email, funcao, senha_hash) VALUES ('d03307d4-2b28-4c23-a004-3da25e5b8ce2', 'filipe.andrade@ssp.df.gov.br', '{ADMIN, MANAGER, USER}', '$2a$10$n531epIH68yygcV6sNNqluZtyPc3smWxbw1WoWDDhOIqUP1Py/GTq');
+
+INSERT INTO cameras (camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao) VALUES ('d03307d4-2b28-4c23-a004-3da25e5b8ce3', 'desc 1', '10.92.10.1', '1', '1', 'admin', 'admin', '-12.2332, -42.231');
+
 Criando authenticação, ver link fixado de como add auth token no ctx da request do gRPC
 
 ver como fica as dependencias/hierarquias, pois client depende do service e nao pode separar eles.
@@ -11,6 +15,12 @@ mover os service.go em internal/grpc/XXXX para internal/XXXX/grpc
 mover os arquivos gerando para internal/api/pb/XXXXX
 
 ativar metricas e demais antes de partir para os outros (processos/usuarios/servidores_de_gravacao/etc...)
+
+
+
+
+quais erros devem ser devolvidos para o client...
+entender o log
 
 
 

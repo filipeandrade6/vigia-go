@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 	"github.com/jmoiron/sqlx"
@@ -23,11 +22,11 @@ func NewStore(log *zap.SugaredLogger, db *sqlx.DB) Store {
 	}
 }
 
-func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera) (string, error) {
+func (s Store) Create(ctx context.Context, cam Camera) (string, error) {
 
-	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
-		return "", database.ErrForbidden
-	}
+	// if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
+	// 	return "", database.ErrForbidden
+	// }
 
 	c := Camera{
 		CameraID:       validate.GenerateID(),
@@ -59,7 +58,7 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 		Offset      int    `db:"offset"`
 		RowsPerPage int    `db:"rows_per_page"`
 	}{
-		Query:       query,
+		Query:       fmt.Sprintf("%%%s%%", query),
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
 	}
@@ -71,9 +70,9 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 	FROM
 		cameras
 	WHERE
-		(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao)
+		CONCAT(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao)
 	ILIKE
-		(%:query%)
+		:query
 	ORDER BY
 		descricao
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`

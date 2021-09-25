@@ -35,10 +35,8 @@ func Run(log *zap.SugaredLogger) error {
 
 	// ----
 
-	fmt.Println("chegou aqui antes de criar o client de genrecia")
-	time.Sleep(time.Duration(time.Second * 10))
+	time.Sleep(time.Duration(time.Second * 5))
 	gerenciaClient := service.NewClientGerencia()
-	fmt.Println("chegou aqui")
 
 	if err := gerenciaClient.Migrate(); err != nil {
 		if errors.As(err, &migrate.ErrNoChange) {
@@ -100,7 +98,7 @@ func Run(log *zap.SugaredLogger) error {
 
 	fmt.Println("câmera 3 deletada e câmera 1 atualizada... segue abaixo")
 
-	cRes, err = gerenciaClient.ReadCameras("", 1, 100)
+	cRes, err = gerenciaClient.ReadCameras("asss 3", 1, 100)
 	if err != nil {
 		log.Fatal(err)
 	}
