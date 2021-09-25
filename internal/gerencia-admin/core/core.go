@@ -48,8 +48,6 @@ func Run(log *zap.SugaredLogger) error {
 		}
 	}
 
-	// TODO na migracao
-
 	c := camera.Camera{
 		Descricao:      "Camerasss 1",
 		EnderecoIP:     "10.0.0.11",
