@@ -2,10 +2,14 @@ package usuario
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 
+	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
@@ -72,7 +76,7 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 
 	var usuarios Usuarios
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &usuarios); err != nil {
-		if err == database.ErrNotFound {
+		if errors.As(err, database.ErrNotFound) {
 			return Usuarios{}, database.ErrNotFound
 		}
 		return Usuarios{}, fmt.Errorf("selecting usuarios: %w", err)
@@ -102,7 +106,7 @@ func (s Store) QueryByID(ctx context.Context, usuarioID string) (Usuario, error)
 
 	var usuario Usuario
 	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &usuario); err != nil {
-		if err == database.ErrNotFound {
+		if errors.As(err, &database.ErrNotFound) {
 			return Usuario{}, database.ErrNotFound
 		}
 		return Usuario{}, fmt.Errorf("selecting usuarioID[%q]: %w", usuarioID, err)
@@ -173,4 +177,44 @@ func (s Store) Delete(ctx context.Context, usuarioID string) error {
 	}
 
 	return nil
+}
+
+func (s Store) Authenticate(ctx context.Context, email, senha string) (auth.Claims, error) {
+	data := struct {
+		Email string `db:"email"`
+	}{
+		Email: email,
+	}
+
+	const q = `
+	SELECT
+		*
+	FROM
+		usuarios
+	WHERE
+		email = :email`
+
+	var usuario Usuario
+	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &usuario); err != nil {
+		if errors.As(err, &database.ErrNotFound) {
+			return auth.Claims{}, database.ErrNotFound
+		}
+		return auth.Claims{}, fmt.Errorf("selecting usuario[%q]: %w", email, err)
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(usuario.Senha), []byte(senha)); err != nil {
+		return auth.Claims{}, database.ErrAuthenticationFailure
+	}
+
+	claims := auth.Claims{
+		StandardClaims: jwt.StandardClaims{
+			Issuer:    "service project",
+			Subject:   usuario.UsuarioID,
+			ExpiresAt: time.Now().Add(time.Hour).Unix(),
+			IssuedAt:  time.Now().UTC().Unix(),
+		},
+		Roles: usuario.Funcao,
+	}
+
+	return claims, nil
 }

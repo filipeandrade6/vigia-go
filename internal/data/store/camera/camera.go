@@ -2,6 +2,7 @@ package camera
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
@@ -79,7 +80,7 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 
 	var cams Cameras
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &cams); err != nil {
-		if err == database.ErrNotFound {
+		if errors.As(err, &database.ErrNotFound) {
 			return Cameras{}, database.ErrNotFound
 		}
 		return Cameras{}, fmt.Errorf("selecting cameras: %w", err)
@@ -109,7 +110,7 @@ func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
 
 	var cam Camera
 	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &cam); err != nil {
-		if err == database.ErrNotFound {
+		if errors.As(err, &database.ErrNotFound) {
 			return Camera{}, database.ErrNotFound
 		}
 		return Camera{}, fmt.Errorf("selecting cameraID[%q]: %w", cameraID, err)
