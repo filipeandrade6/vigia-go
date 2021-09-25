@@ -23,6 +23,7 @@ service Gerencia {
     rpc ReadUsuarios (ReadUsuariosReq) returns (ReadUsuariosRes) {}
     rpc UpdateUsuario (UpdateUsuarioReq) returns (UpdateUsuarioRes) {}
     rpc DeleteUsuario (DeleteUsuarioReq) returns (DeleteUsuarioRes) {}
+    rpc Login(LoginReq) returns (LoginRes) {}
 
     rpc CreateServidorGravacao (CreateServidorGravacaoReq) returns (CreateServidorGravacaoRes) {}
     rpc ReadServidorGravacao (ReadServidorGravacaoReq) returns (ReadServidorGravacaoRes) {}
@@ -54,6 +55,7 @@ message MigrateReq{
 
 message MigrateRes{}
 
+// =========
 
 message Usuario {
     string usuario_id = 1;
@@ -85,7 +87,7 @@ message ReadUsuariosReq {
 }
 
 message ReadUsuariosRes {
-    repeated Usuario usuaio = 1;
+    repeated Usuario usuarios = 1;
 }
 
 message UpdateUsuarioReq {
@@ -95,12 +97,21 @@ message UpdateUsuarioReq {
 message UpdateUsuarioRes {}
 
 message DeleteUsuarioReq {
-    string usuario_id = 1;
+    repeated string usuario_id = 1;
 }
 
 message DeleteUsuarioRes {}
 
+message LoginReq{
+    string email = 1;
+    string senha = 2;
+}
 
+message LoginRes{
+    string access_token = 1;
+}
+
+// =======================
 
 message ServidorGravacao {
     string servidor_gravacao_id = 1;

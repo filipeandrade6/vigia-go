@@ -27,6 +27,7 @@ type GerenciaClient interface {
 	ReadUsuarios(ctx context.Context, in *ReadUsuariosReq, opts ...grpc.CallOption) (*ReadUsuariosRes, error)
 	UpdateUsuario(ctx context.Context, in *UpdateUsuarioReq, opts ...grpc.CallOption) (*UpdateUsuarioRes, error)
 	DeleteUsuario(ctx context.Context, in *DeleteUsuarioReq, opts ...grpc.CallOption) (*DeleteUsuarioRes, error)
+	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error)
 	CreateServidorGravacao(ctx context.Context, in *CreateServidorGravacaoReq, opts ...grpc.CallOption) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(ctx context.Context, in *ReadServidorGravacaoReq, opts ...grpc.CallOption) (*ReadServidorGravacaoRes, error)
 	UpdateServidorGravacao(ctx context.Context, in *UpdateServidorGravacaoReq, opts ...grpc.CallOption) (*UpdateServidorGravacaoRes, error)
@@ -107,6 +108,15 @@ func (c *gerenciaClient) UpdateUsuario(ctx context.Context, in *UpdateUsuarioReq
 func (c *gerenciaClient) DeleteUsuario(ctx context.Context, in *DeleteUsuarioReq, opts ...grpc.CallOption) (*DeleteUsuarioRes, error) {
 	out := new(DeleteUsuarioRes)
 	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/DeleteUsuario", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error) {
+	out := new(LoginRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -243,6 +253,7 @@ type GerenciaServer interface {
 	ReadUsuarios(context.Context, *ReadUsuariosReq) (*ReadUsuariosRes, error)
 	UpdateUsuario(context.Context, *UpdateUsuarioReq) (*UpdateUsuarioRes, error)
 	DeleteUsuario(context.Context, *DeleteUsuarioReq) (*DeleteUsuarioRes, error)
+	Login(context.Context, *LoginReq) (*LoginRes, error)
 	CreateServidorGravacao(context.Context, *CreateServidorGravacaoReq) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(context.Context, *ReadServidorGravacaoReq) (*ReadServidorGravacaoRes, error)
 	UpdateServidorGravacao(context.Context, *UpdateServidorGravacaoReq) (*UpdateServidorGravacaoRes, error)
@@ -283,6 +294,9 @@ func (UnimplementedGerenciaServer) UpdateUsuario(context.Context, *UpdateUsuario
 }
 func (UnimplementedGerenciaServer) DeleteUsuario(context.Context, *DeleteUsuarioReq) (*DeleteUsuarioRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUsuario not implemented")
+}
+func (UnimplementedGerenciaServer) Login(context.Context, *LoginReq) (*LoginRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedGerenciaServer) CreateServidorGravacao(context.Context, *CreateServidorGravacaoReq) (*CreateServidorGravacaoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateServidorGravacao not implemented")
@@ -458,6 +472,24 @@ func _Gerencia_DeleteUsuario_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GerenciaServer).DeleteUsuario(ctx, req.(*DeleteUsuarioReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/Login",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).Login(ctx, req.(*LoginReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -730,6 +762,10 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUsuario",
 			Handler:    _Gerencia_DeleteUsuario_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _Gerencia_Login_Handler,
 		},
 		{
 			MethodName: "CreateServidorGravacao",

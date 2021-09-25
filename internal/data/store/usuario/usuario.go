@@ -208,7 +208,7 @@ func (s Store) Authenticate(ctx context.Context, email, senha string) (auth.Clai
 
 	claims := auth.Claims{
 		StandardClaims: jwt.StandardClaims{
-			Issuer:    "service project",
+			Issuer:    "service project", // TODO alterar?
 			Subject:   usuario.UsuarioID,
 			ExpiresAt: time.Now().Add(time.Hour).Unix(),
 			IssuedAt:  time.Now().UTC().Unix(),

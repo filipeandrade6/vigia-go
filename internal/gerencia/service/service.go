@@ -8,7 +8,9 @@ import (
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/data/migration"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
+	"github.com/filipeandrade6/vigia-go/internal/data/store/usuario"
 	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
+	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 
 	"github.com/golang-migrate/migrate/v4"
 	"go.uber.org/zap"
@@ -18,16 +20,18 @@ import (
 
 type GerenciaService struct {
 	pb.UnimplementedGerenciaServer
-	log         *zap.SugaredLogger
-	auth        *auth.Auth
-	cameraStore camera.Store
+	log          *zap.SugaredLogger
+	auth         *auth.Auth
+	cameraStore  camera.Store
+	usuarioStore usuario.Store
 }
 
-func NewGerenciaService(log *zap.SugaredLogger, auth *auth.Auth, cameraStore camera.Store) *GerenciaService {
+func NewGerenciaService(log *zap.SugaredLogger, auth *auth.Auth, cameraStore camera.Store, usuarioStore usuario.Store) *GerenciaService {
 	return &GerenciaService{
-		log:         log,
-		auth:        auth,
-		cameraStore: cameraStore,
+		log:          log,
+		auth:         auth,
+		cameraStore:  cameraStore,
+		usuarioStore: usuarioStore,
 	}
 }
 
@@ -115,4 +119,95 @@ func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCamera
 	}
 
 	return &pb.DeleteCameraRes{}, nil
+}
+
+func (g *GerenciaService) CreateUsuario(ctx context.Context, req *pb.CreateUsuarioReq) (*pb.CreateUsuarioRes, error) {
+	usuario := usuario.FromProto(req.Usuario)
+
+	// claims, err := auth.GetClaims(ctx)
+	// if err != nil {
+	// 	g.log.Errorw("auth", "claims missing from context", err)
+	// 	return &pb.CreateCameraRes{}, errors.New("claims missing from context")
+	// }
+
+	usuarioID, err := g.usuarioStore.Create(ctx, usuario)
+	if err != nil {
+		g.log.Errorw("create usuario", "ERROR", err)
+		return &pb.CreateUsuarioRes{}, fmt.Errorf("create: %w", err)
+	}
+
+	return &pb.CreateUsuarioRes{UsuarioId: usuarioID}, nil
+}
+
+func (g *GerenciaService) ReadUsuario(ctx context.Context, req *pb.ReadUsuarioReq) (*pb.ReadUsuarioRes, error) {
+
+	usuario, err := g.usuarioStore.QueryByID(ctx, req.GetUsuarioId())
+	if err != nil {
+		g.log.Errorw("query usuario", "ERROR", err)
+		return &pb.ReadUsuarioRes{}, fmt.Errorf("query: %w", err)
+	}
+
+	return &pb.ReadUsuarioRes{Usuario: usuario.ToProto()}, err
+}
+
+func (g *GerenciaService) ReadUsuarios(ctx context.Context, req *pb.ReadUsuariosReq) (*pb.ReadUsuariosRes, error) {
+
+	query := req.GetQuery()
+	pageNumber := int(req.GetPageNumber())
+	rowsPerPage := int(req.GetRowsPerPage())
+
+	usuarios, err := g.usuarioStore.Query(ctx, query, pageNumber, rowsPerPage)
+	if err != nil {
+		g.log.Errorw("query usuarios", "ERROR", err)
+		return &pb.ReadUsuariosRes{}, fmt.Errorf("query: %w", err)
+	}
+
+	return &pb.ReadUsuariosRes{Usuarios: usuarios.ToProto()}, nil
+}
+
+func (g *GerenciaService) UpdateUsuario(ctx context.Context, req *pb.UpdateUsuarioReq) (*pb.UpdateUsuarioRes, error) {
+
+	usuario := usuario.FromProto(req.Usuario)
+
+	if err := g.usuarioStore.Update(ctx, usuario); err != nil {
+		g.log.Errorw("update usuario", "ERROR", err)
+		return &pb.UpdateUsuarioRes{}, fmt.Errorf("update: %w", err)
+	}
+
+	return &pb.UpdateUsuarioRes{}, nil
+}
+
+func (g *GerenciaService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuarioReq) (*pb.DeleteUsuarioRes, error) {
+
+	for _, u := range req.GetUsuarioId() {
+		if err := g.usuarioStore.Delete(ctx, u); err != nil {
+			g.log.Errorw("delete usuario", "ERROR", err)
+			return &pb.DeleteUsuarioRes{}, fmt.Errorf("delete: %w", err)
+		}
+	}
+
+	return &pb.DeleteUsuarioRes{}, nil
+}
+
+func (g *GerenciaService) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginRes, error) {
+
+	claims, err := g.usuarioStore.Authenticate(ctx, req.GetEmail(), req.GetSenha())
+	if err != nil {
+		if errors.As(err, &database.ErrNotFound) {
+			g.log.Errorw("usuario not found", "ERROR", err)
+			return &pb.LoginRes{}, fmt.Errorf("authenticate: %w", err) // TODO melhorar isso aqui e remover o retorno de erros
+		} else if errors.As(err, &database.ErrAuthenticationFailure) {
+			g.log.Errorw("authenticate usuario", "ERROR", err)
+			return &pb.LoginRes{}, fmt.Errorf("authenticate: %w", err) // TODO melhorar isso aqui e remover o retorno de errors
+		}
+		g.log.Errorw("authenticating", "ERROR", err)
+		return &pb.LoginRes{}, fmt.Errorf("authenticating: %w", err)
+	}
+
+	tkn, err := g.auth.GenerateToken(claims)
+	if err != nil {
+		return &pb.LoginRes{}, fmt.Errorf("generating token: %w", err)
+	}
+
+	return &pb.LoginRes{AccessToken: tkn}, nil
 }
