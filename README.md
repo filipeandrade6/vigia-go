@@ -4,6 +4,17 @@
 
 Criando authenticação, ver link fixado de como add auth token no ctx da request do gRPC
 
+ver como fica as dependencias/hierarquias, pois client depende do service e nao pode separar eles.
+
+mover os service.go em internal/grpc/XXXX para internal/XXXX/grpc
+
+mover os arquivos gerando para internal/api/pb/XXXXX
+
+ativar metricas e demais antes de partir para os outros (processos/usuarios/servidores_de_gravacao/etc...)
+
+
+
+
 #### TODO
 
 - [ ] Colocar interface no querier
