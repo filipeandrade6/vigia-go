@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 	"github.com/jmoiron/sqlx"
@@ -23,7 +24,12 @@ func NewStore(log *zap.SugaredLogger, db *sqlx.DB) Store {
 	}
 }
 
-func (s Store) Create(ctx context.Context, cam Camera, now time.Time) (string, error) {
+func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera, now time.Time) (string, error) {
+
+	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
+		return "", database.ErrForbidden
+	}
+
 	c := Camera{
 		CameraID:       validate.GenerateID(),
 		Descricao:      cam.Descricao,

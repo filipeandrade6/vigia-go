@@ -6,35 +6,38 @@ import (
 	"time"
 
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
+	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
+
+	// "github.com/filipeandrade6/vigia-go/internal/data/store/processo"
+	// "github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
 	"go.uber.org/zap"
 )
 
 type GerenciaService struct {
-	log                   *zap.SugaredLogger
-	cameraStore           camera.Store
-	processoStore         processo.Store
-	servidorGravacaoStore servidorgravacao.Store
+	log         *zap.SugaredLogger
+	auth        *auth.Auth
+	cameraStore camera.Store
+	// processoStore         processo.Store
+	// servidorGravacaoStore servidorgravacao.Store
 	// publisher
 	// gravacaoClient *client.GravacaoClient
 }
 
-func NewGerenciaService(log *zap.SugaredLogger, cameraStore camera.Store, processoStore processo.Store, servidorGravacaoStore servidorgravacao.Store) *GerenciaService {
+func NewGerenciaService(log *zap.SugaredLogger, auth *auth.Auth, cameraStore camera.Store) *GerenciaService {
 	return &GerenciaService{
-		log:                   log,
-		cameraStore:           cameraStore,
-		processoStore:         processoStore,
-		servidorGravacaoStore: servidorGravacaoStore,
+		log:         log,
+		cameraStore: cameraStore,
+		// processoStore:         processoStore,
+		// servidorGravacaoStore: servidorGravacaoStore,
 		// gravacaoClient:        gravacaoClient,
 	}
 }
 
-func (g *GerenciaService) CreateCamera(ctx context.Context, cam camera.Camera, now time.Time) (string, error) {
+func (g *GerenciaService) CreateCamera(ctx context.Context, claims auth.Claims, cam camera.Camera, now time.Time) (string, error) {
 
 	// PERFORM PRE BUSINESS OPERATIONS
 
-	cameraID, err := g.cameraStore.Create(ctx, cam, now)
+	cameraID, err := g.cameraStore.Create(ctx, claims, cam, now)
 	if err != nil {
 		return "", fmt.Errorf("create: %w", err)
 	}

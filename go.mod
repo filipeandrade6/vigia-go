@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/ardanlabs/service v0.0.0-20210829190901-46e46e1f4ef4
+	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang-migrate/migrate/v4 v4.15.0
 	github.com/google/uuid v1.3.0

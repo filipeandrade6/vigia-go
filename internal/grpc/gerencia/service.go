@@ -10,6 +10,7 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia/pb"
+	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/golang-migrate/migrate/v4"
 	"go.uber.org/zap"
 )
@@ -51,7 +52,12 @@ func (g *gerenciaGRPCService) CreateCamera(ctx context.Context, req *pb.CreateCa
 
 	now := time.Now() // TODO pegar do contexto?
 
-	camID, err := g.gerenciaService.CreateCamera(ctx, cam, now)
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return &pb.CreateCameraRes{}, errors.New("claims missing from context")
+	}
+
+	camID, err := g.gerenciaService.CreateCamera(ctx, claims, cam, now)
 	if err != nil {
 		return &pb.CreateCameraRes{}, err
 	}

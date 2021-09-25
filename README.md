@@ -2,7 +2,7 @@
 
 #### ONDE PAREI
 
-Criando FromProto e ToProto nos modelos
+Criando authenticação, ver link fixado de como add auth token no ctx da request do gRPC
 
 #### TODO
 

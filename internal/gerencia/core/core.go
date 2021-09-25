@@ -11,8 +11,6 @@ import (
 	"syscall"
 
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
 	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia"
 	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia/pb"
@@ -106,9 +104,7 @@ func Run(log *zap.SugaredLogger) error {
 	serverErrors := make(chan error, 1)
 
 	cameraStore := camera.NewStore(log, db)
-	processoStore := processo.NewStore(log, db)
-	servidorGravacaoStore := servidorgravacao.NewStore(log, db)
-	svc := gerenciaService.NewGerenciaService(log, cameraStore, processoStore, servidorGravacaoStore)
+	svc := gerenciaService.NewGerenciaService(log, auth, cameraStore)
 	gerenciaGRPCService := gerencia.NewGerenciaService(log, svc)
 
 	grpcServer := grpc.NewServer()
