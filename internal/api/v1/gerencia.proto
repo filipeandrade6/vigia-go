@@ -18,6 +18,12 @@ service Gerencia {
     // gerencia cadastra no banco de dados
     // manda sinal de atualizacao para todos os gravacao servers
 
+    rpc CreateUsuario (CreateUsuarioReq) returns (CreateUsuarioRes) {}
+    rpc ReadUsuario (ReadUsuarioReq) returns (ReadUsuarioRes) {}
+    rpc ReadUsuarios (ReadUsuariosReq) returns (ReadUsuariosRes) {}
+    rpc UpdateUsuario (UpdateUsuarioReq) returns (UpdateUsuarioRes) {}
+    rpc DeleteUsuario (DeleteUsuarioReq) returns (DeleteUsuarioRes) {}
+
     rpc CreateServidorGravacao (CreateServidorGravacaoReq) returns (CreateServidorGravacaoRes) {}
     rpc ReadServidorGravacao (ReadServidorGravacaoReq) returns (ReadServidorGravacaoRes) {}
     rpc UpdateServidorGravacao (UpdateServidorGravacaoReq) returns (UpdateServidorGravacaoRes) {}
@@ -47,6 +53,54 @@ message MigrateReq{
 }
 
 message MigrateRes{}
+
+
+message Usuario {
+    string usuario_id = 1;
+    string email = 2;
+    repeated string funcao = 3;
+    string senha_hash = 4;
+}
+
+message CreateUsuarioReq {
+    Usuario usuario = 1;
+}
+
+message CreateUsuarioRes {
+    string usuario_id = 1;
+}
+
+message ReadUsuarioReq {
+    string usuario_id = 1;
+}
+
+message ReadUsuarioRes {
+    Usuario usuario = 1;
+}
+
+message ReadUsuariosReq {
+    string query = 1;
+    int32 page_number = 2;
+    int32 rows_per_page = 3;
+}
+
+message ReadUsuariosRes {
+    repeated Usuario usuaio = 1;
+}
+
+message UpdateUsuarioReq {
+    Usuario usuario = 1;
+}
+
+message UpdateUsuarioRes {}
+
+message DeleteUsuarioReq {
+    string usuario_id = 1;
+}
+
+message DeleteUsuarioRes {}
+
+
 
 message ServidorGravacao {
     string servidor_gravacao_id = 1;
@@ -119,7 +173,7 @@ message UpdateCameraReq{
 message UpdateCameraRes{}
 
 message DeleteCameraReq{
-    string camera_id = 1;
+    repeated string camera_id = 1;
 }
 
 message DeleteCameraRes{}

@@ -22,6 +22,11 @@ type GerenciaClient interface {
 	Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error)
 	// Gerencia Client requests
 	Migrate(ctx context.Context, in *MigrateReq, opts ...grpc.CallOption) (*MigrateRes, error)
+	CreateUsuario(ctx context.Context, in *CreateUsuarioReq, opts ...grpc.CallOption) (*CreateUsuarioRes, error)
+	ReadUsuario(ctx context.Context, in *ReadUsuarioReq, opts ...grpc.CallOption) (*ReadUsuarioRes, error)
+	ReadUsuarios(ctx context.Context, in *ReadUsuariosReq, opts ...grpc.CallOption) (*ReadUsuariosRes, error)
+	UpdateUsuario(ctx context.Context, in *UpdateUsuarioReq, opts ...grpc.CallOption) (*UpdateUsuarioRes, error)
+	DeleteUsuario(ctx context.Context, in *DeleteUsuarioReq, opts ...grpc.CallOption) (*DeleteUsuarioRes, error)
 	CreateServidorGravacao(ctx context.Context, in *CreateServidorGravacaoReq, opts ...grpc.CallOption) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(ctx context.Context, in *ReadServidorGravacaoReq, opts ...grpc.CallOption) (*ReadServidorGravacaoRes, error)
 	UpdateServidorGravacao(ctx context.Context, in *UpdateServidorGravacaoReq, opts ...grpc.CallOption) (*UpdateServidorGravacaoRes, error)
@@ -57,6 +62,51 @@ func (c *gerenciaClient) Match(ctx context.Context, in *MatchReq, opts ...grpc.C
 func (c *gerenciaClient) Migrate(ctx context.Context, in *MigrateReq, opts ...grpc.CallOption) (*MigrateRes, error) {
 	out := new(MigrateRes)
 	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/Migrate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) CreateUsuario(ctx context.Context, in *CreateUsuarioReq, opts ...grpc.CallOption) (*CreateUsuarioRes, error) {
+	out := new(CreateUsuarioRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/CreateUsuario", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) ReadUsuario(ctx context.Context, in *ReadUsuarioReq, opts ...grpc.CallOption) (*ReadUsuarioRes, error) {
+	out := new(ReadUsuarioRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ReadUsuario", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) ReadUsuarios(ctx context.Context, in *ReadUsuariosReq, opts ...grpc.CallOption) (*ReadUsuariosRes, error) {
+	out := new(ReadUsuariosRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ReadUsuarios", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) UpdateUsuario(ctx context.Context, in *UpdateUsuarioReq, opts ...grpc.CallOption) (*UpdateUsuarioRes, error) {
+	out := new(UpdateUsuarioRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/UpdateUsuario", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) DeleteUsuario(ctx context.Context, in *DeleteUsuarioReq, opts ...grpc.CallOption) (*DeleteUsuarioRes, error) {
+	out := new(DeleteUsuarioRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/DeleteUsuario", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -188,6 +238,11 @@ type GerenciaServer interface {
 	Match(context.Context, *MatchReq) (*MatchRes, error)
 	// Gerencia Client requests
 	Migrate(context.Context, *MigrateReq) (*MigrateRes, error)
+	CreateUsuario(context.Context, *CreateUsuarioReq) (*CreateUsuarioRes, error)
+	ReadUsuario(context.Context, *ReadUsuarioReq) (*ReadUsuarioRes, error)
+	ReadUsuarios(context.Context, *ReadUsuariosReq) (*ReadUsuariosRes, error)
+	UpdateUsuario(context.Context, *UpdateUsuarioReq) (*UpdateUsuarioRes, error)
+	DeleteUsuario(context.Context, *DeleteUsuarioReq) (*DeleteUsuarioRes, error)
 	CreateServidorGravacao(context.Context, *CreateServidorGravacaoReq) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(context.Context, *ReadServidorGravacaoReq) (*ReadServidorGravacaoRes, error)
 	UpdateServidorGravacao(context.Context, *UpdateServidorGravacaoReq) (*UpdateServidorGravacaoRes, error)
@@ -213,6 +268,21 @@ func (UnimplementedGerenciaServer) Match(context.Context, *MatchReq) (*MatchRes,
 }
 func (UnimplementedGerenciaServer) Migrate(context.Context, *MigrateReq) (*MigrateRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Migrate not implemented")
+}
+func (UnimplementedGerenciaServer) CreateUsuario(context.Context, *CreateUsuarioReq) (*CreateUsuarioRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUsuario not implemented")
+}
+func (UnimplementedGerenciaServer) ReadUsuario(context.Context, *ReadUsuarioReq) (*ReadUsuarioRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadUsuario not implemented")
+}
+func (UnimplementedGerenciaServer) ReadUsuarios(context.Context, *ReadUsuariosReq) (*ReadUsuariosRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadUsuarios not implemented")
+}
+func (UnimplementedGerenciaServer) UpdateUsuario(context.Context, *UpdateUsuarioReq) (*UpdateUsuarioRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUsuario not implemented")
+}
+func (UnimplementedGerenciaServer) DeleteUsuario(context.Context, *DeleteUsuarioReq) (*DeleteUsuarioRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUsuario not implemented")
 }
 func (UnimplementedGerenciaServer) CreateServidorGravacao(context.Context, *CreateServidorGravacaoReq) (*CreateServidorGravacaoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateServidorGravacao not implemented")
@@ -298,6 +368,96 @@ func _Gerencia_Migrate_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GerenciaServer).Migrate(ctx, req.(*MigrateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_CreateUsuario_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUsuarioReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).CreateUsuario(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/CreateUsuario",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).CreateUsuario(ctx, req.(*CreateUsuarioReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_ReadUsuario_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadUsuarioReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ReadUsuario(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ReadUsuario",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ReadUsuario(ctx, req.(*ReadUsuarioReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_ReadUsuarios_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadUsuariosReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ReadUsuarios(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ReadUsuarios",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ReadUsuarios(ctx, req.(*ReadUsuariosReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_UpdateUsuario_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUsuarioReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).UpdateUsuario(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/UpdateUsuario",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).UpdateUsuario(ctx, req.(*UpdateUsuarioReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_DeleteUsuario_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUsuarioReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).DeleteUsuario(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/DeleteUsuario",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).DeleteUsuario(ctx, req.(*DeleteUsuarioReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -550,6 +710,26 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Migrate",
 			Handler:    _Gerencia_Migrate_Handler,
+		},
+		{
+			MethodName: "CreateUsuario",
+			Handler:    _Gerencia_CreateUsuario_Handler,
+		},
+		{
+			MethodName: "ReadUsuario",
+			Handler:    _Gerencia_ReadUsuario_Handler,
+		},
+		{
+			MethodName: "ReadUsuarios",
+			Handler:    _Gerencia_ReadUsuarios_Handler,
+		},
+		{
+			MethodName: "UpdateUsuario",
+			Handler:    _Gerencia_UpdateUsuario_Handler,
+		},
+		{
+			MethodName: "DeleteUsuario",
+			Handler:    _Gerencia_DeleteUsuario_Handler,
 		},
 		{
 			MethodName: "CreateServidorGravacao",

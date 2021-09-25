@@ -108,11 +108,11 @@ func (g *GerenciaClient) UpdateCamera(cam camera.Camera) error {
 	return nil
 }
 
-func (g *GerenciaClient) DeleteCamera(cameraID string) error {
+func (g *GerenciaClient) DeleteCamera(camerasID []string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	if _, err := g.c.DeleteCamera(ctx, &pb.DeleteCameraReq{CameraId: cameraID}); err != nil {
+	if _, err := g.c.DeleteCamera(ctx, &pb.DeleteCameraReq{CameraId: camerasID}); err != nil {
 		return err
 	}
 

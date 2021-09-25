@@ -107,9 +107,11 @@ func (g *GerenciaService) UpdateCamera(ctx context.Context, req *pb.UpdateCamera
 
 func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCameraReq) (*pb.DeleteCameraRes, error) {
 
-	if err := g.cameraStore.Delete(ctx, req.GetCameraId()); err != nil {
-		g.log.Errorw("delete camera", "ERROR", err)
-		return &pb.DeleteCameraRes{}, fmt.Errorf("delete: %w", err)
+	for _, c := range req.GetCameraId() {
+		if err := g.cameraStore.Delete(ctx, c); err != nil {
+			g.log.Errorw("delete camera", "ERROR", err)
+			return &pb.DeleteCameraRes{}, fmt.Errorf("delete: %w", err)
+		}
 	}
 
 	return &pb.DeleteCameraRes{}, nil

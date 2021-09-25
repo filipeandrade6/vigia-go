@@ -92,7 +92,7 @@ func Run(log *zap.SugaredLogger) error {
 		log.Fatal(err)
 	}
 
-	if err := gerenciaClient.DeleteCamera(cam3); err != nil {
+	if err := gerenciaClient.DeleteCamera([]string{cam3}); err != nil {
 		log.Fatal(err)
 	}
 
