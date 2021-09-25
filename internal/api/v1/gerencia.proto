@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "./internal/grpc/gerencia/pb";
+option go_package = "./internal/api/v1";
 
 package gerencia;
 
@@ -84,29 +84,45 @@ message Camera {
     string usuario = 6;
     string senha = 7;
     string geolocalizacao = 8;
-    google.protobuf.Timestamp criado_em = 9;
-    google.protobuf.Timestamp editado_em = 10;
 }
 
-message CreateCameraReq{Camera camera = 1;}
+message CreateCameraReq{
+    Camera camera = 1;
+}
 
-message CreateCameraRes{Camera camera = 1;}
+message CreateCameraRes{
+    string camera_id = 1;
+}
 
-message ReadCameraReq{Camera camera = 1;}
+message ReadCameraReq{
+    string camera_id = 1;
+}
 
-message ReadCameraRes{Camera camera = 1;}
+message ReadCameraRes{
+    Camera camera = 1;
+}
 
-message ReadCamerasReq{Camera camera = 1;}
+message ReadCamerasReq{
+    string query = 1;
+    int32 page_number = 2;
+    int32 rows_per_page = 3;
+}
 
-message ReadCamerasRes{repeated Camera cameras = 1;}
+message ReadCamerasRes{
+    repeated Camera cameras = 1;
+}
 
-message UpdateCameraReq{Camera camera = 1;}
+message UpdateCameraReq{
+    Camera camera = 1;
+}
 
-message UpdateCameraRes{Camera camera = 1;}
+message UpdateCameraRes{}
 
-message DeleteCameraReq{Camera camera = 1;}
+message DeleteCameraReq{
+    string camera_id = 1;
+}
 
-message DeleteCameraRes{Camera camera = 1;}
+message DeleteCameraRes{}
 
 
 message Processo {

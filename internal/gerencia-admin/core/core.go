@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia-admin/service"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 )
 
@@ -37,7 +37,7 @@ func Run(log *zap.SugaredLogger) error {
 
 	fmt.Println("chegou aqui antes de criar o client de genrecia")
 	time.Sleep(time.Duration(time.Second * 10))
-	gerenciaClient := gerencia.NewClientGerencia()
+	gerenciaClient := service.NewClientGerencia()
 	fmt.Println("chegou aqui")
 
 	if err := gerenciaClient.Migrate(); err != nil {
@@ -51,8 +51,8 @@ func Run(log *zap.SugaredLogger) error {
 	// TODO na migracao
 
 	c := camera.Camera{
-		Descricao:      "Camera 1",
-		EnderecoIP:     "10.0.0.1",
+		Descricao:      "Camerasss 1",
+		EnderecoIP:     "10.0.0.11",
 		Porta:          12,
 		Canal:          1,
 		Usuario:        "admin",
@@ -65,32 +65,32 @@ func Run(log *zap.SugaredLogger) error {
 		log.Fatal(err)
 	}
 
-	c.Descricao = "Camera 2"
-	c.EnderecoIP = "10.0.0.2"
+	c.Descricao = "Camerasss 2"
+	c.EnderecoIP = "10.0.0.22"
 
 	if _, err := gerenciaClient.CreateCamera(c); err != nil {
 		log.Fatal(err)
 	}
 
-	c.Descricao = "Camera 3"
-	c.EnderecoIP = "10.0.0.3"
+	c.Descricao = "Camerasss 3"
+	c.EnderecoIP = "10.0.0.33"
 
 	cam3, err := gerenciaClient.CreateCamera(c)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("criado 3 câmeras... segue abaixo")
+	fmt.Println("criado 3 câmeras... segue Camerasss 2 abaixo")
 
-	cRes, err := gerenciaClient.ReadCameras()
+	cRes, err := gerenciaClient.ReadCameras("asss 2", 1, 100)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(cRes)
 
 	c.CameraID = cam1
-	c.Descricao = "Camera Updatada"
-	c.EnderecoIP = "123.123.123.123"
+	c.Descricao = "Camera Updatadassss"
+	c.EnderecoIP = "234.234.234.234"
 
 	if err = gerenciaClient.UpdateCamera(c); err != nil {
 		log.Fatal(err)
@@ -102,7 +102,7 @@ func Run(log *zap.SugaredLogger) error {
 
 	fmt.Println("câmera 3 deletada e câmera 1 atualizada... segue abaixo")
 
-	cRes, err = gerenciaClient.ReadCameras()
+	cRes, err = gerenciaClient.ReadCameras("", 1, 100)
 	if err != nil {
 		log.Fatal(err)
 	}

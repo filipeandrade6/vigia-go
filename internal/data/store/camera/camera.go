@@ -3,7 +3,6 @@ package camera
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
@@ -24,7 +23,7 @@ func NewStore(log *zap.SugaredLogger, db *sqlx.DB) Store {
 	}
 }
 
-func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera, now time.Time) (string, error) {
+func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera) (string, error) {
 
 	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
 		return "", database.ErrForbidden
@@ -54,22 +53,29 @@ func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera, now t
 	return c.CameraID, nil
 }
 
-func (s Store) Query(ctx context.Context, pageNumber int, rowsPerPage int) (Cameras, error) {
+func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerPage int) (Cameras, error) {
 	data := struct {
-		Offset      int `db:"offset"`
-		RowsPerPage int `db:"rows_per_page"`
+		Query       string `db:"query"`
+		Offset      int    `db:"offset"`
+		RowsPerPage int    `db:"rows_per_page"`
 	}{
+		Query:       query,
 		Offset:      (pageNumber - 1) * rowsPerPage,
 		RowsPerPage: rowsPerPage,
 	}
 
+	// TODO verificar sqlinjection
 	const q = `
 	SELECT
 		*
 	FROM
 		cameras
+	WHERE
+		(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao)
+	ILIKE
+		(%:query%)
 	ORDER BY
-		camera_id
+		descricao
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
 
 	var cams Cameras
@@ -113,7 +119,7 @@ func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
 	return cam, nil
 }
 
-func (s Store) Update(ctx context.Context, cam Camera, now time.Time) error {
+func (s Store) Update(ctx context.Context, cam Camera) error {
 	if err := validate.CheckID(cam.CameraID); err != nil {
 		return database.ErrInvalidID
 	}
@@ -154,7 +160,6 @@ func (s Store) Delete(ctx context.Context, cameraID string) error {
 		return database.ErrInvalidID
 	}
 
-	// TODO entender abaixo
 	data := struct {
 		CameraID string `db:"camera_id"`
 	}{

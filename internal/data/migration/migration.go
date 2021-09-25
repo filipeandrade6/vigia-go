@@ -15,7 +15,7 @@ import (
 //go:embed sql/*.sql
 var fs embed.FS
 
-func Migrate(ctx context.Context) error {
+func Migrate(ctx context.Context, version int32) error {
 	d, err := iofs.New(fs, "sql")
 	if err != nil {
 		return fmt.Errorf("getting new driver from io/fs: %w", err)
@@ -35,7 +35,7 @@ func Migrate(ctx context.Context) error {
 		return fmt.Errorf("construct postgres driver: %w", err)
 	}
 
-	err = m.Up()
+	err = m.Migrate(uint(version))
 	if err != nil {
 		return fmt.Errorf("applying migrations: %w", err)
 	}

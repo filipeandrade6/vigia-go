@@ -1,7 +1,7 @@
 package camera
 
 import (
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia/pb"
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 )
 
 // TODO aggregate fields - consumo, leituras, tempo de atividade

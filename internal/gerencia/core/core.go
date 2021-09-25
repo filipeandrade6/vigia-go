@@ -10,10 +10,9 @@ import (
 	"runtime"
 	"syscall"
 
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia"
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia/pb"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
@@ -104,11 +103,10 @@ func Run(log *zap.SugaredLogger) error {
 	serverErrors := make(chan error, 1)
 
 	cameraStore := camera.NewStore(log, db)
-	svc := gerenciaService.NewGerenciaService(log, auth, cameraStore)
-	gerenciaGRPCService := gerencia.NewGerenciaService(log, svc)
+	svc := service.NewGerenciaService(log, auth, cameraStore)
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterGerenciaServer(grpcServer, gerenciaGRPCService)
+	pb.RegisterGerenciaServer(grpcServer, svc)
 
 	go func() {
 		lis, err := net.Listen(viper.GetString("VIGIA_GER_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("VIGIA_GER_SERVER_PORT")))

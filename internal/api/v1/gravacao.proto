@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "./internal/grpc/gravacao/pb";
+option go_package = "./internal/api/v1";
 
 package gravacao;
 

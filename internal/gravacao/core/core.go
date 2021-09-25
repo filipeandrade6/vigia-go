@@ -9,10 +9,8 @@ import (
 	"runtime"
 	"syscall"
 
-	gravacaoService "github.com/filipeandrade6/vigia-go/internal/gravacao/service"
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia"
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gravacao"
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gravacao/pb"
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/service"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 
 	"github.com/spf13/viper"
@@ -149,13 +147,10 @@ func Run(log *zap.SugaredLogger) error {
 
 	serverErrors := make(chan error, 1)
 
-	gerenciaClient := gerencia.NewClientGerencia() // TODO: passar log?
-	svc := gravacaoService.NewGravacaoService(log, gerenciaClient)
+	svc := service.NewGravacaoService(log)
 
 	grpcServer := grpc.NewServer()
-	gravacaoGRPCService := gravacao.NewGravacaoService(log, svc)
-
-	pb.RegisterGravacaoServer(grpcServer, gravacaoGRPCService)
+	pb.RegisterGravacaoServer(grpcServer, svc)
 
 	go func() {
 		lis, err := net.Listen(viper.GetString("VIGIA_GRA_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("VIGIA_GRA_SERVER_PORT")))

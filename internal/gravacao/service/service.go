@@ -1,18 +1,17 @@
 package service
 
 import (
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia"
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"go.uber.org/zap"
 )
 
 type GravacaoService struct {
-	log            *zap.SugaredLogger
-	gerenciaClient *gerencia.GerenciaClient
+	pb.UnimplementedGravacaoServer
+	log *zap.SugaredLogger
 }
 
-func NewGravacaoService(log *zap.SugaredLogger, gerenciaClient *gerencia.GerenciaClient) *GravacaoService {
+func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
 	return &GravacaoService{
-		log:            log,
-		gerenciaClient: gerenciaClient,
+		log: log,
 	}
 }

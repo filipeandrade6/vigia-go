@@ -1,12 +1,12 @@
-package gerencia
+package service
 
 import (
 	"context"
 	"fmt"
 	"time"
 
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia/pb"
 
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
@@ -67,16 +67,14 @@ func (g *GerenciaClient) CreateCamera(cam camera.Camera) (string, error) {
 		return "", err
 	}
 
-	camRes := camera.FromProto(c.Camera)
-
-	return camRes.CameraID, nil
+	return c.GetCameraId(), nil
 }
 
 func (g *GerenciaClient) ReadCamera(cameraID string) (camera.Camera, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	c, err := g.c.ReadCamera(ctx, &pb.ReadCameraReq{Camera: camera.Camera{CameraID: cameraID}.ToProto()})
+	c, err := g.c.ReadCamera(ctx, &pb.ReadCameraReq{CameraId: cameraID})
 	if err != nil {
 		return camera.Camera{}, err
 	}
@@ -84,11 +82,17 @@ func (g *GerenciaClient) ReadCamera(cameraID string) (camera.Camera, error) {
 	return camera.FromProto(c.Camera), nil
 }
 
-func (g *GerenciaClient) ReadCameras() (camera.Cameras, error) {
+func (g *GerenciaClient) ReadCameras(query string, pageNumber int, rowsPerPage int) (camera.Cameras, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	c, err := g.c.ReadCameras(ctx, &pb.ReadCamerasReq{})
+	request := &pb.ReadCamerasReq{
+		Query:       query,
+		PageNumber:  int32(pageNumber),
+		RowsPerPage: int32(rowsPerPage),
+	}
+
+	c, err := g.c.ReadCameras(ctx, request)
 	if err != nil {
 		return camera.Cameras{}, err
 	}
@@ -113,7 +117,7 @@ func (g *GerenciaClient) DeleteCamera(cameraID string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	if _, err := g.c.DeleteCamera(ctx, &pb.DeleteCameraReq{Camera: camera.Camera{CameraID: cameraID}.ToProto()}); err != nil {
+	if _, err := g.c.DeleteCamera(ctx, &pb.DeleteCameraReq{CameraId: cameraID}); err != nil {
 		return err
 	}
 

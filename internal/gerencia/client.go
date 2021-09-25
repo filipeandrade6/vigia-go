@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gravacao/pb"
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

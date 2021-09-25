@@ -3,7 +3,7 @@ package servidorgravacao
 import (
 	"time"
 
-	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia/pb"
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
