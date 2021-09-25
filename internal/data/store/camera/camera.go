@@ -117,10 +117,10 @@ func (s Store) Update(ctx context.Context, cam Camera, now time.Time) error {
 	// 	return fmt.Errorf("validating data: %w", err)
 	// }
 
-	c, err := s.QueryByID(ctx, cam.CameraID)
-	if err != nil {
-		return fmt.Errorf("updating camera cameraID[%s]: %w", cam.CameraID, err)
-	}
+	// c, err := s.QueryByID(ctx, cam.CameraID)
+	// if err != nil {
+	// 	return fmt.Errorf("updating cameraID[%s]: %w", cam.CameraID, err)
+	// }
 
 	const q = `
 	UPDATE
@@ -136,7 +136,7 @@ func (s Store) Update(ctx context.Context, cam Camera, now time.Time) error {
 	WHERE
 		camera_id = :camera_id`
 
-	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
+	if err := database.NamedExecContext(ctx, s.log, s.db, q, cam); err != nil {
 		return fmt.Errorf("updating cameraID[%s]: %w", cam.CameraID, err)
 	}
 

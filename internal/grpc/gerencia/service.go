@@ -1,4 +1,4 @@
-package grpc
+package gerencia
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	"github.com/filipeandrade6/vigia-go/internal/data/migration"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
+	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia/pb"
 	"github.com/golang-migrate/migrate/v4"
 	"go.uber.org/zap"
 )

@@ -1,10 +1,10 @@
-package grpc
+package gravacao
 
 import (
 	"context"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	gravacaoService "github.com/filipeandrade6/vigia-go/internal/gravacao/service"
+	"github.com/filipeandrade6/vigia-go/internal/grpc/gravacao/pb"
 	"go.uber.org/zap"
 )
 

@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
+	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 )
 
@@ -37,7 +37,7 @@ func Run(log *zap.SugaredLogger) error {
 
 	fmt.Println("chegou aqui antes de criar o client de genrecia")
 	time.Sleep(time.Duration(time.Second * 10))
-	gerenciaClient := gerenciaGRPC.NewClientGerencia()
+	gerenciaClient := gerencia.NewClientGerencia()
 	fmt.Println("chegou aqui")
 
 	if err := gerenciaClient.Migrate(); err != nil {
@@ -90,6 +90,7 @@ func Run(log *zap.SugaredLogger) error {
 
 	c.CameraID = cam1
 	c.Descricao = "Camera Updatada"
+	c.EnderecoIP = "123.123.123.123"
 
 	if err = gerenciaClient.UpdateCamera(c); err != nil {
 		log.Fatal(err)

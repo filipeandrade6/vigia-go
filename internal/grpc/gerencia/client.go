@@ -1,12 +1,12 @@
-package grpc
+package gerencia
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
+	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia/pb"
 
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"

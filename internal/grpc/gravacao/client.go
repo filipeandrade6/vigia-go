@@ -1,10 +1,10 @@
-package grpc
+package gravacao
 
 import (
 	"context"
 	"fmt"
 
-	pb "github.com/filipeandrade6/vigia-go/internal/api"
+	"github.com/filipeandrade6/vigia-go/internal/grpc/gravacao/pb"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

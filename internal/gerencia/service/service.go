@@ -74,11 +74,13 @@ func (g *GerenciaService) ReadCamera(ctx context.Context, cameraID string) (came
 
 func (g *GerenciaService) UpdateCamera(ctx context.Context, cam camera.Camera, now time.Time) error {
 
-	// PERFORM PRE BUSINESS OPERATIONS:
+	// PERFORM PRE BUSINESS OPERATIONS
 
 	if err := g.cameraStore.Update(ctx, cam, now); err != nil {
 		return fmt.Errorf("update: %w", err)
 	}
+
+	// TODO tem que adicionar os logs
 
 	// PERFORM POST BUSINESS OPERATIONS
 

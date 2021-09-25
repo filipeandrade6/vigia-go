@@ -14,8 +14,8 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/processo"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
-	gerenciaGRPC "github.com/filipeandrade6/vigia-go/internal/gerencia/grpc"
 	gerenciaService "github.com/filipeandrade6/vigia-go/internal/gerencia/service"
+	"github.com/filipeandrade6/vigia-go/internal/grpc/gerencia"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 
@@ -92,9 +92,9 @@ func Run(log *zap.SugaredLogger) error {
 	processoStore := processo.NewStore(log, db)
 	servidorGravacaoStore := servidorgravacao.NewStore(log, db)
 	svc := gerenciaService.NewGerenciaService(log, cameraStore, processoStore, servidorGravacaoStore)
-	grpcServer := grpc.NewServer()
-	gerenciaGRPCService := gerenciaGRPC.NewGerenciaService(log, svc)
+	gerenciaGRPCService := gerencia.NewGerenciaService(log, svc)
 
+	grpcServer := grpc.NewServer()
 	pb.RegisterGerenciaServer(grpcServer, gerenciaGRPCService)
 
 	go func() {
