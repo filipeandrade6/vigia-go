@@ -12,6 +12,9 @@ quais erros devem ser devolvidos para o client...
 
 Add https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-tutorial.md ?
 
+EU POSSO REGISTRAR OUTROS SERVICOS NO GRPCSERVER - isso permite separar os servicos em arquivos
+
+VER O EVANS no TECH SCHOOL PARA CLIENT DE GRPC - acho que usa o grpc reflect...
 
 #### TODO
 

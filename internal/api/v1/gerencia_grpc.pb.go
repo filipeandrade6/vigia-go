@@ -18,9 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
-	// Gravacao requests
 	Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error)
-	// Gerencia Client requests
 	Migrate(ctx context.Context, in *MigrateReq, opts ...grpc.CallOption) (*MigrateRes, error)
 	CreateUsuario(ctx context.Context, in *CreateUsuarioReq, opts ...grpc.CallOption) (*CreateUsuarioRes, error)
 	ReadUsuario(ctx context.Context, in *ReadUsuarioReq, opts ...grpc.CallOption) (*ReadUsuarioRes, error)
@@ -30,6 +28,7 @@ type GerenciaClient interface {
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error)
 	CreateServidorGravacao(ctx context.Context, in *CreateServidorGravacaoReq, opts ...grpc.CallOption) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(ctx context.Context, in *ReadServidorGravacaoReq, opts ...grpc.CallOption) (*ReadServidorGravacaoRes, error)
+	ReadServidoresGravacao(ctx context.Context, in *ReadServidoresGravacaoReq, opts ...grpc.CallOption) (*ReadServidoresGravacaoRes, error)
 	UpdateServidorGravacao(ctx context.Context, in *UpdateServidorGravacaoReq, opts ...grpc.CallOption) (*UpdateServidorGravacaoRes, error)
 	DeleteServidorGravacao(ctx context.Context, in *DeleteServidorGravacaoReq, opts ...grpc.CallOption) (*DeleteServidorGravacaoRes, error)
 	CreateCamera(ctx context.Context, in *CreateCameraReq, opts ...grpc.CallOption) (*CreateCameraRes, error)
@@ -141,6 +140,15 @@ func (c *gerenciaClient) ReadServidorGravacao(ctx context.Context, in *ReadServi
 	return out, nil
 }
 
+func (c *gerenciaClient) ReadServidoresGravacao(ctx context.Context, in *ReadServidoresGravacaoReq, opts ...grpc.CallOption) (*ReadServidoresGravacaoRes, error) {
+	out := new(ReadServidoresGravacaoRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ReadServidoresGravacao", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gerenciaClient) UpdateServidorGravacao(ctx context.Context, in *UpdateServidorGravacaoReq, opts ...grpc.CallOption) (*UpdateServidorGravacaoRes, error) {
 	out := new(UpdateServidorGravacaoRes)
 	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/UpdateServidorGravacao", in, out, opts...)
@@ -244,9 +252,7 @@ func (c *gerenciaClient) DeleteProcesso(ctx context.Context, in *DeleteProcessoR
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
-	// Gravacao requests
 	Match(context.Context, *MatchReq) (*MatchRes, error)
-	// Gerencia Client requests
 	Migrate(context.Context, *MigrateReq) (*MigrateRes, error)
 	CreateUsuario(context.Context, *CreateUsuarioReq) (*CreateUsuarioRes, error)
 	ReadUsuario(context.Context, *ReadUsuarioReq) (*ReadUsuarioRes, error)
@@ -256,6 +262,7 @@ type GerenciaServer interface {
 	Login(context.Context, *LoginReq) (*LoginRes, error)
 	CreateServidorGravacao(context.Context, *CreateServidorGravacaoReq) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(context.Context, *ReadServidorGravacaoReq) (*ReadServidorGravacaoRes, error)
+	ReadServidoresGravacao(context.Context, *ReadServidoresGravacaoReq) (*ReadServidoresGravacaoRes, error)
 	UpdateServidorGravacao(context.Context, *UpdateServidorGravacaoReq) (*UpdateServidorGravacaoRes, error)
 	DeleteServidorGravacao(context.Context, *DeleteServidorGravacaoReq) (*DeleteServidorGravacaoRes, error)
 	CreateCamera(context.Context, *CreateCameraReq) (*CreateCameraRes, error)
@@ -303,6 +310,9 @@ func (UnimplementedGerenciaServer) CreateServidorGravacao(context.Context, *Crea
 }
 func (UnimplementedGerenciaServer) ReadServidorGravacao(context.Context, *ReadServidorGravacaoReq) (*ReadServidorGravacaoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadServidorGravacao not implemented")
+}
+func (UnimplementedGerenciaServer) ReadServidoresGravacao(context.Context, *ReadServidoresGravacaoReq) (*ReadServidoresGravacaoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadServidoresGravacao not implemented")
 }
 func (UnimplementedGerenciaServer) UpdateServidorGravacao(context.Context, *UpdateServidorGravacaoReq) (*UpdateServidorGravacaoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateServidorGravacao not implemented")
@@ -526,6 +536,24 @@ func _Gerencia_ReadServidorGravacao_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GerenciaServer).ReadServidorGravacao(ctx, req.(*ReadServidorGravacaoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_ReadServidoresGravacao_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadServidoresGravacaoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ReadServidoresGravacao(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ReadServidoresGravacao",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ReadServidoresGravacao(ctx, req.(*ReadServidoresGravacaoReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -774,6 +802,10 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReadServidorGravacao",
 			Handler:    _Gerencia_ReadServidorGravacao_Handler,
+		},
+		{
+			MethodName: "ReadServidoresGravacao",
+			Handler:    _Gerencia_ReadServidoresGravacao_Handler,
 		},
 		{
 			MethodName: "UpdateServidorGravacao",

@@ -7,16 +7,9 @@ package gerencia;
 import "google/protobuf/timestamp.proto";
 
 service Gerencia {
-    // Gravacao requests
     rpc Match (MatchReq) returns (MatchRes) {} // TODO streaming de informação de placa e o gerencia processa tudo?
 
-    // Gerencia Client requests
     rpc Migrate (MigrateReq) returns (MigrateRes) {}
-
-    // Acontecimentos
-    // manda a lista para o gerencia
-    // gerencia cadastra no banco de dados
-    // manda sinal de atualizacao para todos os gravacao servers
 
     rpc CreateUsuario (CreateUsuarioReq) returns (CreateUsuarioRes) {}
     rpc ReadUsuario (ReadUsuarioReq) returns (ReadUsuarioRes) {}
@@ -27,6 +20,7 @@ service Gerencia {
 
     rpc CreateServidorGravacao (CreateServidorGravacaoReq) returns (CreateServidorGravacaoRes) {}
     rpc ReadServidorGravacao (ReadServidorGravacaoReq) returns (ReadServidorGravacaoRes) {}
+    rpc ReadServidoresGravacao (ReadServidoresGravacaoReq) returns (ReadServidoresGravacaoRes) {}
     rpc UpdateServidorGravacao (UpdateServidorGravacaoReq) returns (UpdateServidorGravacaoRes) {}
     rpc DeleteServidorGravacao (DeleteServidorGravacaoReq) returns (DeleteServidorGravacaoRes) {}
 
@@ -129,6 +123,10 @@ message CreateServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
 message ReadServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
 
 message ReadServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
+
+message ReadServidoresGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
+
+message ReadServidoresGravacaoRes {ServidorGravacao service_gravacao = 1;}
 
 message UpdateServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
 
