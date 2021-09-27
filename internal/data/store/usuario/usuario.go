@@ -186,6 +186,8 @@ func (s Store) Authenticate(ctx context.Context, email, senha string) (auth.Clai
 		Email: email,
 	}
 
+	fmt.Println("chegou aqui")
+
 	const q = `
 	SELECT
 		*

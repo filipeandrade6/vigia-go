@@ -75,11 +75,13 @@ func New(activeKID string, keyLookup KeyLookup) (*Auth, error) {
 	return &a, nil
 }
 
+// AuthFunc is used for user Authentication in gRPC intercept.
 func (a *Auth) AuthFunc(ctx context.Context) (context.Context, error) {
 	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token")
 	}
+	fmt.Println(token)
 
 	claims, err := a.ValidateToken(token)
 	if err != nil {

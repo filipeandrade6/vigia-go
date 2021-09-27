@@ -13,7 +13,10 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 
 	"github.com/golang-migrate/migrate/v4"
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // TODO registrar no log os erros
@@ -33,6 +36,27 @@ func NewGerenciaService(log *zap.SugaredLogger, auth *auth.Auth, cameraStore cam
 		cameraStore:  cameraStore,
 		usuarioStore: usuarioStore,
 	}
+}
+
+func (g *GerenciaService) AuthFuncOverride(ctx context.Context, fullMethodName string) (context.Context, error) {
+	// TODO se o servico chamado for Login - so encaminha o contexto
+	fmt.Println(fullMethodName)
+	if fullMethodName == "/gerencia.Gerencia/Login" || fullMethodName == "/gerencia.Gerencia/Migrate" {
+		return ctx, nil
+	}
+
+	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token")
+	}
+	fmt.Println(token)
+
+	claims, err := g.auth.ValidateToken(token)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token")
+	}
+
+	return auth.SetClaims(ctx, claims), nil
 }
 
 func (g *GerenciaService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.MigrateRes, error) {
@@ -190,6 +214,8 @@ func (g *GerenciaService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuar
 }
 
 func (g *GerenciaService) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginRes, error) {
+
+	fmt.Println("chegou aqui")
 
 	claims, err := g.usuarioStore.Authenticate(ctx, req.GetEmail(), req.GetSenha())
 	if err != nil {

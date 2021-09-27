@@ -2,13 +2,14 @@ package usuario
 
 import (
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/lib/pq"
 )
 
 type Usuario struct {
-	UsuarioID string   `db:"usuario_id"`
-	Email     string   `db:"email"`
-	Funcao    []string `db:"funcao"`
-	Senha     string   `db:senha_hash`
+	UsuarioID string         `db:"usuario_id"`
+	Email     string         `db:"email"`
+	Funcao    pq.StringArray `db:"funcao"`
+	Senha     string         `db:"senha_hash"`
 }
 
 func (u Usuario) ToProto() *pb.Usuario {
