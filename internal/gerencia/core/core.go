@@ -12,12 +12,14 @@ import (
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
+	"github.com/filipeandrade6/vigia-go/internal/data/store/usuario"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/filipeandrade6/vigia-go/internal/sys/keystore"
 
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/spf13/viper"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
@@ -103,9 +105,14 @@ func Run(log *zap.SugaredLogger) error {
 	serverErrors := make(chan error, 1)
 
 	cameraStore := camera.NewStore(log, db)
-	svc := service.NewGerenciaService(log, auth, cameraStore)
+	usuarioStore := usuario.NewStore(log, db)
 
-	grpcServer := grpc.NewServer()
+	svc := service.NewGerenciaService(log, auth, cameraStore, usuarioStore)
+
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(auth.AuthFunc)),
+	)
+
 	pb.RegisterGerenciaServer(grpcServer, svc)
 
 	go func() {

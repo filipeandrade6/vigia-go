@@ -45,7 +45,7 @@ func (g *GerenciaClient) Migrate() error {
 	defer cancel()
 
 	// TODO refatorar aqui
-	if _, err := g.c.Migrate(ctx, &pb.MigrateReq{Versao: 6}); err != nil {
+	if _, err := g.c.Migrate(ctx, &pb.MigrateReq{Versao: 7}); err != nil {
 		fmt.Println(err)
 		return err
 	}
@@ -117,4 +117,18 @@ func (g *GerenciaClient) DeleteCamera(camerasID []string) error {
 	}
 
 	return nil
+}
+
+func (g *GerenciaClient) Login(email, senha string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	t, err := g.c.Login(ctx, &pb.LoginReq{Email: email, Senha: senha})
+	if err != nil {
+		return "", err
+	}
+
+	token := t.GetAccessToken()
+
+	return token, nil
 }

@@ -46,6 +46,13 @@ func Run(log *zap.SugaredLogger) error {
 		}
 	}
 
+	token, err := gerenciaClient.Login("filipe.andrade@ssp.df.gov.br", "secret")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(token)
+
 	c := camera.Camera{
 		Descricao:      "Camerasss 1",
 		EnderecoIP:     "10.0.0.11",

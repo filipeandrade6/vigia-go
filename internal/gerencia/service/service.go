@@ -195,19 +195,22 @@ func (g *GerenciaService) Login(ctx context.Context, req *pb.LoginReq) (*pb.Logi
 	if err != nil {
 		if errors.As(err, &database.ErrNotFound) {
 			g.log.Errorw("usuario not found", "ERROR", err)
-			return &pb.LoginRes{}, fmt.Errorf("authenticate: %w", err) // TODO melhorar isso aqui e remover o retorno de erros
+			return &pb.LoginRes{}, err
 		} else if errors.As(err, &database.ErrAuthenticationFailure) {
 			g.log.Errorw("authenticate usuario", "ERROR", err)
-			return &pb.LoginRes{}, fmt.Errorf("authenticate: %w", err) // TODO melhorar isso aqui e remover o retorno de errors
+			return &pb.LoginRes{}, err
 		}
 		g.log.Errorw("authenticating", "ERROR", err)
-		return &pb.LoginRes{}, fmt.Errorf("authenticating: %w", err)
+		return &pb.LoginRes{}, err
 	}
 
-	tkn, err := g.auth.GenerateToken(claims)
+	var tkn struct {
+		Token string `json:"token"`
+	}
+	tkn.Token, err = g.auth.GenerateToken(claims)
 	if err != nil {
 		return &pb.LoginRes{}, fmt.Errorf("generating token: %w", err)
 	}
 
-	return &pb.LoginRes{AccessToken: tkn}, nil
+	return &pb.LoginRes{AccessToken: tkn.Token}, nil // TODO devolver o Token em contexto eu acho - no header
 }

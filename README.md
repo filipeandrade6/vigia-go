@@ -2,13 +2,9 @@
 
 #### ONDE PAREI
 
-INSERT INTO usuarios (usuario_id, email, funcao, senha_hash) VALUES ('d03307d4-2b28-4c23-a004-3da25e5b8ce2', 'filipe.andrade@ssp.df.gov.br', '{ADMIN, MANAGER, USER}', '$2a$10$n531epIH68yygcV6sNNqluZtyPc3smWxbw1WoWDDhOIqUP1Py/GTq');
+TEM QUE IGNORAR O SERVIÇO LOGIN - A AUTHENTICATION
+VER INFO.FULLMETHOD - CRIAR AUTHFUNC ESPECIAL QUE ATENDA A INTERFACE ETC
 
-INSERT INTO cameras (camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao) VALUES ('d03307d4-2b28-4c23-a004-3da25e5b8ce3', 'desc 1', '10.92.10.1', '1', '1', 'admin', 'admin', '-12.2332, -42.231');
-
-ativar metricas e demais antes de partir para os outros (processos/usuarios/servidores_de_gravacao/etc...)
-
-quais erros devem ser devolvidos para o client...
 
 Add https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-tutorial.md ?
 

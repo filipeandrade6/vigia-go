@@ -2,9 +2,14 @@
 package auth
 
 import (
+	"context"
 	"crypto/rsa"
 	"errors"
 	"fmt"
+
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -68,6 +73,20 @@ func New(activeKID string, keyLookup KeyLookup) (*Auth, error) {
 	}
 
 	return &a, nil
+}
+
+func (a *Auth) AuthFunc(ctx context.Context) (context.Context, error) {
+	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token")
+	}
+
+	claims, err := a.ValidateToken(token)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token")
+	}
+
+	return SetClaims(ctx, claims), nil
 }
 
 // GenerateToken generates a signed JWT token string representing the user Claims.
