@@ -4,8 +4,6 @@ import (
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 )
 
-// TODO aggregate fields - consumo, leituras, tempo de atividade
-
 type Camera struct {
 	CameraID       string `db:"camera_id"`
 	Descricao      string `db:"descricao"`

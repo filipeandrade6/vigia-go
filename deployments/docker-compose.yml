@@ -29,3 +29,13 @@ services:
     env_file:
       - .dev.env
     command: ["iniciar"]
+
+  # metrics:
+  #   build:
+  #     context: ../
+  #     dockerfile: deployments/dockerfile.metrics
+  #   env_file:
+  #     - .dev.env
+  #   ports:
+  #     - "3001:3001"
+  #     - "4001:4001"

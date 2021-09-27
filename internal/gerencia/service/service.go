@@ -11,6 +11,7 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/data/store/usuario"
 	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
+	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 
 	"github.com/golang-migrate/migrate/v4"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
@@ -19,7 +20,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// TODO registrar no log os erros
+// TODO registrar no log os erros - ver como fazer corretamente...
+
+// TODO criar campo servicos - e registrar os servicos para não colocar tudo em um?
 
 type GerenciaService struct {
 	pb.UnimplementedGerenciaServer
@@ -39,25 +42,33 @@ func NewGerenciaService(log *zap.SugaredLogger, auth *auth.Auth, cameraStore cam
 }
 
 func (g *GerenciaService) AuthFuncOverride(ctx context.Context, fullMethodName string) (context.Context, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("authentication", "ERROR", err)
+		}
+	}()
+
 	// TODO se o servico chamado for Login - so encaminha o contexto
 	fmt.Println(fullMethodName)
-	if fullMethodName == "/gerencia.Gerencia/Login" || fullMethodName == "/gerencia.Gerencia/Migrate" {
-		return ctx, nil
-	}
+	return ctx, nil
 
 	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token")
+		return nil, err
 	}
 	fmt.Println(token)
 
 	claims, err := g.auth.ValidateToken(token)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token")
+		return nil, status.Error(codes.Unauthenticated, "invalid auth token")
 	}
 
 	return auth.SetClaims(ctx, claims), nil
 }
+
+// =========================================================================
+// Migrate
 
 func (g *GerenciaService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.MigrateRes, error) {
 
@@ -78,16 +89,200 @@ func (g *GerenciaService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.
 	return &pb.MigrateRes{}, nil
 }
 
+// =========================================================================
+// Usuario
+
+func (g *GerenciaService) CreateUsuario(ctx context.Context, req *pb.CreateUsuarioReq) (*pb.CreateUsuarioRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("create usuario", "ERROR", err)
+		}
+	}()
+
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return &pb.CreateUsuarioRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
+
+	usuario := usuario.FromProto(req.Usuario)
+
+	usuarioID, err := g.usuarioStore.Create(ctx, claims, usuario)
+	if err != nil {
+		if validate.Cause(err) == database.ErrForbidden {
+			return &pb.CreateUsuarioRes{}, status.Error(codes.PermissionDenied, err.Error())
+		}
+		return &pb.CreateUsuarioRes{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &pb.CreateUsuarioRes{UsuarioId: usuarioID}, nil
+}
+
+func (g *GerenciaService) ReadUsuario(ctx context.Context, req *pb.ReadUsuarioReq) (*pb.ReadUsuarioRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("read usuario", "ERROR", err)
+		}
+	}()
+
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return &pb.ReadUsuarioRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
+
+	usuario, err := g.usuarioStore.QueryByID(ctx, claims, req.GetUsuarioId())
+	if err != nil {
+		switch validate.Cause(err) {
+		case database.ErrInvalidID:
+			return &pb.ReadUsuarioRes{}, status.Error(codes.InvalidArgument, err.Error())
+		case database.ErrForbidden:
+			return &pb.ReadUsuarioRes{}, status.Error(codes.PermissionDenied, err.Error())
+		case database.ErrNotFound:
+			return &pb.ReadUsuarioRes{}, status.Error(codes.NotFound, err.Error())
+		default:
+			return &pb.ReadUsuarioRes{}, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return &pb.ReadUsuarioRes{Usuario: usuario.ToProto()}, err
+}
+
+func (g *GerenciaService) ReadUsuarios(ctx context.Context, req *pb.ReadUsuariosReq) (*pb.ReadUsuariosRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("read usuarios", "ERROR", err)
+		}
+	}()
+
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return &pb.ReadUsuariosRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
+
+	query := req.GetQuery()
+	pageNumber := int(req.GetPageNumber())
+	rowsPerPage := int(req.GetRowsPerPage())
+
+	usuarios, err := g.usuarioStore.Query(ctx, claims, query, pageNumber, rowsPerPage)
+	if err != nil {
+		switch validate.Cause(err) {
+		case database.ErrForbidden:
+			return &pb.ReadUsuariosRes{}, status.Error(codes.PermissionDenied, err.Error())
+		case database.ErrNotFound:
+			return &pb.ReadUsuariosRes{}, status.Error(codes.NotFound, err.Error())
+		default:
+			return &pb.ReadUsuariosRes{}, status.Error(codes.Internal, err.Error())
+		}
+	}
+	return &pb.ReadUsuariosRes{Usuarios: usuarios.ToProto()}, nil
+}
+
+func (g *GerenciaService) UpdateUsuario(ctx context.Context, req *pb.UpdateUsuarioReq) (*pb.UpdateUsuarioRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("update usuario", "ERROR", err)
+		}
+	}()
+
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return &pb.UpdateUsuarioRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
+
+	usuario := usuario.FromProto(req.Usuario)
+
+	if err := g.usuarioStore.Update(ctx, claims, usuario); err != nil {
+		switch validate.Cause(err) {
+		case database.ErrInvalidID:
+			return &pb.UpdateUsuarioRes{}, status.Error(codes.InvalidArgument, err.Error())
+		case database.ErrForbidden:
+			return &pb.UpdateUsuarioRes{}, status.Error(codes.PermissionDenied, err.Error())
+		case database.ErrNotFound:
+			return &pb.UpdateUsuarioRes{}, status.Error(codes.NotFound, err.Error())
+		default:
+			return &pb.UpdateUsuarioRes{}, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return &pb.UpdateUsuarioRes{}, nil
+}
+
+func (g *GerenciaService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuarioReq) (*pb.DeleteUsuarioRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("delete usuario", "ERROR", err)
+		}
+	}()
+
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return &pb.DeleteUsuarioRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
+
+	for _, u := range req.GetUsuarioId() {
+		if err := g.usuarioStore.Delete(ctx, claims, u); err != nil {
+			switch validate.Cause(err) {
+			case database.ErrInvalidID:
+				return &pb.DeleteUsuarioRes{}, status.Error(codes.InvalidArgument, err.Error())
+			case database.ErrForbidden:
+				return &pb.DeleteUsuarioRes{}, status.Error(codes.PermissionDenied, err.Error())
+			default:
+				return &pb.DeleteUsuarioRes{}, status.Error(codes.Internal, err.Error())
+			}
+		}
+	}
+
+	return &pb.DeleteUsuarioRes{}, nil
+}
+
+func (g *GerenciaService) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("login usuario", "ERROR", err)
+		}
+	}()
+
+	claims, err := g.usuarioStore.Authenticate(ctx, req.GetEmail(), req.GetSenha())
+	if err != nil {
+		switch validate.Cause(err) {
+		case database.ErrNotFound:
+			return &pb.LoginRes{}, status.Error(codes.NotFound, err.Error())
+		case database.ErrAuthenticationFailure:
+			return &pb.LoginRes{}, status.Error(codes.Unauthenticated, err.Error())
+		default:
+			return &pb.LoginRes{}, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	var tkn struct {
+		Token string `json:"token"`
+	}
+	tkn.Token, err = g.auth.GenerateToken(claims)
+	if err != nil {
+		return &pb.LoginRes{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &pb.LoginRes{AccessToken: tkn.Token}, nil // TODO devolver o Token em contexto eu acho - no header
+}
+
+// =========================================================================
+// Camera
+
 func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		g.log.Errorw("", "ERROR", err)
+		return &pb.CreateCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
+
 	cam := camera.FromProto(req.Camera)
 
-	// claims, err := auth.GetClaims(ctx)
-	// if err != nil {
-	// 	g.log.Errorw("auth", "claims missing from context", err)
-	// 	return &pb.CreateCameraRes{}, errors.New("claims missing from context")
-	// }
-
-	camID, err := g.cameraStore.Create(ctx, cam)
+	camID, err := g.cameraStore.Create(ctx, claims, cam)
 	if err != nil {
 		g.log.Errorw("create camera", "ERROR", err)
 		return &pb.CreateCameraRes{}, fmt.Errorf("create: %w", err)
@@ -97,7 +292,6 @@ func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCamera
 }
 
 func (g *GerenciaService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq) (*pb.ReadCameraRes, error) {
-
 	cam, err := g.cameraStore.QueryByID(ctx, req.GetCameraId())
 	if err != nil {
 		g.log.Errorw("query camera", "ERROR", err)
@@ -108,7 +302,6 @@ func (g *GerenciaService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq)
 }
 
 func (g *GerenciaService) ReadCameras(ctx context.Context, req *pb.ReadCamerasReq) (*pb.ReadCamerasRes, error) {
-
 	query := req.GetQuery()
 	pageNumber := int(req.GetPageNumber())
 	rowsPerPage := int(req.GetRowsPerPage())
@@ -123,10 +316,15 @@ func (g *GerenciaService) ReadCameras(ctx context.Context, req *pb.ReadCamerasRe
 }
 
 func (g *GerenciaService) UpdateCamera(ctx context.Context, req *pb.UpdateCameraReq) (*pb.UpdateCameraRes, error) {
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		g.log.Errorw("", "ERROR", err)
+		return &pb.UpdateCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
 
 	cam := camera.FromProto(req.Camera)
 
-	if err := g.cameraStore.Update(ctx, cam); err != nil {
+	if err := g.cameraStore.Update(ctx, claims, cam); err != nil {
 		g.log.Errorw("update camera", "ERROR", err)
 		return &pb.UpdateCameraRes{}, fmt.Errorf("update: %w", err)
 	}
@@ -134,109 +332,18 @@ func (g *GerenciaService) UpdateCamera(ctx context.Context, req *pb.UpdateCamera
 }
 
 func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCameraReq) (*pb.DeleteCameraRes, error) {
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		g.log.Errorw("", "ERROR", err)
+		return &pb.DeleteCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
 
 	for _, c := range req.GetCameraId() {
-		if err := g.cameraStore.Delete(ctx, c); err != nil {
+		if err := g.cameraStore.Delete(ctx, claims, c); err != nil {
 			g.log.Errorw("delete camera", "ERROR", err)
 			return &pb.DeleteCameraRes{}, fmt.Errorf("delete: %w", err)
 		}
 	}
 
 	return &pb.DeleteCameraRes{}, nil
-}
-
-func (g *GerenciaService) CreateUsuario(ctx context.Context, req *pb.CreateUsuarioReq) (*pb.CreateUsuarioRes, error) {
-	usuario := usuario.FromProto(req.Usuario)
-
-	// claims, err := auth.GetClaims(ctx)
-	// if err != nil {
-	// 	g.log.Errorw("auth", "claims missing from context", err)
-	// 	return &pb.CreateCameraRes{}, errors.New("claims missing from context")
-	// }
-
-	usuarioID, err := g.usuarioStore.Create(ctx, usuario)
-	if err != nil {
-		g.log.Errorw("create usuario", "ERROR", err)
-		return &pb.CreateUsuarioRes{}, fmt.Errorf("create: %w", err)
-	}
-
-	return &pb.CreateUsuarioRes{UsuarioId: usuarioID}, nil
-}
-
-func (g *GerenciaService) ReadUsuario(ctx context.Context, req *pb.ReadUsuarioReq) (*pb.ReadUsuarioRes, error) {
-
-	usuario, err := g.usuarioStore.QueryByID(ctx, req.GetUsuarioId())
-	if err != nil {
-		g.log.Errorw("query usuario", "ERROR", err)
-		return &pb.ReadUsuarioRes{}, fmt.Errorf("query: %w", err)
-	}
-
-	return &pb.ReadUsuarioRes{Usuario: usuario.ToProto()}, err
-}
-
-func (g *GerenciaService) ReadUsuarios(ctx context.Context, req *pb.ReadUsuariosReq) (*pb.ReadUsuariosRes, error) {
-
-	query := req.GetQuery()
-	pageNumber := int(req.GetPageNumber())
-	rowsPerPage := int(req.GetRowsPerPage())
-
-	usuarios, err := g.usuarioStore.Query(ctx, query, pageNumber, rowsPerPage)
-	if err != nil {
-		g.log.Errorw("query usuarios", "ERROR", err)
-		return &pb.ReadUsuariosRes{}, fmt.Errorf("query: %w", err)
-	}
-
-	return &pb.ReadUsuariosRes{Usuarios: usuarios.ToProto()}, nil
-}
-
-func (g *GerenciaService) UpdateUsuario(ctx context.Context, req *pb.UpdateUsuarioReq) (*pb.UpdateUsuarioRes, error) {
-
-	usuario := usuario.FromProto(req.Usuario)
-
-	if err := g.usuarioStore.Update(ctx, usuario); err != nil {
-		g.log.Errorw("update usuario", "ERROR", err)
-		return &pb.UpdateUsuarioRes{}, fmt.Errorf("update: %w", err)
-	}
-
-	return &pb.UpdateUsuarioRes{}, nil
-}
-
-func (g *GerenciaService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuarioReq) (*pb.DeleteUsuarioRes, error) {
-
-	for _, u := range req.GetUsuarioId() {
-		if err := g.usuarioStore.Delete(ctx, u); err != nil {
-			g.log.Errorw("delete usuario", "ERROR", err)
-			return &pb.DeleteUsuarioRes{}, fmt.Errorf("delete: %w", err)
-		}
-	}
-
-	return &pb.DeleteUsuarioRes{}, nil
-}
-
-func (g *GerenciaService) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginRes, error) {
-
-	fmt.Println("chegou aqui")
-
-	claims, err := g.usuarioStore.Authenticate(ctx, req.GetEmail(), req.GetSenha())
-	if err != nil {
-		if errors.As(err, &database.ErrNotFound) {
-			g.log.Errorw("usuario not found", "ERROR", err)
-			return &pb.LoginRes{}, err
-		} else if errors.As(err, &database.ErrAuthenticationFailure) {
-			g.log.Errorw("authenticate usuario", "ERROR", err)
-			return &pb.LoginRes{}, err
-		}
-		g.log.Errorw("authenticating", "ERROR", err)
-		return &pb.LoginRes{}, err
-	}
-
-	var tkn struct {
-		Token string `json:"token"`
-	}
-	tkn.Token, err = g.auth.GenerateToken(claims)
-	if err != nil {
-		return &pb.LoginRes{}, fmt.Errorf("generating token: %w", err)
-	}
-
-	return &pb.LoginRes{AccessToken: tkn.Token}, nil // TODO devolver o Token em contexto eu acho - no header
 }

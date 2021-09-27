@@ -27,7 +27,11 @@ func NewStore(log *zap.SugaredLogger, db *sqlx.DB) Store {
 	}
 }
 
-func (s Store) Create(ctx context.Context, usuario Usuario) (string, error) {
+func (s Store) Create(ctx context.Context, claims auth.Claims, usuario Usuario) (string, error) {
+	if !claims.Authorized(auth.RoleAdmin) {
+		return "", database.ErrForbidden
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(usuario.Senha), bcrypt.DefaultCost)
 	if err != nil {
 		return "", fmt.Errorf("generating password hash: %w", err)
@@ -49,7 +53,11 @@ func (s Store) Create(ctx context.Context, usuario Usuario) (string, error) {
 	return usuario.UsuarioID, nil
 }
 
-func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerPage int) (Usuarios, error) {
+func (s Store) Query(ctx context.Context, claims auth.Claims, query string, pageNumber int, rowsPerPage int) (Usuarios, error) {
+	if !claims.Authorized(auth.RoleAdmin) {
+		return Usuarios{}, database.ErrForbidden
+	}
+
 	data := struct {
 		Query       string `db:"query"`
 		Offset      int    `db:"offset"`
@@ -85,9 +93,13 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 	return usuarios, nil
 }
 
-func (s Store) QueryByID(ctx context.Context, usuarioID string) (Usuario, error) {
+func (s Store) QueryByID(ctx context.Context, claims auth.Claims, usuarioID string) (Usuario, error) {
 	if err := validate.CheckID(usuarioID); err != nil {
 		return Usuario{}, database.ErrInvalidID
+	}
+
+	if !claims.Authorized(auth.RoleAdmin) {
+		return Usuario{}, database.ErrForbidden
 	}
 
 	data := struct {
@@ -115,20 +127,14 @@ func (s Store) QueryByID(ctx context.Context, usuarioID string) (Usuario, error)
 	return usuario, nil
 }
 
-func (s Store) Update(ctx context.Context, usuario Usuario) error {
+func (s Store) Update(ctx context.Context, claims auth.Claims, usuario Usuario) error {
 	if err := validate.CheckID(usuario.UsuarioID); err != nil {
 		return database.ErrInvalidID
 	}
 
-	// TODO implementar validate.Check
-	// if err := validate.Check(camera); err != nil {
-	// 	return fmt.Errorf("validating data: %w", err)
-	// }
-
-	// c, err := s.QueryByID(ctx, cam.CameraID)
-	// if err != nil {
-	// 	return fmt.Errorf("updating cameraID[%s]: %w", cam.CameraID, err)
-	// }
+	if !claims.Authorized(auth.RoleAdmin) {
+		return database.ErrForbidden
+	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(usuario.Senha), bcrypt.DefaultCost)
 	if err != nil {
@@ -155,9 +161,13 @@ func (s Store) Update(ctx context.Context, usuario Usuario) error {
 	return nil
 }
 
-func (s Store) Delete(ctx context.Context, usuarioID string) error {
+func (s Store) Delete(ctx context.Context, claims auth.Claims, usuarioID string) error {
 	if err := validate.CheckID(usuarioID); err != nil {
 		return database.ErrInvalidID
+	}
+
+	if !claims.Authorized(auth.RoleAdmin) && claims.Subject != usuarioID {
+		return database.ErrForbidden
 	}
 
 	data := struct {
@@ -210,7 +220,7 @@ func (s Store) Authenticate(ctx context.Context, email, senha string) (auth.Clai
 
 	claims := auth.Claims{
 		StandardClaims: jwt.StandardClaims{
-			Issuer:    "service project", // TODO alterar?
+			Issuer:    "service project",
 			Subject:   usuario.UsuarioID,
 			ExpiresAt: time.Now().Add(time.Hour).Unix(),
 			IssuedAt:  time.Now().UTC().Unix(),

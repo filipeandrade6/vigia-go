@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"syscall"
 
+	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/usuario"
@@ -92,7 +93,23 @@ func Run(log *zap.SugaredLogger) error {
 	// TODO Start Tracing Support
 
 	// =========================================================================
-	// TODO Start Debug Service
+	// Start Debug Service
+
+	// log.Infow("startup", "status", "debug router started", "host", viper.GetString("VIGIA_GER_DEBUGHOST"))
+
+	// The Debug function returns a mux to listen and serve on for all the debug
+	// related endpoints. This include the standart library endpoints.
+
+	// Construct the mux for the debug calls.
+	// debugMux := handlers.DebugMux(build, log, db)
+
+	// Start the service listening for debug requests.
+	// Not concerned with shutting this down with load shedding.
+	// go func() {
+	// 	if err := http.ListenAndServe(viper.GetString("VIGIA_GER_DEBUGHOST"), debugMux); err != nil {
+	// 		log.Errorw("shutdown", "status", "debug router closed", "host", viper.GetString("VIGIA_GER_DEBUGHOST"), "ERROR", err)
+	// 	}
+	// }()
 
 	// =========================================================================
 	// Start Service
@@ -110,7 +127,7 @@ func Run(log *zap.SugaredLogger) error {
 	svc := service.NewGerenciaService(log, auth, cameraStore, usuarioStore)
 
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(auth.AuthFunc)),
+		grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(nil)),
 	)
 
 	pb.RegisterGerenciaServer(grpcServer, svc)

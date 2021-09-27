@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 	"github.com/jmoiron/sqlx"
@@ -23,11 +24,10 @@ func NewStore(log *zap.SugaredLogger, db *sqlx.DB) Store {
 	}
 }
 
-func (s Store) Create(ctx context.Context, cam Camera) (string, error) {
-
-	// if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
-	// 	return "", database.ErrForbidden
-	// }
+func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera) (string, error) {
+	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
+		return "", database.ErrForbidden
+	}
 
 	c := Camera{
 		CameraID:       validate.GenerateID(),
@@ -64,7 +64,6 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 		RowsPerPage: rowsPerPage,
 	}
 
-	// TODO verificar sqlinjection
 	const q = `
 	SELECT
 		*
@@ -119,20 +118,14 @@ func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
 	return cam, nil
 }
 
-func (s Store) Update(ctx context.Context, cam Camera) error {
+func (s Store) Update(ctx context.Context, claims auth.Claims, cam Camera) error {
+	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
+		return database.ErrForbidden
+	}
+
 	if err := validate.CheckID(cam.CameraID); err != nil {
 		return database.ErrInvalidID
 	}
-
-	// TODO implementar validate.Check
-	// if err := validate.Check(camera); err != nil {
-	// 	return fmt.Errorf("validating data: %w", err)
-	// }
-
-	// c, err := s.QueryByID(ctx, cam.CameraID)
-	// if err != nil {
-	// 	return fmt.Errorf("updating cameraID[%s]: %w", cam.CameraID, err)
-	// }
 
 	const q = `
 	UPDATE
@@ -155,7 +148,14 @@ func (s Store) Update(ctx context.Context, cam Camera) error {
 	return nil
 }
 
-func (s Store) Delete(ctx context.Context, cameraID string) error {
+func (s Store) Delete(ctx context.Context, claims auth.Claims, cameraID string) error {
+
+	// TODO verificar se a camera nao esta em execucao em algum servidor de gravacao...
+
+	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
+		return database.ErrForbidden
+	}
+
 	if err := validate.CheckID(cameraID); err != nil {
 		return database.ErrInvalidID
 	}
