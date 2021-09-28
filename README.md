@@ -2,15 +2,13 @@
 
 #### ONDE PAREI
 
-TEM QUE IGNORAR O SERVIÇO LOGIN - A AUTHENTICATION
-VER INFO.FULLMETHOD - CRIAR AUTHFUNC ESPECIAL QUE ATENDA A INTERFACE ETC
-
-
 Add https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-tutorial.md ?
 
 EU POSSO REGISTRAR OUTROS SERVICOS NO GRPCSERVER - isso permite separar os servicos em arquivos
 
 VER O EVANS no TECH SCHOOL PARA CLIENT DE GRPC - acho que usa o grpc reflect...
+
+CRIAR OS TESTE E FAZER TDD
 
 #### TODO
 
