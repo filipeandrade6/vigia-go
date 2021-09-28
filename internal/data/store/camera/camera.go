@@ -54,6 +54,8 @@ func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera) (stri
 }
 
 func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerPage int) (Cameras, error) {
+	// TODO limitar a quantidade de informação a ser exibida para USUARIO
+
 	data := struct {
 		Query       string `db:"query"`
 		Offset      int    `db:"offset"`

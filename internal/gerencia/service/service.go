@@ -274,9 +274,15 @@ func (g *GerenciaService) Login(ctx context.Context, req *pb.LoginReq) (*pb.Logi
 // Camera
 
 func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("create camera", "ERROR", err)
+		}
+	}()
+
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
-		g.log.Errorw("", "ERROR", err)
 		return &pb.CreateCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
 	}
 
@@ -284,64 +290,112 @@ func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCamera
 
 	camID, err := g.cameraStore.Create(ctx, claims, cam)
 	if err != nil {
-		g.log.Errorw("create camera", "ERROR", err)
-		return &pb.CreateCameraRes{}, fmt.Errorf("create: %w", err)
+		if validate.Cause(err) == database.ErrForbidden {
+			return &pb.CreateCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
+		}
+		return &pb.CreateCameraRes{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &pb.CreateCameraRes{CameraId: camID}, nil
 }
 
 func (g *GerenciaService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq) (*pb.ReadCameraRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("read camera", "ERROR", err)
+		}
+	}()
+
 	cam, err := g.cameraStore.QueryByID(ctx, req.GetCameraId())
 	if err != nil {
-		g.log.Errorw("query camera", "ERROR", err)
-		return &pb.ReadCameraRes{}, fmt.Errorf("query: %w", err)
+		switch validate.Cause(err) {
+		case database.ErrInvalidID:
+			return &pb.ReadCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
+		case database.ErrNotFound:
+			return &pb.ReadCameraRes{}, status.Error(codes.NotFound, err.Error())
+		default:
+			return &pb.ReadCameraRes{}, status.Error(codes.Internal, err.Error())
+		}
 	}
 
-	return &pb.ReadCameraRes{Camera: cam.ToProto()}, err
+	return &pb.ReadCameraRes{Camera: cam.ToProto()}, nil
 }
 
 func (g *GerenciaService) ReadCameras(ctx context.Context, req *pb.ReadCamerasReq) (*pb.ReadCamerasRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("read cameras", "ERROR", err)
+		}
+	}()
+
 	query := req.GetQuery()
 	pageNumber := int(req.GetPageNumber())
 	rowsPerPage := int(req.GetRowsPerPage())
 
 	cameras, err := g.cameraStore.Query(ctx, query, pageNumber, rowsPerPage)
 	if err != nil {
-		g.log.Errorw("query cameras", "ERROR", err)
-		return &pb.ReadCamerasRes{}, fmt.Errorf("query: %w", err)
+		if validate.Cause(err) == database.ErrNotFound {
+			return &pb.ReadCamerasRes{}, status.Error(codes.NotFound, err.Error())
+		}
+		return &pb.ReadCamerasRes{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &pb.ReadCamerasRes{Cameras: cameras.ToProto()}, nil
 }
 
 func (g *GerenciaService) UpdateCamera(ctx context.Context, req *pb.UpdateCameraReq) (*pb.UpdateCameraRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("update camera", "ERROR", err)
+		}
+	}()
+
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
-		g.log.Errorw("", "ERROR", err)
 		return &pb.UpdateCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
 	}
 
 	cam := camera.FromProto(req.Camera)
 
 	if err := g.cameraStore.Update(ctx, claims, cam); err != nil {
-		g.log.Errorw("update camera", "ERROR", err)
-		return &pb.UpdateCameraRes{}, fmt.Errorf("update: %w", err)
+		switch validate.Cause(err) {
+		case database.ErrForbidden:
+			return &pb.UpdateCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
+		case database.ErrInvalidID:
+			return &pb.UpdateCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
+		default:
+			return &pb.UpdateCameraRes{}, status.Error(codes.Internal, err.Error())
+		}
 	}
 	return &pb.UpdateCameraRes{}, nil
 }
 
 func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCameraReq) (*pb.DeleteCameraRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("delete camera", "ERROR", err)
+		}
+	}()
+
 	claims, err := auth.GetClaims(ctx)
 	if err != nil {
-		g.log.Errorw("", "ERROR", err)
 		return &pb.DeleteCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
 	}
 
 	for _, c := range req.GetCameraId() {
 		if err := g.cameraStore.Delete(ctx, claims, c); err != nil {
-			g.log.Errorw("delete camera", "ERROR", err)
-			return &pb.DeleteCameraRes{}, fmt.Errorf("delete: %w", err)
+			switch validate.Cause(err) {
+			case database.ErrForbidden:
+				return &pb.DeleteCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
+			case database.ErrInvalidID:
+				return &pb.DeleteCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
+			default:
+				return &pb.DeleteCameraRes{}, status.Error(codes.Internal, err.Error())
+			}
 		}
 	}
 
