@@ -26,3 +26,7 @@ postgres:
 .PHONY: pgadmin
 pgadmin:
 	docker restart dev-pgadmin
+
+.PHONY: docker-clean-volume
+docker-clean-volume:
+	docker volume ls -qf dangling=true | xargs -r docker volume rm

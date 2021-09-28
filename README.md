@@ -10,6 +10,8 @@ VER O EVANS no TECH SCHOOL PARA CLIENT DE GRPC - acho que usa o grpc reflect...
 
 CRIAR OS TESTE E FAZER TDD
 
+SEPARAR OS SERVIÇOS GRPC EM TIPO - CLIENT FRONT-END / GERENCIA INTER / GRAVACAO
+
 #### TODO
 
 - [ ] Colocar interface no querier
@@ -26,12 +28,17 @@ CRIAR OS TESTE E FAZER TDD
 - `make postgrse` reinicia o container Postgres
 - `make pgadmin` reinicia o container pgAdmin
 
-### boot
-
-- docker-compose up informando qual o tipo de ambiente (dev, test, staging, prod)
-- no docker-compose tem variaveis de ambiente que sobrescrevem o arquivo de configuracao
-- carrega o arquivo de configuracao
-
 ### FEDORA
 
 - Na instalação do protobuf - não instale com dnf install protoc - siga a respota... https://stackoverflow.com/questions/40025602/how-to-use-predifined-protobuf-type-i-e-google-protobuf-timestamp-proto-wit
+
+
+NewUnit - cria um banco de dados de teste
+
+NewIntegration - cria um db, alimenta ele  e constroi um autenticador (cria chave, cria um autenticador com essa chave)
+Retorna um test { DB, LOG, AUTH, testing.T e função de teardown}
+
+Token - gera um token autenticado para o usuario
+store - usuarioStore, claims e token utilizando o test acima
+
+como a verificação de auth fica na requisição da Store - não vou precisar testar o Authentication

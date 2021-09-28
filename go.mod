@@ -12,6 +12,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.2
+	github.com/ory/dockertest/v3 v3.8.0
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
 	go.uber.org/automaxprocs v1.4.0
