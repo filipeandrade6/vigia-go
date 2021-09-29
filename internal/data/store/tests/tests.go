@@ -59,7 +59,7 @@ func New(t *testing.T) (*zap.SugaredLogger, *sqlx.DB, func()) {
 	pgURL.Host = resource.Container.NetworkSettings.IPAddress
 
 	resource.Expire(60)
-	pool.MaxWait = 10 * time.Second
+	pool.MaxWait = 15 * time.Second
 	var db *sqlx.DB
 	err = pool.Retry(func() error {
 		db, err = sqlx.Open("postgres", pgURL.String())

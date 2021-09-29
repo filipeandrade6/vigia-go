@@ -81,7 +81,7 @@ func TestCamera(t *testing.T) {
 
 		// ---
 
-		cams, err := cameraStore.Query(ctx, claimsAdmin, "query aleatoria", 1, 1)
+		cams, err := cameraStore.Query(ctx, claimsAdmin, "random query", 1, 1)
 		if len(cams) != 0 {
 			t.Fatalf("\t%s\tShould NOT return any camera: %s.", tests.Failed, err)
 		}
@@ -169,8 +169,8 @@ func TestCamera(t *testing.T) {
 		t.Logf("\t%s\tShould have a single camera.", tests.Success)
 
 		if camera1[0].CameraID == camera2[0].CameraID {
-			t.Logf("\t\tUser1: %v", camera1[0].CameraID)
-			t.Logf("\t\tUser2: %v", camera2[0].CameraID)
+			t.Logf("\t\tCamera1: %v", camera1[0].CameraID)
+			t.Logf("\t\tCamera2: %v", camera2[0].CameraID)
 			t.Fatalf("\t%s\tShould have different cameras: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould have different cameras.", tests.Success)

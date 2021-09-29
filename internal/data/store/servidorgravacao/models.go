@@ -28,3 +28,25 @@ func FromProto(s *pb.ServidorGravacao) ServidorGravacao {
 		Host:               s.GetHost(),
 	}
 }
+
+type ServidoresGravacao []ServidorGravacao
+
+func (s ServidoresGravacao) ToProto() []*pb.ServidorGravacao {
+	var svs []*pb.ServidorGravacao
+
+	for _, sv := range s {
+		svs = append(svs, sv.ToProto())
+	}
+
+	return svs
+}
+
+func ServidoresGravacaoFromProto(s []*pb.ServidorGravacao) ServidoresGravacao {
+	var svs ServidoresGravacao
+
+	for _, sv := range s {
+		svs = append(svs, FromProto(sv))
+	}
+
+	return svs
+}
