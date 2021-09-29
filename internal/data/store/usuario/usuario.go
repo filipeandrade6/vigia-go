@@ -84,7 +84,7 @@ func (s Store) Query(ctx context.Context, claims auth.Claims, query string, page
 
 	var usuarios Usuarios
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &usuarios); err != nil {
-		if errors.As(err, database.ErrNotFound) {
+		if errors.As(err, &database.ErrNotFound) { // TODO verificar se esse database.ErrNotFound funciona com ponteiro...
 			return Usuarios{}, database.ErrNotFound
 		}
 		return Usuarios{}, fmt.Errorf("selecting usuarios: %w", err)
@@ -149,8 +149,7 @@ func (s Store) Update(ctx context.Context, claims auth.Claims, usuario Usuario) 
 	SET
 		"email" = :email,
 		"senha_hash" = :senha_hash,
-		"funcao" = :funcao,
-		"canal" = :canal,
+		"funcao" = :funcao
 	WHERE
 		usuario_id = :usuario_id`
 
@@ -178,7 +177,7 @@ func (s Store) Delete(ctx context.Context, claims auth.Claims, usuarioID string)
 
 	const q = `
 	DELETE FROM
-		usuario
+		usuarios
 	WHERE
 		usuario_id = :usuario_id`
 

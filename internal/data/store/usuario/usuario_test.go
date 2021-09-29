@@ -43,9 +43,9 @@ func TestUsuario(t *testing.T) {
 				Roles: []string{auth.RoleAdmin},
 			}
 
-			usr, err := usuarioStore.Create(ctx, claims, u)
+			usr, err := usuarioStore.Create(ctx, claims, u) // TODO renomear usr para userId e as outras váriaveis tbm
 			if err != nil {
-				t.Fatalf("\t%s\tTest %d:\tShould be able to create user : %s.", tests.Failed, testID, err)
+				t.Fatalf("\t%s\tTest %d:\tShould be able to create user: %s.", tests.Failed, testID, err)
 			}
 			t.Logf("\t%s\tTest %d:\tShould be able to create user.", tests.Success, testID)
 
@@ -55,11 +55,12 @@ func TestUsuario(t *testing.T) {
 			}
 			t.Logf("\t%s\tTest %d:\tShould be able to retrieve user by ID.", tests.Success, testID)
 
-			if diff := cmp.Diff(usr, saved); diff != "" {
+			if diff := cmp.Diff(usr, saved.UsuarioID); diff != "" {
 				t.Fatalf("\t%s\tTest %d:\tShould get back the same user. Diff:\n%s", tests.Failed, testID, diff)
 			}
 			t.Logf("\t%s\tTest %d:\tShould get back the same user.", tests.Success, testID)
 
+			u.UsuarioID = usr
 			u.Email = "filipe@teste2.com"
 			u.Senha = "secret2"
 
