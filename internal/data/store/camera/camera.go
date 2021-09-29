@@ -29,16 +29,7 @@ func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera) (stri
 		return "", database.ErrForbidden
 	}
 
-	c := Camera{
-		CameraID:       validate.GenerateID(),
-		Descricao:      cam.Descricao,
-		EnderecoIP:     cam.EnderecoIP,
-		Porta:          cam.Porta,
-		Canal:          cam.Canal,
-		Usuario:        cam.Usuario,
-		Senha:          cam.Senha,
-		Geolocalizacao: cam.Geolocalizacao,
-	}
+	cam.CameraID = validate.GenerateID()
 
 	const q = `
 	INSERT INTO cameras
@@ -46,16 +37,14 @@ func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera) (stri
 	VALUES
 		(:camera_id, :descricao, :endereco_ip, :porta, :canal, :usuario, :senha, :geolocalizacao)`
 
-	if err := database.NamedExecContext(ctx, s.log, s.db, q, c); err != nil {
+	if err := database.NamedExecContext(ctx, s.log, s.db, q, cam); err != nil {
 		return "", fmt.Errorf("inserting camera: %w", err)
 	}
 
-	return c.CameraID, nil
+	return cam.CameraID, nil
 }
 
-func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerPage int) (Cameras, error) {
-	// TODO limitar a quantidade de informação a ser exibida para USUARIO
-
+func (s Store) Query(ctx context.Context, claims auth.Claims, query string, pageNumber int, rowsPerPage int) (Cameras, error) {
 	data := struct {
 		Query       string `db:"query"`
 		Offset      int    `db:"offset"`
@@ -87,10 +76,20 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 		return Cameras{}, fmt.Errorf("selecting cameras: %w", err)
 	}
 
+	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
+		for _, cam := range cams {
+			cam.EnderecoIP = ""
+			cam.Porta = 0
+			cam.Canal = 0
+			cam.Usuario = ""
+			cam.Senha = ""
+		}
+	}
+
 	return cams, nil
 }
 
-func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
+func (s Store) QueryByID(ctx context.Context, claims auth.Claims, cameraID string) (Camera, error) {
 	if err := validate.CheckID(cameraID); err != nil {
 		return Camera{}, database.ErrInvalidID
 	}
@@ -115,6 +114,14 @@ func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
 			return Camera{}, database.ErrNotFound
 		}
 		return Camera{}, fmt.Errorf("selecting cameraID[%q]: %w", cameraID, err)
+	}
+
+	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
+		cam.EnderecoIP = ""
+		cam.Porta = 0
+		cam.Canal = 0
+		cam.Usuario = ""
+		cam.Senha = ""
 	}
 
 	return cam, nil

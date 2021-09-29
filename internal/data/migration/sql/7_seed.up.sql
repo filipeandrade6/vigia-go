@@ -1,5 +1,6 @@
 INSERT INTO usuarios (usuario_id, email, funcao, senha_hash) VALUES
-    ('d03307d4-2b28-4c23-a004-3da25e5b8ce2', 'filipe.andrade@ssp.df.gov.br', '{ADMIN, MANAGER, USER}', '$2a$10$n531epIH68yygcV6sNNqluZtyPc3smWxbw1WoWDDhOIqUP1Py/GTq')
+    ('d03307d4-2b28-4c23-a004-3da25e5b8ce2', 'filipe@andrade.com.br', '{ADMIN, MANAGER, USER}', '$2a$10$n531epIH68yygcV6sNNqluZtyPc3smWxbw1WoWDDhOIqUP1Py/GTq'),
+    ('d03307d4-2b28-4c23-a004-3da25e5b8cf3', 'filipe@andrade2.com.br', '{ADMIN, MANAGER, USER}', '$2a$10$n531epIH68yygcV6sNNqluZtyPc3smWxbw1WoWDDhOIqUP1Py/GTq')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO cameras (camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao) VALUES

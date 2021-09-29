@@ -12,6 +12,11 @@ CRIAR OS TESTE E FAZER TDD
 
 SEPARAR OS SERVIÇOS GRPC EM TIPO - CLIENT FRONT-END / GERENCIA INTER / GRAVACAO
 
+ELE SEPAROU
+ - ERROS NO DB DE database.ErrDBNotFound
+ - ERROS de aplicação validate.ErrNotFound
+ - ERROS viraram erro de validate - fora do doman de db
+
 #### TODO
 
 - [ ] Colocar interface no querier

@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ardanlabs/service/foundation/web"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Calls init function.
 	"go.uber.org/zap"
@@ -138,8 +137,8 @@ func NamedQuerySlice(ctx context.Context, log *zap.SugaredLogger, db *sqlx.DB, q
 // NamedQueryStruct is a helper function for executing queries that return a
 // single value to be unmarshalled into a struct type.
 func NamedQueryStruct(ctx context.Context, log *zap.SugaredLogger, db *sqlx.DB, query string, data interface{}, dest interface{}) error {
-	q := queryString(query, data)
-	log.Infow("database.NamedQueryStruct", "traceid", web.GetTraceID(ctx), "query", q)
+	// q := queryString(query, data)
+	// log.Infow("database.NamedQueryStruct", "traceid", web.GetTraceID(ctx), "query", q)
 
 	rows, err := db.NamedQueryContext(ctx, query, data)
 	if err != nil {

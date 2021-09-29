@@ -32,8 +32,6 @@ func (s Store) Create(ctx context.Context, claims auth.Claims, usuario Usuario) 
 		return "", database.ErrForbidden
 	}
 
-	// TODO quando criar verificar o nível e adicionar os outros e.g. RoleAdmin deve ter RoleManager e RoleUSer
-
 	hash, err := bcrypt.GenerateFromPassword([]byte(usuario.Senha), bcrypt.DefaultCost)
 	if err != nil {
 		return "", fmt.Errorf("generating password hash: %w", err)
@@ -70,7 +68,6 @@ func (s Store) Query(ctx context.Context, claims auth.Claims, query string, page
 		RowsPerPage: rowsPerPage,
 	}
 
-	// TODO verificar sqlinjection
 	const q = `
 	SELECT
 		*
