@@ -32,6 +32,8 @@ func (s Store) Create(ctx context.Context, claims auth.Claims, usuario Usuario) 
 		return "", database.ErrForbidden
 	}
 
+	// TODO quando criar verificar o nível e adicionar os outros e.g. RoleAdmin deve ter RoleManager e RoleUSer
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(usuario.Senha), bcrypt.DefaultCost)
 	if err != nil {
 		return "", fmt.Errorf("generating password hash: %w", err)
@@ -84,9 +86,6 @@ func (s Store) Query(ctx context.Context, claims auth.Claims, query string, page
 
 	var usuarios Usuarios
 	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &usuarios); err != nil {
-		if errors.As(err, &database.ErrNotFound) { // TODO verificar se esse database.ErrNotFound funciona com ponteiro...
-			return Usuarios{}, database.ErrNotFound
-		}
 		return Usuarios{}, fmt.Errorf("selecting usuarios: %w", err)
 	}
 
@@ -95,7 +94,7 @@ func (s Store) Query(ctx context.Context, claims auth.Claims, query string, page
 
 func (s Store) QueryByID(ctx context.Context, claims auth.Claims, usuarioID string) (Usuario, error) {
 	if err := validate.CheckID(usuarioID); err != nil {
-		return Usuario{}, database.ErrInvalidID
+		return Usuario{}, database.ErrInvalidID // TODO adicionar nos testes
 	}
 
 	if !claims.Authorized(auth.RoleAdmin) {
@@ -165,7 +164,7 @@ func (s Store) Delete(ctx context.Context, claims auth.Claims, usuarioID string)
 		return database.ErrInvalidID
 	}
 
-	if !claims.Authorized(auth.RoleAdmin) && claims.Subject != usuarioID {
+	if !claims.Authorized(auth.RoleAdmin) || claims.Subject == usuarioID {
 		return database.ErrForbidden
 	}
 
