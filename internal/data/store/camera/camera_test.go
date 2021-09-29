@@ -56,6 +56,7 @@ func TestCamera(t *testing.T) {
 		t.Logf("\t%s\tUser should NOT beable to create camera.", tests.Success)
 
 		// ---
+
 		cam, err := cameraStore.QueryByID(ctx, claimsAdmin, cameraID)
 		if err != nil {
 			t.Fatalf("\t%s\tAdmin should be able to retrieve camera by ID: %s.", tests.Failed, err)

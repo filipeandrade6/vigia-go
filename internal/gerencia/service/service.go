@@ -8,6 +8,7 @@ import (
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/data/migration"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
+	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/usuario"
 	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
@@ -26,18 +27,26 @@ import (
 
 type GerenciaService struct {
 	pb.UnimplementedGerenciaServer
-	log          *zap.SugaredLogger
-	auth         *auth.Auth
-	cameraStore  camera.Store
-	usuarioStore usuario.Store
+	log                   *zap.SugaredLogger
+	auth                  *auth.Auth
+	cameraStore           camera.Store
+	usuarioStore          usuario.Store
+	servidorGravacaoStore servidorgravacao.Store
 }
 
-func NewGerenciaService(log *zap.SugaredLogger, auth *auth.Auth, cameraStore camera.Store, usuarioStore usuario.Store) *GerenciaService {
+func NewGerenciaService(
+	log *zap.SugaredLogger,
+	auth *auth.Auth,
+	cameraStore camera.Store,
+	usuarioStore usuario.Store,
+	servidorGravacaoStore servidorgravacao.Store,
+) *GerenciaService {
 	return &GerenciaService{
-		log:          log,
-		auth:         auth,
-		cameraStore:  cameraStore,
-		usuarioStore: usuarioStore,
+		log:                   log,
+		auth:                  auth,
+		cameraStore:           cameraStore,
+		usuarioStore:          usuarioStore,
+		servidorGravacaoStore: servidorGravacaoStore,
 	}
 }
 
@@ -75,7 +84,9 @@ func (g *GerenciaService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.
 	// TODO add claims/auth
 	version := req.GetVersao()
 
-	if err := migration.Migrate(ctx, version); err != nil {
+	dbURL := "" // TODO arrumar
+
+	if err := migration.Migrate(ctx, version, dbURL); err != nil {
 		if errors.As(err, &migrate.ErrNoChange) {
 			g.log.Infow("service", "migration", "no change in migration")
 		} else {
@@ -307,7 +318,12 @@ func (g *GerenciaService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq)
 		}
 	}()
 
-	cam, err := g.cameraStore.QueryByID(ctx, req.GetCameraId())
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return &pb.ReadCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
+
+	cam, err := g.cameraStore.QueryByID(ctx, claims, req.GetCameraId())
 	if err != nil {
 		switch validate.Cause(err) {
 		case database.ErrInvalidID:
@@ -330,11 +346,16 @@ func (g *GerenciaService) ReadCameras(ctx context.Context, req *pb.ReadCamerasRe
 		}
 	}()
 
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return &pb.ReadCamerasRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
+
 	query := req.GetQuery()
 	pageNumber := int(req.GetPageNumber())
 	rowsPerPage := int(req.GetRowsPerPage())
 
-	cameras, err := g.cameraStore.Query(ctx, query, pageNumber, rowsPerPage)
+	cameras, err := g.cameraStore.Query(ctx, claims, query, pageNumber, rowsPerPage)
 	if err != nil {
 		if validate.Cause(err) == database.ErrNotFound {
 			return &pb.ReadCamerasRes{}, status.Error(codes.NotFound, err.Error())
@@ -400,4 +421,33 @@ func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCamera
 	}
 
 	return &pb.DeleteCameraRes{}, nil
+}
+
+// =========================================================================
+// Servidores Gravacao
+
+func (g *GerenciaService) CreateServidorGravacao(ctx context.Context, req *pb.CreateServidorGravacaoReq) (*pb.CreateServidorGravacaoRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("create camera", "ERROR", err)
+		}
+	}()
+
+	claims, err := auth.GetClaims(ctx)
+	if err != nil {
+		return &pb.CreateServidorGravacaoRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
+	}
+
+	sv := servidorgravacao.FromProto(req.ServidorGravacao)
+
+	svID, err := g.servidorGravacaoStore.Create(ctx, claims, sv)
+	if err != nil {
+		if validate.Cause(err) == database.ErrForbidden {
+			return &pb.CreateServidorGravacaoRes{}, status.Error(codes.PermissionDenied, err.Error())
+		}
+		return &pb.CreateServidorGravacaoRes{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &pb.CreateServidorGravacaoRes{ServidorGravacaoId: svID}, nil
 }

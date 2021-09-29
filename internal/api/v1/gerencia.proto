@@ -4,12 +4,11 @@ option go_package = "./internal/api/v1";
 
 package gerencia;
 
-import "google/protobuf/timestamp.proto";
-
 service Gerencia {
     rpc Match (MatchReq) returns (MatchRes) {} // TODO streaming de informação de placa e o gerencia processa tudo?
 
     rpc Migrate (MigrateReq) returns (MigrateRes) {}
+    // TODO da pra consultar a versão na tabela schema_migrations coluna version e dirty
 
     rpc CreateUsuario (CreateUsuarioReq) returns (CreateUsuarioRes) {}
     rpc ReadUsuario (ReadUsuarioReq) returns (ReadUsuarioRes) {}
@@ -112,31 +111,45 @@ message ServidorGravacao {
     string endereco_ip = 2;
     int32 porta = 3;
     string host = 4;
-    google.protobuf.Timestamp criado_em = 5;
-    google.protobuf.Timestamp editado_em = 6;
 }
 
-message CreateServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
+message CreateServidorGravacaoReq {
+    ServidorGravacao servidor_gravacao = 1;
+}
 
-message CreateServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
+message CreateServidorGravacaoRes {
+    string servidor_gravacao_id = 1;
+}
 
-message ReadServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
+message ReadServidorGravacaoReq {
+    string servidor_gravacao_id = 1;
+}
 
-message ReadServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
+message ReadServidorGravacaoRes {
+    ServidorGravacao servidor_gravacao = 1;
+}
 
-message ReadServidoresGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
+message ReadServidoresGravacaoReq {
+    string query = 1;
+    int32 page_number = 2;
+    int32 rows_per_page = 3;
+}
 
-message ReadServidoresGravacaoRes {ServidorGravacao service_gravacao = 1;}
+message ReadServidoresGravacaoRes {
+    repeated ServidorGravacao service_gravacao = 1;
+}
 
-message UpdateServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
+message UpdateServidorGravacaoReq {
+    ServidorGravacao servidor_gravacao = 1;
+}
 
-message UpdateServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
+message UpdateServidorGravacaoRes {}
 
-message DeleteServidorGravacaoReq {ServidorGravacao servidor_gravacao = 1;}
+message DeleteServidorGravacaoReq {
+    repeated string servidor_gravacao_id = 1;
+}
 
-message DeleteServidorGravacaoRes {ServidorGravacao servidor_gravacao = 1;}
-
-
+message DeleteServidorGravacaoRes {}
 
 message Camera {
     string camera_id = 1;
