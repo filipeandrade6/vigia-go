@@ -24,9 +24,9 @@ func NewStore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Store {
 func (s Store) Create(ctx context.Context, cam Camera) error {
 	const q = `
 	INSERT INTO cameras
-		(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao)
+		(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, latitude, longitude)
 	VALUES
-		(:camera_id, :descricao, :endereco_ip, :porta, :canal, :usuario, :senha, :geolocalizacao)`
+		(:camera_id, :descricao, :endereco_ip, :porta, :canal, :usuario, :senha, :latitude, :longitude)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.sqlxDB, q, cam); err != nil {
 		return fmt.Errorf("inserting camera: %w", err)
@@ -46,7 +46,8 @@ func (s Store) Update(ctx context.Context, cam Camera) error {
 		"canal" = :canal,
 		"usuario" = :usuario,
 		"senha" = :senha,
-		"geolocalizacao" = :geolocalizacao
+		"latitude" = :latitude,
+		"longitude" = :longitude
 	WHERE
 		camera_id = :camera_id`
 
@@ -94,7 +95,7 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 	FROM
 		cameras
 	WHERE
-		CONCAT(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, geolocalizacao)
+		CONCAT(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, latitude, longitude)
 	ILIKE
 		:query
 	ORDER BY

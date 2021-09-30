@@ -41,7 +41,7 @@ func (s Store) Update(ctx context.Context, usuario Usuario) error {
 		usuarios
 	SET
 		"email" = :email,
-		"senha_hash" = :senha_hash,
+		"senha" = :senha,
 		"funcao" = :funcao
 	WHERE
 		usuario_id = :usuario_id`
@@ -90,7 +90,7 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 	FROM
 		usuarios
 	WHERE
-		CONCAT(usuario_id, email, senha_hash, funcao)
+		CONCAT(usuario_id, email, senha, funcao)
 	ILIKE
 		:query
 	ORDER BY
@@ -141,7 +141,7 @@ func (s Store) QueryByEmail(ctx context.Context, email string) (Usuario, error) 
 	FROM
 		usuarios
 	WHERE
-		usuario_id = :email`
+		email = :email`
 
 	var usuario Usuario
 	if err := database.NamedQueryStruct(ctx, s.log, s.sqlxDB, q, data, &usuario); err != nil {

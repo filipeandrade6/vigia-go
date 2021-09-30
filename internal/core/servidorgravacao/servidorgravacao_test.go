@@ -5,10 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/filipeandrade6/vigia-go/internal/data/store/servidorgravacao"
+	"github.com/filipeandrade6/vigia-go/internal/core/servidorgravacao"
 	"github.com/filipeandrade6/vigia-go/internal/data/store/tests"
-	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
-	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -16,123 +14,92 @@ func TestServidorGravacao(t *testing.T) {
 	log, db, teardown := tests.New(t)
 	t.Cleanup(teardown)
 
-	servidorGravacaoStore := servidorgravacao.NewStore(log, db)
+	core := servidorgravacao.NewCore(log, db)
 
 	ctx := context.Background()
 
-	claimsAdmin := auth.Claims{Roles: []string{auth.RoleAdmin}}
-	claimsManager := auth.Claims{Roles: []string{auth.RoleManager}}
-	claimsUser := auth.Claims{Roles: []string{auth.RoleUser}}
-
-	s := servidorgravacao.ServidorGravacao{
+	ns := servidorgravacao.NewServidorGravacao{
 		EnderecoIP: "10.20.30.40",
 		Porta:      5001,
-		Host:       "sv1",
 	}
 
 	t.Log("\tGiven the need to work with Servidores de Gravacao records.")
 	{
-		svID, err := servidorGravacaoStore.Create(ctx, claimsAdmin, s)
+		sv, err := core.Create(ctx, ns)
 		if err != nil {
-			t.Fatalf("\t%s\tAdmin should be able to create servidor de gravacao: %s.", tests.Failed, err)
+			t.Fatalf("\t%s\tShould be able to create servidor de gravacao: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tAdmin should be able to create servidor de gravacao.", tests.Success)
+		t.Logf("\t%s\tShould be able to create servidor de gravacao.", tests.Success)
 
-		if _, err := servidorGravacaoStore.Create(ctx, claimsAdmin, s); err == nil {
-			t.Fatalf("\t%s\tShould be able to create servidor de gravacao with existing endereco_ip:porta: %s.", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to create sservidor de gravacao with existing endereco_ip:porta.", tests.Success)
-
-		if _, err := servidorGravacaoStore.Create(ctx, claimsManager, s); !errors.As(err, &database.ErrForbidden) {
-			t.Fatalf("\t%s\tManager should NOT be able to create servidor de gravacao: %s.", tests.Failed, err)
-		}
-		t.Logf("\t%s\tManager should NOT be able to create servidor de gravacao.", tests.Success)
-
-		if _, err := servidorGravacaoStore.Create(ctx, claimsUser, s); !errors.As(err, &database.ErrForbidden) {
-			t.Fatalf("\t%s\tUser should NOT be able to create servidor de gravacao: %s.", tests.Failed, err)
-		}
-		t.Logf("\t%s\tUser should NOT be able to create servidor de gravacao.", tests.Success)
-
-		// ---
-
-		sv, err := servidorGravacaoStore.QueryByID(ctx, claimsAdmin, svID)
+		saved, err := core.QueryByID(ctx, sv.ServidorGravacaoID)
 		if err != nil {
-			t.Fatalf("\t%s\tAdmin should be able to retrieve servidor de gravacao by ID: %s.", tests.Failed, err)
+			t.Fatalf("\t%s\tShould be able to retrieve servidor de gravacao by ID: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tAdmin should be able to retrieve servidor de gravacao by ID.", tests.Success)
+		t.Logf("\t%s\tShould be able to retrieve servidor de gravacao by ID.", tests.Success)
 
-		if _, err := servidorGravacaoStore.QueryByID(ctx, claimsManager, svID); !errors.As(err, &database.ErrForbidden) {
-			t.Fatalf("\t%s\tManager should NOT be able to retrieve servidor de gravacao by ID: %s.", tests.Failed, err)
-		}
-		t.Logf("\t%s\tManager should NOT be able to retrieve servidor de gravacao by ID.", tests.Success)
-
-		if _, err := servidorGravacaoStore.QueryByID(ctx, claimsUser, svID); !errors.As(err, &database.ErrForbidden) {
-			t.Fatalf("\t%s\tUser should NOT be able to retrieve servidor de gravacao by ID: %s.", tests.Failed, err)
-		}
-		t.Logf("\t%s\tUser should NOT be able to retreive servidor de gravacao by ID.", tests.Success)
-
-		if _, err := servidorGravacaoStore.QueryByID(ctx, claimsAdmin, "bad ID"); !errors.As(err, &database.ErrInvalidID) {
-			t.Logf("\t%s\tShould NOT be able to retrieve servidor de gravacao by bad ID: %s.", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould NOT be able to retrieve retrieve servidor de gravacao by bad ID", tests.Success)
-
-		// ---
-
-		svs, err := servidorGravacaoStore.Query(ctx, claimsAdmin, "random query", 1, 1)
-		if len(svs) != 0 {
-			t.Fatalf("\t%s\tShould NOT return any servidor de gravacao: %s.", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould NOT return any servidor de gravacao.", tests.Success)
-
-		// ---
-
-		if diff := cmp.Diff(svID, sv.ServidorGravacaoID); diff != "" {
+		if diff := cmp.Diff(sv, saved); diff != "" {
 			t.Fatalf("\t%s\tShould get back the same servidor de gravacao. Diff:\n%s", tests.Failed, diff)
 		}
 		t.Logf("\t%s\tShould get back the same servidor de gravacao.", tests.Success)
 
-		// ---
-
-		s.ServidorGravacaoID = svID
-		s.EnderecoIP = "11.22.33.44"
-		s.Porta = 1005
-		s.Host = "sv2"
-
-		if err = servidorGravacaoStore.Update(ctx, claimsAdmin, s); err != nil {
-			t.Fatalf("\t%s\tAdmin should be able to update servidor de gravacao: %s.", tests.Failed, err)
+		upd := servidorgravacao.UpdateServidorGravacao{
+			EnderecoIP: tests.StringPointer("60.50.30.20"),
+			Porta:      tests.IntPointer(2727),
 		}
-		t.Logf("\t%s\tAdmin should be able to update servidor de gravacao.", tests.Success)
 
-		if err = servidorGravacaoStore.Update(ctx, claimsManager, s); !errors.As(err, &database.ErrForbidden) {
-			t.Fatalf("\t%s\tManager should NOT be able to update servidor de gravacao: %s.", tests.Failed, err)
+		if err = core.Update(ctx, sv.ServidorGravacaoID, upd); err != nil {
+			t.Fatalf("\t%s\tShould be able to update servidor de gravacao: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tManager should be able to update servidor de gravacao.", tests.Success)
+		t.Logf("\t%s\tShould be able to update servidor de gravacao.", tests.Success)
 
-		if err = servidorGravacaoStore.Update(ctx, claimsUser, s); !errors.As(err, &database.ErrForbidden) {
-			t.Fatalf("\t%s\tUser should NOT be able to update servidor de gravacao: %s.", tests.Failed, err)
+		svs, err := core.Query(ctx, "", 1, 3)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to retrieve updated servidor de gravacao: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tUser should NOT be able to update servidor de gravacao.", tests.Success)
+		t.Logf("\t%s\tShould be able to retrieve updated servidor de gravacao.", tests.Success)
 
-		// ---
+		want := sv
+		want.EnderecoIP = *upd.EnderecoIP
+		want.Porta = *upd.Porta
 
-		if err = servidorGravacaoStore.Delete(ctx, claimsAdmin, s.ServidorGravacaoID); err != nil {
-			t.Fatalf("\t%s\tAdmin should be able to delete servidor de gravacao: %s.", tests.Failed, err)
+		var idx int
+		for i, s := range svs {
+			if s.EnderecoIP == want.EnderecoIP {
+				idx = i
+			}
 		}
-		t.Logf("\t%s\tAdmin should be able to delete servidor de gravacao.", tests.Success)
-
-		if err = servidorGravacaoStore.Delete(ctx, claimsManager, s.ServidorGravacaoID); !errors.As(err, &database.ErrForbidden) { // TODO e pra dar erro?
-			t.Fatalf("\t%s\tManager should NOT be able to delete servidor de gravacao: %s.", tests.Failed, err)
+		if diff := cmp.Diff(want, svs[idx]); diff != "" {
+			t.Fatalf("\t%s\tShould get back the same servidor de gravacao. Diff:\n%s", tests.Failed, diff)
 		}
-		t.Logf("\t%s\tManager should NOT be able to delete servidor de gravacao.", tests.Success)
+		t.Logf("\t%s\tShould get back the same servidor de gravacao.", tests.Success)
 
-		if err = servidorGravacaoStore.Delete(ctx, claimsUser, s.ServidorGravacaoID); !errors.As(err, &database.ErrForbidden) {
-			t.Fatalf("\t%s\tUser should NOT be able to delete servidor de gravacao: %s.", tests.Failed, err)
+		upd = servidorgravacao.UpdateServidorGravacao{
+			Porta: tests.IntPointer(4343),
 		}
-		t.Logf("\t%s\tUser should NOT be able to delete servidor de gravacao.", tests.Success)
 
-		// ---
+		if err = core.Update(ctx, sv.ServidorGravacaoID, upd); err != nil {
+			t.Fatalf("\t%s\tShould be able to update just some fields of servidor de gravacao: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to update just some fields of servidor de gravacao.", tests.Success)
 
-		if _, err = servidorGravacaoStore.QueryByID(ctx, claimsAdmin, s.ServidorGravacaoID); !errors.As(err, &database.ErrNotFound) {
+		saved, err = core.QueryByID(ctx, sv.ServidorGravacaoID)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to retrieve servidor de gravacao by ID: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to retrieve servidor de gravacao by ID.", tests.Success)
+
+		if saved.Porta != *upd.Porta {
+			t.Fatalf("\t%s\tShould be able to see updated Porta field: got %q want %q.", tests.Failed, saved.Porta, *upd.Porta)
+		}
+		t.Logf("\t%s\tShould be able to see updated Porta field.", tests.Success)
+
+		if err = core.Delete(ctx, sv.ServidorGravacaoID); err != nil {
+			t.Fatalf("\t%s\tShould be able to delete servidor de gravacao: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to delete servidor de gravacao.", tests.Success)
+
+		_, err = core.QueryByID(ctx, sv.ServidorGravacaoID)
+		if !errors.Is(err, servidorgravacao.ErrNotFound) {
 			t.Fatalf("\t%s\tShould NOT be able to retrieve servidor de gravacao: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould NOT be able to retrieve servidor de gravacao.", tests.Success)
@@ -140,7 +107,7 @@ func TestServidorGravacao(t *testing.T) {
 
 	t.Log("\tGiven the need to page through Servidores de Gravacao records.")
 	{
-		sv1, err := servidorGravacaoStore.Query(ctx, claimsAdmin, "", 1, 1)
+		sv1, err := core.Query(ctx, "", 1, 1)
 		if err != nil {
 			t.Fatalf("\t%s\tShould be able to retrieve servidores de gravacao for page 1: %s.", tests.Failed, err)
 		}
@@ -151,7 +118,7 @@ func TestServidorGravacao(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould have a single servidor de gravacao.", tests.Success)
 
-		sv2, err := servidorGravacaoStore.Query(ctx, claimsAdmin, "", 2, 1)
+		sv2, err := core.Query(ctx, "", 2, 1)
 		if err != nil {
 			t.Fatalf("\t%s\tShould be able to retrieve servidores de gravacao for page 2: %s.", tests.Failed, err)
 		}

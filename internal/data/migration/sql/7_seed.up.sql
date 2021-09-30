@@ -1,4 +1,4 @@
-INSERT INTO usuarios (usuario_id, email, funcao) VALUES
+INSERT INTO usuarios (usuario_id, email, funcao, senha) VALUES
     ('d03307d4-2b28-4c23-a004-3da25e5b8ce2', 'filipe@andrade.com.br', '{ADMIN, MANAGER, USER}', '$2a$10$n531epIH68yygcV6sNNqluZtyPc3smWxbw1WoWDDhOIqUP1Py/GTq'),
     ('d03307d4-2b28-4c23-a004-3da25e5b8cf3', 'filipe@andrade2.com.br', '{ADMIN, MANAGER, USER}', '$2a$10$n531epIH68yygcV6sNNqluZtyPc3smWxbw1WoWDDhOIqUP1Py/GTq')
 ON CONFLICT DO NOTHING;
@@ -8,7 +8,7 @@ INSERT INTO cameras (camera_id, descricao, endereco_ip, porta, canal, usuario, s
     ('d03307d4-2b28-4c23-a004-3da25e5b8aa3', 'desc 2', '45.56.78.89', '1', '1', 'admin', 'admin', '-12.2332', '-42.231')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO servidores_gravacao (servidor_gravacao_id, endereco_ip, porta, host) VALUES
+INSERT INTO servidores_gravacao (servidor_gravacao_id, endereco_ip, porta) VALUES
     ('d03307d4-2b28-4c23-a004-3da25e5b8bb1', '12.34.67.89', '6543'),
     ('d03307d4-2b28-4c23-a004-3da25e524bb1', '21.43.76.98', '3456')
 ON CONFLICT DO NOTHING;

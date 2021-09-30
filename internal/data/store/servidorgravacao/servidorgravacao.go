@@ -33,9 +33,9 @@ func (s *Store) Create(ctx context.Context, claims auth.Claims, sv ServidorGrava
 
 	const q = `
 	INSERT INTO servidores_gravacao
-		(servidor_gravacao_id, endereco_ip, porta, host)
+		(servidor_gravacao_id, endereco_ip, porta)
 	VALUES
-		(:servidor_gravacao_id, :endereco_ip, :porta, :host)`
+		(:servidor_gravacao_id, :endereco_ip, :porta)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.db, q, sv); err != nil {
 		return "", fmt.Errorf("inserting servidor gravacao: %w", err)
@@ -131,8 +131,7 @@ func (s Store) Update(ctx context.Context, claims auth.Claims, sv ServidorGravac
 		servidores_gravacao
 	SET
 		"endereco_ip" = :endereco_ip,
-		"porta" = :porta,
-		"host" = :host
+		"porta" = :porta
 	WHERE
 		servidor_gravacao_id = :servidor_gravacao_id`
 

@@ -3,7 +3,7 @@
 
 #### ONDE PAREI
 
-ARRUMAR O SEED DOWN
+ARRUMAR O SEED DOWN ESTA SEM OS TESTS PARA OS VALIDATORS
 
 Add https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-tutorial.md ?
 

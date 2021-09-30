@@ -93,7 +93,7 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 	ILIKE
 		:query
 	ORDER BY
-		host
+		endereco_ip
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
 
 	var svs []ServidorGravacao

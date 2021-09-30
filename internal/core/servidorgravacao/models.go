@@ -19,8 +19,8 @@ type NewServidorGravacao struct {
 }
 
 type UpdateServidorGravacao struct {
-	EnderecoIP *string `json:"endereco_ip" validate="omitempty,ip"`
-	Porta      *int    `json:"porta" validate="omitempty,gte=1,lte=65536`
+	EnderecoIP *string `json:"endereco_ip" validate:"omitempty,ip"`
+	Porta      *int    `json:"porta" validate:"omitempty,gte=1,lte=65536"`
 }
 
 // =============================================================================

@@ -19,6 +19,8 @@ const (
 	Failed  = "\u2717"
 )
 
+// TODO no services ele joga todo o log dos containers no final dos tests
+
 func New(t *testing.T) (*zap.SugaredLogger, *sqlx.DB, func()) {
 	var err error
 	log, err := logger.New("TEST")
@@ -84,3 +86,11 @@ func New(t *testing.T) (*zap.SugaredLogger, *sqlx.DB, func()) {
 }
 
 // TODO - está mostrando logs... nos tests - é certo?
+
+func StringPointer(s string) *string {
+	return &s
+}
+
+func IntPointer(i int) *int {
+	return &i
+}
