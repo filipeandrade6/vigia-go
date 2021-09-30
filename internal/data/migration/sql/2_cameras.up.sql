@@ -6,7 +6,8 @@ CREATE TABLE cameras (
     canal INTEGER NOT NULL,
     usuario TEXT NOT NULL,
     senha TEXT NOT NULL,
-    geolocalizacao TEXT NOT NULL,
+    latitude TEXT NOT NULL,
+    longitude TEXT NOT NULL,
 
     PRIMARY KEY (camera_id)
 );

@@ -25,8 +25,7 @@ func TestProcesso(t *testing.T) {
 	claimsManager := auth.Claims{Roles: []string{auth.RoleManager}}
 	claimsUser := auth.Claims{Roles: []string{auth.RoleUser}}
 
-	// TODO ver a necessidade de seed de processo no DB
-	// TODO criar as restrições de adição - somente uma câmera com mesmo IP etc.
+	// TODO necessidade seed de processo?
 
 	p := processo.Processo{
 		ServidorGravacaoID: "d03307d4-2b28-4c23-a004-3da25e5b8bb1", // seeded from migration.
@@ -36,22 +35,30 @@ func TestProcesso(t *testing.T) {
 		Execucao: false,
 	}
 
+	// TODO tentar adicionar com camera inexistente
+	// TODO tentar adicionar com servidor_gravacao inexistente
+	// TODO tentar adicionar com processador inexistente
+	// TODO tentar adicionar com adaptador inexsistente
+	// TODO parar ou iniciar serviço... add nos serviços
+
+	// TODO criar tabela de processador e adaptador?
+
+	// TODO o serviço tem de informar esses errors para o usuario...
+
 	t.Log("\tGiven the need to work with Processo records.")
 	{
 		processoID, err := processoStore.Create(ctx, claimsAdmin, c)
 		if err != nil {
-			t.Fatalf("\t%s\tAdmin should be able to create camera: %s.", tests.Failed, err)
+			t.Fatalf("\t%s\tAdmin should be able to create processo: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tAdmin should be able to create camera.", tests.Success)
-
-		c.EnderecoIP = "2.3.4.5"
+		t.Logf("\t%s\tAdmin should be able to create processo.", tests.Success)
 
 		if _, err = processoStore.Create(ctx, claimsManager, c); err != nil {
-			t.Fatalf("\t%s\tManager should be able to create camera: %s.", tests.Failed, err)
+			t.Fatalf("\t%s\tManager should be able to create processo: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tManager should be able to create camera.", tests.Success)
+		t.Logf("\t%s\tManager should be able to create processo.", tests.Success)
 
 		if _, err = processoStore.Create(ctx, claimsUser, c); !errors.As(err, &database.ErrForbidden) {
-			t.Fatalf("\t%s\tUser should NOT be able to create camera: %s.", tests.Failed, err)
+			t.Fatalf("\t%s\tUser should NOT be able to create processo: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tUser should NOT beable to create camera.", tests.Success)
+		t.Logf("\t%s\tUser should NOT beable to create processo.", tests.Success)

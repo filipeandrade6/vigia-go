@@ -29,6 +29,13 @@ func (s Store) Create(ctx context.Context, claims auth.Claims, cam Camera) (stri
 		return "", database.ErrForbidden
 	}
 
+	// TODO criar validação...
+
+	err := s.QueryByEnderecoIP(ctx, cam.EnderecoIP)
+	if !errors.As(err, &database.ErrNotFound) {
+		return "", fmt.Errorf("querying camera with the same endereco_ip %s: %w", cam.EnderecoIP, err)
+	}
+
 	cam.CameraID = validate.GenerateID()
 
 	const q = `
@@ -73,7 +80,7 @@ func (s Store) Query(ctx context.Context, claims auth.Claims, query string, page
 		if errors.As(err, &database.ErrNotFound) {
 			return Cameras{}, database.ErrNotFound
 		}
-		return Cameras{}, fmt.Errorf("selecting cameras: %w", err)
+		return Cameras{}, fmt.Errorf("querying cameras: %w", err)
 	}
 
 	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {
@@ -87,6 +94,32 @@ func (s Store) Query(ctx context.Context, claims auth.Claims, query string, page
 	}
 
 	return cams, nil
+}
+
+func (s Store) QueryByEnderecoIP(ctx context.Context, endereco_ip string) error {
+	data := struct {
+		EnderecoIP string `db:"endereco_ip"`
+	}{
+		EnderecoIP: endereco_ip,
+	}
+
+	const q = `
+	SELECT
+		*
+	FROM
+		cameras
+	WHERE
+		endereco_ip = :endereco_ip`
+
+	var cam Camera
+	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &cam); err != nil {
+		if errors.As(err, &database.ErrNotFound) {
+			return database.ErrNotFound
+		}
+		return fmt.Errorf("querying camera by endereco_ip[%q]: %w", endereco_ip, err)
+	}
+
+	return nil
 }
 
 func (s Store) QueryByID(ctx context.Context, claims auth.Claims, cameraID string) (Camera, error) {
@@ -113,7 +146,7 @@ func (s Store) QueryByID(ctx context.Context, claims auth.Claims, cameraID strin
 		if errors.As(err, &database.ErrNotFound) {
 			return Camera{}, database.ErrNotFound
 		}
-		return Camera{}, fmt.Errorf("selecting cameraID[%q]: %w", cameraID, err)
+		return Camera{}, fmt.Errorf("querying camera[%q]: %w", cameraID, err)
 	}
 
 	if !claims.Authorized(auth.RoleAdmin, auth.RoleManager) {

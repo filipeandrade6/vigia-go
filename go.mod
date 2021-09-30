@@ -5,6 +5,9 @@ go 1.16
 require (
 	github.com/ardanlabs/service v0.0.0-20210829190901-46e46e1f4ef4
 	github.com/dimfeld/httptreemux/v5 v5.3.0
+	github.com/go-playground/locales v0.14.0
+	github.com/go-playground/universal-translator v0.18.0
+	github.com/go-playground/validator/v10 v10.9.0
 	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang-migrate/migrate/v4 v4.15.0

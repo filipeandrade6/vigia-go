@@ -7,12 +7,12 @@ import (
 type Camera struct {
 	CameraID       string `db:"camera_id"`
 	Descricao      string `db:"descricao"`
-	EnderecoIP     string `db:"endereco_ip"`
-	Porta          int    `db:"porta"`
-	Canal          int    `db:"canal"`
-	Usuario        string `db:"usuario"`
-	Senha          string `db:"senha"`
-	Geolocalizacao string `db:"geolocalizacao"`
+	EnderecoIP     string `db:"endereco_ip" validate:""`
+	Porta          int    `db:"porta" validate:""`
+	Canal          int    `db:"canal" validate:""`
+	Usuario        string `db:"usuario" validate:""`
+	Senha          string `db:"senha" validate:""`
+	Geolocalizacao string `db:"geolocalizacao" validate:""`
 }
 
 func (c Camera) ToProto() *pb.Camera {

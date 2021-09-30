@@ -111,7 +111,6 @@ message ServidorGravacao {
     string servidor_gravacao_id = 1;
     string endereco_ip = 2;
     int32 porta = 3;
-    string host = 4;
 }
 
 message CreateServidorGravacaoReq {
@@ -162,7 +161,8 @@ message Camera {
     int32 canal = 5;
     string usuario = 6;
     string senha = 7;
-    string geolocalizacao = 8;
+    string latitude = 8;
+    string longitude = 9;
 }
 
 message CreateCameraReq{

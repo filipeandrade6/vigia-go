@@ -1,6 +1,9 @@
 ## VIGIA
 
+
 #### ONDE PAREI
+
+ARRUMAR O SEED DOWN
 
 Add https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-tutorial.md ?
 
