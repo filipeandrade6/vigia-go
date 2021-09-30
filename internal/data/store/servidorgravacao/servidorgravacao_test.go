@@ -38,6 +38,11 @@ func TestServidorGravacao(t *testing.T) {
 		}
 		t.Logf("\t%s\tAdmin should be able to create servidor de gravacao.", tests.Success)
 
+		if _, err := servidorGravacaoStore.Create(ctx, claimsAdmin, s); err == nil {
+			t.Fatalf("\t%s\tShould be able to create servidor de gravacao with existing endereco_ip:porta: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to create sservidor de gravacao with existing endereco_ip:porta.", tests.Success)
+
 		if _, err := servidorGravacaoStore.Create(ctx, claimsManager, s); !errors.As(err, &database.ErrForbidden) {
 			t.Fatalf("\t%s\tManager should NOT be able to create servidor de gravacao: %s.", tests.Failed, err)
 		}

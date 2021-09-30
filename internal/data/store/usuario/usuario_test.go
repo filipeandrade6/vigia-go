@@ -14,6 +14,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+// TODO teste com email repetido
+
 func TestUsuario(t *testing.T) {
 	log, db, teardown := tests.New(t)
 	t.Cleanup(teardown)
@@ -39,6 +41,11 @@ func TestUsuario(t *testing.T) {
 			t.Fatalf("\t%s\tAdmin should be able to create user: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tAdmin should be able to create user.", tests.Success)
+
+		if _, err = usuarioStore.Create(ctx, claimsAdmin, u); err == nil {
+			t.Fatalf("\t%s\tShould NOT be able to create user with existing email: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould NOT be able to create user with existing email.", tests.Success)
 
 		if _, err = usuarioStore.Create(ctx, claimsManager, u); !errors.As(err, &database.ErrForbidden) {
 			t.Fatalf("\t%s\tManager should NOT be able to create user: %s.", tests.Failed, err)

@@ -31,6 +31,7 @@ service Gerencia {
 
     rpc CreateProcesso (CreateProcessoReq) returns (CreateProcessoRes) {}
     rpc ReadProcesso (ReadProcessoReq) returns (ReadProcessoRes) {}
+    rpc ReadProcessos (ReadProcessosReq) returns (ReadProcessosRes) {}
     rpc UpdateProcesso (UpdateProcessoReq) returns (UpdateProcessoRes) {}
     rpc DeleteProcesso (DeleteProcessoReq) returns (DeleteProcessoRes) {}
 }
@@ -151,6 +152,8 @@ message DeleteServidorGravacaoReq {
 
 message DeleteServidorGravacaoRes {}
 
+// =======================
+
 message Camera {
     string camera_id = 1;
     string descricao = 2;
@@ -200,33 +203,51 @@ message DeleteCameraReq{
 
 message DeleteCameraRes{}
 
+// =======================
 
 message Processo {
-
+    string processo_id = 1;
+    string servidor_gravacao_id = 2;
+    string camera_id = 3;
+    int32 processador = 4;
+    int32 adaptador = 5;
+    bool execucao = 6;
 }
 
 message CreateProcessoReq{
-    string servidor_gravacao_id = 1;
-    string camera_id = 2;
-    int32 processador = 3;
-    int32 adaptador = 4;
-    bool execucao = 5;
+    Processo processo = 1;
 }
 
 message CreateProcessoRes{
     string processo_id = 1;
 }
 
-message ReadProcessoReq{}
+message ReadProcessoReq{
+    string processo_id = 1;
+}
 
-message ReadProcessoRes{}
+message ReadProcessoRes{
+    Processo processo = 1;
+}
 
-message UpdateProcessoReq{}
+message ReadProcessosReq{
+    string query = 1;
+    int32 page_number = 2;
+    int32 rows_per_page = 3;
+}
+
+message ReadProcessosRes{
+    repeated Processo processo = 1;
+}
+
+message UpdateProcessoReq{
+    Processo processo = 1;
+}
 
 message UpdateProcessoRes{}
 
 message DeleteProcessoReq{
-    string processo_id = 1;
+    repeated string processo_id = 1;
 }
 
 message DeleteProcessoRes{}

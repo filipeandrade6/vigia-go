@@ -43,9 +43,15 @@ func TestCamera(t *testing.T) {
 		}
 		t.Logf("\t%s\tAdmin should be able to create camera.", tests.Success)
 
+		if _, err := cameraStore.Create(ctx, claimsAdmin, c); err == nil {
+			t.Fatalf("\t%s\tShould NOT be able to create camera with existing endereco_ip: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould NOT be able to create camera with existing endereco_ip.", tests.Success)
+
 		c.EnderecoIP = "2.3.4.5"
 
-		if _, err = cameraStore.Create(ctx, claimsManager, c); err != nil {
+		camera2ID, err := cameraStore.Create(ctx, claimsManager, c)
+		if err != nil {
 			t.Fatalf("\t%s\tManager should be able to create camera: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tManager should be able to create camera.", tests.Success)
@@ -109,6 +115,9 @@ func TestCamera(t *testing.T) {
 		}
 		t.Logf("\t%s\tAdmin should be able to update camera.", tests.Success)
 
+		c.CameraID = camera2ID
+		c.EnderecoIP = "212.212.212.212"
+
 		if err = cameraStore.Update(ctx, claimsManager, c); err != nil {
 			t.Fatalf("\t%s\tManager should be able to update camera: %s.", tests.Failed, err)
 		}
@@ -121,12 +130,12 @@ func TestCamera(t *testing.T) {
 
 		// ---
 
-		if err = cameraStore.Delete(ctx, claimsAdmin, c.CameraID); err != nil {
+		if err = cameraStore.Delete(ctx, claimsAdmin, cameraID); err != nil {
 			t.Fatalf("\t%s\tAdmin should be able to delete camera: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tAdmin should be able to delete camera.", tests.Success)
 
-		if err = cameraStore.Delete(ctx, claimsManager, c.CameraID); err != nil { // TODO e pra dar erro?
+		if err = cameraStore.Delete(ctx, claimsManager, camera2ID); err != nil { // TODO e pra dar erro?
 			t.Fatalf("\t%s\tManager should be able to delete camera: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tManager should be able to delete camera.", tests.Success)
@@ -138,7 +147,7 @@ func TestCamera(t *testing.T) {
 
 		// ---
 
-		if _, err = cameraStore.QueryByID(ctx, claimsAdmin, c.CameraID); !errors.As(err, &database.ErrNotFound) {
+		if _, err = cameraStore.QueryByID(ctx, claimsAdmin, cameraID); !errors.As(err, &database.ErrNotFound) {
 			t.Fatalf("\t%s\tShould NOT be able to retrieve camera: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould NOT be able to retrieve camera.", tests.Success)
@@ -153,7 +162,7 @@ func TestCamera(t *testing.T) {
 		t.Logf("\t%s\tShould be able to retrieve cameras for page 1.", tests.Success)
 
 		if len(camera1) != 1 {
-			t.Fatalf("\t%s\tShould have a single camera : %s.", tests.Failed, err)
+			t.Fatalf("\t%s\tShould have a single camera: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould have a single camera.", tests.Success)
 

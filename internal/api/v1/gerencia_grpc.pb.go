@@ -38,6 +38,7 @@ type GerenciaClient interface {
 	DeleteCamera(ctx context.Context, in *DeleteCameraReq, opts ...grpc.CallOption) (*DeleteCameraRes, error)
 	CreateProcesso(ctx context.Context, in *CreateProcessoReq, opts ...grpc.CallOption) (*CreateProcessoRes, error)
 	ReadProcesso(ctx context.Context, in *ReadProcessoReq, opts ...grpc.CallOption) (*ReadProcessoRes, error)
+	ReadProcessos(ctx context.Context, in *ReadProcessosReq, opts ...grpc.CallOption) (*ReadProcessosRes, error)
 	UpdateProcesso(ctx context.Context, in *UpdateProcessoReq, opts ...grpc.CallOption) (*UpdateProcessoRes, error)
 	DeleteProcesso(ctx context.Context, in *DeleteProcessoReq, opts ...grpc.CallOption) (*DeleteProcessoRes, error)
 }
@@ -230,6 +231,15 @@ func (c *gerenciaClient) ReadProcesso(ctx context.Context, in *ReadProcessoReq, 
 	return out, nil
 }
 
+func (c *gerenciaClient) ReadProcessos(ctx context.Context, in *ReadProcessosReq, opts ...grpc.CallOption) (*ReadProcessosRes, error) {
+	out := new(ReadProcessosRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ReadProcessos", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gerenciaClient) UpdateProcesso(ctx context.Context, in *UpdateProcessoReq, opts ...grpc.CallOption) (*UpdateProcessoRes, error) {
 	out := new(UpdateProcessoRes)
 	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/UpdateProcesso", in, out, opts...)
@@ -272,6 +282,7 @@ type GerenciaServer interface {
 	DeleteCamera(context.Context, *DeleteCameraReq) (*DeleteCameraRes, error)
 	CreateProcesso(context.Context, *CreateProcessoReq) (*CreateProcessoRes, error)
 	ReadProcesso(context.Context, *ReadProcessoReq) (*ReadProcessoRes, error)
+	ReadProcessos(context.Context, *ReadProcessosReq) (*ReadProcessosRes, error)
 	UpdateProcesso(context.Context, *UpdateProcessoReq) (*UpdateProcessoRes, error)
 	DeleteProcesso(context.Context, *DeleteProcessoReq) (*DeleteProcessoRes, error)
 	mustEmbedUnimplementedGerenciaServer()
@@ -340,6 +351,9 @@ func (UnimplementedGerenciaServer) CreateProcesso(context.Context, *CreateProces
 }
 func (UnimplementedGerenciaServer) ReadProcesso(context.Context, *ReadProcessoReq) (*ReadProcessoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadProcesso not implemented")
+}
+func (UnimplementedGerenciaServer) ReadProcessos(context.Context, *ReadProcessosReq) (*ReadProcessosRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadProcessos not implemented")
 }
 func (UnimplementedGerenciaServer) UpdateProcesso(context.Context, *UpdateProcessoReq) (*UpdateProcessoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateProcesso not implemented")
@@ -720,6 +734,24 @@ func _Gerencia_ReadProcesso_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gerencia_ReadProcessos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadProcessosReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ReadProcessos(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ReadProcessos",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ReadProcessos(ctx, req.(*ReadProcessosReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Gerencia_UpdateProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateProcessoReq)
 	if err := dec(in); err != nil {
@@ -842,6 +874,10 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReadProcesso",
 			Handler:    _Gerencia_ReadProcesso_Handler,
+		},
+		{
+			MethodName: "ReadProcessos",
+			Handler:    _Gerencia_ReadProcessos_Handler,
 		},
 		{
 			MethodName: "UpdateProcesso",
