@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/servidorgravacao/db"
-	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 	"github.com/jmoiron/sqlx"
@@ -46,132 +45,69 @@ func (c Core) Create(ctx context.Context, nsv NewServidorGravacao) (ServidorGrav
 	return toServidorGravacao(dbSV), nil
 }
 
-func (c Core) Query(ctx context.Context, claims auth.Claims, query string, pageNumber int, rowsPerPage int) (ServidoresGravacao, error) {
-	if !claims.Authorized(auth.RoleAdmin) {
-		return ServidoresGravacao{}, database.ErrForbidden
-	}
-
-	data := struct {
-		Query       string `db:"query"`
-		Offset      int    `db:"offset"`
-		RowsPerPage int    `db:"rows_per_page"`
-	}{
-		Query:       fmt.Sprintf("%%%s%%", query),
-		Offset:      (pageNumber - 1) * rowsPerPage,
-		RowsPerPage: rowsPerPage,
-	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		servidores_gravacao
-	WHERE
-		CONCAT(servidor_gravacao_id, endereco_ip, porta, host)
-	ILIKE
-		:query
-	ORDER BY
-		host
-	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
-
-	var svs ServidoresGravacao
-	if err := database.NamedQuerySlice(ctx, s.log, s.db, q, data, &svs); err != nil {
-		if errors.As(err, &database.ErrNotFound) {
-			return ServidoresGravacao{}, database.ErrNotFound
-		}
-		return ServidoresGravacao{}, fmt.Errorf("selecting servidores de gravacao: %w", err)
-	}
-
-	return svs, nil
-}
-
-func (c Core) QueryByID(ctx context.Context, claims auth.Claims, svID string) (ServidorGravacao, error) {
+func (c Core) Update(ctx context.Context, svID string, up UpdateServidorGravacao) error {
 	if err := validate.CheckID(svID); err != nil {
-		return ServidorGravacao{}, database.ErrInvalidID
+		return ErrInvalidID
 	}
 
-	if !claims.Authorized(auth.RoleAdmin) {
-		return ServidorGravacao{}, database.ErrForbidden
-	}
-
-	data := struct {
-		SvID string `db:"servidor_gravacao_id"`
-	}{
-		SvID: svID,
-	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		servidores_gravacao
-	WHERE
-		servidor_gravacao_id = :servidor_gravacao_id`
-
-	var sv ServidorGravacao
-	if err := database.NamedQueryStruct(ctx, s.log, s.db, q, data, &sv); err != nil {
-		if errors.As(err, &database.ErrNotFound) {
-			return ServidorGravacao{}, database.ErrNotFound
+	dbSV, err := c.store.QueryByID(ctx, svID)
+	if err != nil {
+		if errors.Is(err, database.ErrDBNotFound) {
+			return ErrNotFound
 		}
-		return ServidorGravacao{}, fmt.Errorf("selecting svID[%q]: %w", svID, err)
+		return fmt.Errorf("updating servidor de gravacao svID[%s]: %w", svID, err)
 	}
 
-	return sv, nil
-}
-
-func (c Core) Update(ctx context.Context, claims auth.Claims, sv ServidorGravacao) error {
-	if !claims.Authorized(auth.RoleAdmin) {
-		return database.ErrForbidden
+	if up.EnderecoIP != nil {
+		dbSV.EnderecoIP = *up.EnderecoIP
+	}
+	if up.Porta != nil {
+		dbSV.Porta = *up.Porta
 	}
 
-	if err := validate.CheckID(sv.ServidorGravacaoID); err != nil {
-		return database.ErrInvalidID
-	}
-
-	const q = `
-	UPDATE
-		servidores_gravacao
-	SET
-		"endereco_ip" = :endereco_ip,
-		"porta" = :porta,
-		"host" = :host
-	WHERE
-		servidor_gravacao_id = :servidor_gravacao_id`
-
-	if err := database.NamedExecContext(ctx, s.log, s.db, q, sv); err != nil {
-		return fmt.Errorf("updating svID[%s]: %w", sv.ServidorGravacaoID, err)
+	if err := c.store.Update(ctx, dbSV); err != nil {
+		return fmt.Errorf("update: %w", err)
 	}
 
 	return nil
 }
 
-func (c Core) Delete(ctx context.Context, claims auth.Claims, svID string) error {
-
-	// TODO verificar se o servidor não está em execução, perguntar, etc...
-
-	if !claims.Authorized(auth.RoleAdmin) {
-		return database.ErrForbidden
-	}
-
+func (c Core) Delete(ctx context.Context, svID string) error {
 	if err := validate.CheckID(svID); err != nil {
-		return database.ErrInvalidID
+		return ErrInvalidID
 	}
 
-	data := struct {
-		SvID string `db:"servidor_gravacao_id"`
-	}{
-		SvID: svID,
-	}
-
-	const q = `
-	DELETE FROM
-		servidores_gravacao
-	WHERE
-		servidor_gravacao_id = :servidor_gravacao_id`
-
-	if err := database.NamedExecContext(ctx, s.log, s.db, q, data); err != nil {
-		return fmt.Errorf("deleting svID[%s]: %w", svID, err)
+	if err := c.store.Delete(ctx, svID); err != nil {
+		return fmt.Errorf("delete: %w", err)
 	}
 
 	return nil
+}
+
+func (c Core) Query(ctx context.Context, query string, pageNumber int, rowsPerPage int) (ServidoresGravacao, error) {
+	dbSVs, err := c.store.Query(ctx, query, pageNumber, rowsPerPage)
+	if err != nil {
+		if errors.Is(err, database.ErrDBNotFound) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query: %w", err)
+	}
+
+	return toServidorGravacaoSlice(dbSVs), nil
+}
+
+func (c Core) QueryByID(ctx context.Context, svID string) (ServidorGravacao, error) {
+	if err := validate.CheckID(svID); err != nil {
+		return ServidorGravacao{}, ErrInvalidID
+	}
+
+	dbSV, err := c.store.QueryByID(ctx, svID)
+	if err != nil {
+		if errors.Is(err, database.ErrDBNotFound) {
+			return ServidorGravacao{}, ErrNotFound
+		}
+		return ServidorGravacao{}, fmt.Errorf("query: %w", err)
+	}
+
+	return toServidorGravacao(dbSV), nil
 }

@@ -128,12 +128,10 @@ func (c Core) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
 
 	dbCam, err := c.store.QueryByID(ctx, cameraID)
 	if err != nil {
-		if err != nil {
-			if errors.Is(err, database.ErrDBNotFound) {
-				return Camera{}, ErrNotFound
-			}
-			return Camera{}, fmt.Errorf("query: %w", err)
+		if errors.Is(err, database.ErrDBNotFound) {
+			return Camera{}, ErrNotFound
 		}
+		return Camera{}, fmt.Errorf("query: %w", err)
 	}
 
 	return toCamera(dbCam), nil
