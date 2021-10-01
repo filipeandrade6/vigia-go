@@ -30,3 +30,7 @@ pgadmin:
 .PHONY: docker-clean-volume
 docker-clean-volume:
 	docker volume ls -qf dangling=true | xargs -r docker volume rm
+
+.PHONY: gerencia
+gerencia:
+	go run ./cmd/gerencia/main.go --auth-directory=${PWD}/deployments/keys

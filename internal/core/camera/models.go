@@ -10,37 +10,37 @@ import (
 // TODO colcoar campos agregados e data de criacao e edicao
 
 type Camera struct {
-	CameraID   string `json:"camera_id"`
-	Descricao  string `json:"descricao"`
-	EnderecoIP string `json:"endereco_ip"`
-	Porta      int    `json:"porta"`
-	Canal      int    `json:"canal"`
-	Usuario    string `json:"usuario"`
-	Senha      string `json:"senha"`
-	Latitude   string `json:"latitude"`
-	Longitude  string `json:"longitude"`
+	CameraID   string
+	Descricao  string
+	EnderecoIP string
+	Porta      int
+	Canal      int
+	Usuario    string
+	Senha      string
+	Latitude   string
+	Longitude  string
 }
 
 type NewCamera struct {
-	Descricao  string `json:"descricao" validate:"required"`
-	EnderecoIP string `json:"endereco_ip" validate:"required,ip"`
-	Porta      int    `json:"porta" validate:"required,gte=1,lte=65536"`
-	Canal      int    `json:"canal" validate:"required,gte=0,lte=10"`
-	Usuario    string `json:"usuario" validate:"required"`
-	Senha      string `json:"senha" validate:"required"`
-	Latitude   string `json:"latitude" validate:"required,latitude"`
-	Longitude  string `json:"longitude" validate:"required,longitude"`
+	Descricao  string `validate:"required"`
+	EnderecoIP string `validate:"required,ip"`
+	Porta      int    `validate:"required,gte=1,lte=65536"`
+	Canal      int    `validate:"required,gte=0,lte=10"`
+	Usuario    string `validate:"required"`
+	Senha      string `validate:"required"`
+	Latitude   string `validate:"required,latitude"`
+	Longitude  string `validate:"required,longitude"`
 }
 
 type UpdateCamera struct {
-	Descricao  *string `json:"descricao"`
-	EnderecoIP *string `json:"endereco_ip" validate:"omitempty,ip"`
-	Porta      *int    `json:"porta" validate:"omitempty,gte=1,lte=65536"`
-	Canal      *int    `json:"canal" validate:"omitempty,gte=0,lte=10"`
-	Usuario    *string `json:"usuario" validate:"omitempty"`
-	Senha      *string `json:"senha" validate:"omitempty"`
-	Latitude   *string `json:"latitude" validate:"omitempty,latitude"`
-	Longitude  *string `json:"longitude" validate:"omitempty,longitude"`
+	Descricao  *string `validate:"omitempty"`
+	EnderecoIP *string `validate:"omitempty,ip"`
+	Porta      *int    `validate:"omitempty,gte=1,lte=65536"`
+	Canal      *int    `validate:"omitempty,gte=0,lte=10"`
+	Usuario    *string `validate:"omitempty"`
+	Senha      *string `validate:"omitempty"`
+	Latitude   *string `validate:"omitempty,latitude"`
+	Longitude  *string `validate:"omitempty,longitude"`
 }
 
 // =============================================================================

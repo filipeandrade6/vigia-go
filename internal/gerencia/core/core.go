@@ -12,16 +12,18 @@ import (
 
 	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/usuario"
+	// "github.com/filipeandrade6/vigia-go/internal/data/store/camera"
+	// "github.com/filipeandrade6/vigia-go/internal/data/store/usuario"
+	"github.com/filipeandrade6/vigia-go/internal/core/camera"
+	"github.com/filipeandrade6/vigia-go/internal/core/servidorgravacao"
+	"github.com/filipeandrade6/vigia-go/internal/core/usuario"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia/config"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia/service"
 	"github.com/filipeandrade6/vigia-go/internal/sys/auth"
-	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/filipeandrade6/vigia-go/internal/sys/keystore"
 
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"github.com/spf13/viper"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -29,7 +31,7 @@ import (
 
 var build = "develop"
 
-func Run(log *zap.SugaredLogger) error {
+func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 	// =========================================================================
 	// CPU Quota
 
@@ -42,8 +44,12 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Load Configuration
 
-	viper.AutomaticEnv()
-	log.Infow("startup", "config", config.PrettyPrintConfig())
+	// cfg, err := config.ParseConfig(build)
+	// if err != nil {
+	// 	log.Fatalw("errors getting config", "ERROR", err)
+	// }
+
+	log.Infow("startup", "config", fmt.Sprintf("%+v", cfg)) // TODO esconder senhas
 
 	// =========================================================================
 	// App Starting
@@ -57,12 +63,12 @@ func Run(log *zap.SugaredLogger) error {
 
 	log.Infow("startup", "status", "initializing authentication support")
 
-	ks, err := keystore.NewFS(os.DirFS(viper.GetString("VIGIA_AUTH_DIR")))
+	ks, err := keystore.NewFS(os.DirFS(cfg.Auth.Directory))
 	if err != nil {
 		return fmt.Errorf("reading keys: %w", err)
 	}
 
-	auth, err := auth.New(viper.GetString("VIGIA_AUTH_ACTIVEKID"), ks)
+	auth, err := auth.New(cfg.Auth.ActiveKID, ks)
 	if err != nil {
 		return fmt.Errorf("constructing auth: %w", err)
 	}
@@ -70,22 +76,22 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Database Support
 
-	log.Infow("startup", "status", "initializing database support", "host", viper.GetString("VIGIA_DB_HOST"))
+	log.Infow("startup", "status", "initializing database support", "host", cfg.Database.Host)
 
 	db, err := database.Open(database.Config{
-		Host:         viper.GetString("VIGIA_DB_HOST"),
-		User:         viper.GetString("VIGIA_DB_USER"),
-		Password:     viper.GetString("VIGIA_DB_PASSWORD"),
-		Name:         viper.GetString("VIGIA_DB_NAME"),
-		MaxIdleConns: viper.GetInt("VIGIA_DB_MAXIDLECONNS"),
-		MaxOpenConns: viper.GetInt("VIGIA_DB_MAXOPENCONNS"),
-		SSLMode:      viper.GetString("VIGIA_DB_SSLMODE"),
+		User:         cfg.Database.User,
+		Password:     cfg.Database.Password,
+		Host:         cfg.Database.Host,
+		Name:         cfg.Database.Name,
+		MaxIDLEConns: cfg.Database.MaxIDLEConns,
+		MaxOpenConns: cfg.Database.MaxOpenConns,
+		SSLMode:      cfg.Database.SSLMode,
 	})
 	if err != nil {
 		return fmt.Errorf("connecting to db: %w", err)
 	}
 	defer func() {
-		log.Infow("shutdown", "status", "stopping database support", "host", viper.GetString("VIGIA_DB_HOST"))
+		log.Infow("shutdown", "status", "stopping database support", "host", cfg.Database.Host)
 		db.Close()
 	}()
 
@@ -121,10 +127,14 @@ func Run(log *zap.SugaredLogger) error {
 
 	serverErrors := make(chan error, 1)
 
-	cameraStore := camera.NewStore(log, db)
-	usuarioStore := usuario.NewStore(log, db)
+	// cameraStore := camera.NewStore(log, db)
+	// usuarioStore := usuario.NewStore(log, db)
 
-	svc := service.NewGerenciaService(log, auth, cameraStore, usuarioStore)
+	cameraCore := camera.NewCore(log, db)
+	usuarioCore := usuario.NewCore(log, db)
+	servidorgravacaoCore := servidorgravacao.NewCore(log, db)
+
+	svc := service.NewGerenciaService(log, auth, cameraCore, usuarioCore, servidorgravacaoCore)
 
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(nil)),
@@ -133,12 +143,12 @@ func Run(log *zap.SugaredLogger) error {
 	pb.RegisterGerenciaServer(grpcServer, svc)
 
 	go func() {
-		lis, err := net.Listen(viper.GetString("VIGIA_GER_SERVER_CONN"), fmt.Sprintf(":%s", viper.GetString("VIGIA_GER_SERVER_PORT")))
+		lis, err := net.Listen(cfg.Service.Conn, fmt.Sprintf(":%d", cfg.Service.Port))
 		if err != nil {
-			log.Errorw("startup", "status", "could not open socket", viper.GetString("VIGIA_GER_SERVER_CONN"), viper.GetString("VIGIA_GER_SERVER_ADDR"), viper.GetString("VIGIA_GER_SERVER_PORT"), "ERROR", err)
+			log.Errorw("startup", "status", "could not open socket", cfg.Service.Conn, cfg.Service.Port, "ERROR", err)
 		}
 
-		log.Infow("startup", "status", "gRPC server started", viper.GetString("VIGIA_GER_SERVER_HOST"))
+		log.Infow("startup", "status", "gRPC server started", cfg.Service.Address)
 		serverErrors <- grpcServer.Serve(lis)
 	}()
 

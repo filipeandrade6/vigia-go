@@ -107,6 +107,8 @@ func TestCamera(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to retrieve updated camera.", tests.Success)
 
+		t.Logf("%+v", saved)
+
 		if saved.Porta != *upd.Porta {
 			t.Fatalf("\t%s\tShould be able to see updated Porta field: got %q want %q.", tests.Failed, saved.Porta, *upd.Porta)
 		}

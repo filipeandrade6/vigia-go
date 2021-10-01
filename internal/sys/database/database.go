@@ -29,7 +29,7 @@ type Config struct {
 	Password     string
 	Host         string
 	Name         string
-	MaxIdleConns int
+	MaxIDLEConns int
 	MaxOpenConns int
 	// DisableTLS   bool
 	SSLMode string
@@ -58,7 +58,7 @@ func Open(cfg Config) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.SetMaxIdleConns(cfg.MaxIdleConns)
+	db.SetMaxIdleConns(cfg.MaxIDLEConns)
 	db.SetMaxOpenConns(cfg.MaxOpenConns)
 
 	return db, nil

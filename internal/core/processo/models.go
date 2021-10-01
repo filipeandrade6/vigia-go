@@ -10,28 +10,28 @@ import (
 // TODO colcoar campos agregados e data de criacao e edicao
 
 type Processo struct {
-	ProcessoID         string `json:"processo_id"`
-	ServidorGravacaoID string `json:"servidor_gravacao_id"`
-	CameraID           string `json:"camera_id"`
-	Processador        int    `json:"processador"`
-	Adaptador          int    `json:"adaptador"`
-	Execucao           bool   `json:"execucao"`
+	ProcessoID         string
+	ServidorGravacaoID string
+	CameraID           string
+	Processador        int
+	Adaptador          int
+	Execucao           bool
 }
 
 type NewProcesso struct {
-	ServidorGravacaoID string `json:"servidor_gravacao_id" validate:"required"`
-	CameraID           string `json:"camera_id" validate:"required"`
-	Processador        int    `json:"processador" validate:"required"`
-	Adaptador          int    `json:"adaptador" validate:"required"`
-	Execucao           bool   `json:"execucao"`
+	ServidorGravacaoID string `validate:"required"`
+	CameraID           string `validate:"required"`
+	Processador        int    `validate:"required"`
+	Adaptador          int    `validate:"required"`
+	Execucao           bool
 }
 
 type UpdateProcesso struct {
-	ServidorGravacaoID *string `json:"servidor_gravacao_id" validate:"omitempty"`
-	CameraID           *string `json:"camera_id" validate:"omitempty"`
-	Processador        *int    `json:"processador" validate:"omitempty"`
-	Adaptador          *int    `json:"adaptador" validate:"omitempty"`
-	Execucao           *bool   `json:"execucao" validate:"omitempty"`
+	ServidorGravacaoID *string `validate:"omitempty"`
+	CameraID           *string `validate:"omitempty"`
+	Processador        *int    `validate:"omitempty"`
+	Adaptador          *int    `validate:"omitempty"`
+	Execucao           *bool   `validate:"omitempty"`
 }
 
 // =============================================================================

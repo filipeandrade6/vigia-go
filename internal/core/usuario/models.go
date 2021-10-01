@@ -8,22 +8,22 @@ import (
 )
 
 type Usuario struct {
-	UsuarioID string   `json:"usuario_id"`
-	Email     string   `json:"email"`
-	Funcao    []string `json:"funcao"`
-	Senha     string   `json:"senha"`
+	UsuarioID string
+	Email     string
+	Funcao    []string
+	Senha     string
 }
 
 type NewUsuario struct {
-	Email  string   `json:"email" validate:"required,email"`
-	Funcao []string `json:"funcao" validate:"required"`
-	Senha  string   `json:"senha" validate:"required"`
+	Email  string   `validate:"required,email"`
+	Funcao []string `validate:"required"`
+	Senha  string   `validate:"required"`
 }
 
 type UpdateUsuario struct {
-	Email  *string  `json:"email" validate:"omitempty,email"`
-	Funcao []string `json:"funcao"`
-	Senha  *string  `json:"senha"`
+	Email  *string  `validate:"omitempty,email"`
+	Funcao []string `validate:"omitempty"`
+	Senha  *string  `validate:"omitempty"`
 }
 
 // =============================================================================

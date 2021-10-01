@@ -8,19 +8,19 @@ import (
 )
 
 type ServidorGravacao struct {
-	ServidorGravacaoID string `json:"servidor_gravacao_id"`
-	EnderecoIP         string `json:"endereco_ip"`
-	Porta              int    `json:"porta"`
+	ServidorGravacaoID string
+	EnderecoIP         string
+	Porta              int
 }
 
 type NewServidorGravacao struct {
-	EnderecoIP string `json:"endereco_ip" validate:"required,ip"`
-	Porta      int    `json:"porta" validate:"required,gte=1,lte=65536"`
+	EnderecoIP string `validate:"required,ip"`
+	Porta      int    `validate:"required,gte=1,lte=65536"`
 }
 
 type UpdateServidorGravacao struct {
-	EnderecoIP *string `json:"endereco_ip" validate:"omitempty,ip"`
-	Porta      *int    `json:"porta" validate:"omitempty,gte=1,lte=65536"`
+	EnderecoIP *string `validate:"omitempty,ip"`
+	Porta      *int    `validate:"omitempty,gte=1,lte=65536"`
 }
 
 // =============================================================================
