@@ -5,6 +5,8 @@
 
 ARRUMAR O SEED DOWN ESTA SEM OS TESTS PARA OS VALIDATORS
 
+ADICIONAR TESTES PARA OS VALIDADORES E UNIQUE DO PG
+
 Add https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-tutorial.md ?
 
 EU POSSO REGISTRAR OUTROS SERVICOS NO GRPCSERVER - isso permite separar os servicos em arquivos
