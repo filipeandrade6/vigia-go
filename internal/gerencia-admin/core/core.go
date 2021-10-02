@@ -1,23 +1,21 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"runtime"
 	"time"
 
-	"github.com/golang-migrate/migrate"
-	"github.com/spf13/viper"
+	"github.com/filipeandrade6/vigia-go/internal/core/usuario"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia-admin/config"
+	"github.com/filipeandrade6/vigia-go/internal/gerencia-admin/service"
+	"google.golang.org/protobuf/types/known/wrapperspb"
+
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
-
-	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	"github.com/filipeandrade6/vigia-go/internal/gerencia-admin/service"
-	"github.com/filipeandrade6/vigia-go/internal/sys/config"
 )
 
-func Run(log *zap.SugaredLogger) error {
+func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 	// =========================================================================
 	// CPU Quota
 
@@ -30,86 +28,25 @@ func Run(log *zap.SugaredLogger) error {
 	// =========================================================================
 	// Load Configuration
 
-	viper.AutomaticEnv()
-	log.Infow("startup", "config", config.PrettyPrintConfig())
+	log.Infow("startup", "config", fmt.Sprintf("%+v", cfg)) // TODO esconder senhas
 
 	// ----
 
 	time.Sleep(time.Duration(time.Second * 5))
-	gerenciaClient := service.NewClientGerencia()
+	gerenciaClient := service.NewClientGerencia(fmt.Sprintf("%s:%d", cfg.Service.Address, cfg.Service.Port))
 
-	if err := gerenciaClient.Migrate(); err != nil {
-		if errors.As(err, &migrate.ErrNoChange) {
-			fmt.Println("Sem alterações")
-		} else {
-			log.Fatalf("calling migrate: %s", err)
-		}
+	usuarioID := "ce93c4ba-aec9-42fa-ba7c-85e712e4ade8"
+
+	u := usuario.UpdateUsuario{
+		Funcao: []string{"USER", "MANAGER"},
+		Senha:  &wrapperspb.StringValue{Value: "secret"},
 	}
 
-	token, err := gerenciaClient.Login("filipe.andrade@ssp.df.gov.br", "secret")
-	if err != nil {
-		log.Fatal(err)
+	fmt.Println(usuarioID)
+
+	if err := gerenciaClient.UpdateUsuario(usuarioID, u); err != nil {
+		log.Fatalw("updating usuario", "ERROR", err)
 	}
-
-	fmt.Println(token)
-
-	c := camera.Camera{
-		Descricao:      "Camerasss 1",
-		EnderecoIP:     "10.0.0.11",
-		Porta:          12,
-		Canal:          1,
-		Usuario:        "admin",
-		Senha:          "admin",
-		Geolocalizacao: "-12.3242, -45.1234",
-	}
-
-	cam1, err := gerenciaClient.CreateCamera(c)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	c.Descricao = "Camerasss 2"
-	c.EnderecoIP = "10.0.0.22"
-
-	if _, err := gerenciaClient.CreateCamera(c); err != nil {
-		log.Fatal(err)
-	}
-
-	c.Descricao = "Camerasss 3"
-	c.EnderecoIP = "10.0.0.33"
-
-	cam3, err := gerenciaClient.CreateCamera(c)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("criado 3 câmeras... segue Camerasss 2 abaixo")
-
-	cRes, err := gerenciaClient.ReadCameras("asss 2", 1, 100)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(cRes)
-
-	c.CameraID = cam1
-	c.Descricao = "Camera Updatadassss"
-	c.EnderecoIP = "234.234.234.234"
-
-	if err = gerenciaClient.UpdateCamera(c); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := gerenciaClient.DeleteCamera([]string{cam3}); err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("câmera 3 deletada e câmera 1 atualizada... segue abaixo")
-
-	cRes, err = gerenciaClient.ReadCameras("asss 3", 1, 100)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(cRes)
 
 	return nil
 }

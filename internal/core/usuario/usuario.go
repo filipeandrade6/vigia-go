@@ -54,13 +54,9 @@ func (c Core) Create(ctx context.Context, nu NewUsuario) (Usuario, error) {
 	return toUsuario(dbUsr), nil
 }
 
-func (c Core) Update(ctx context.Context, usuarioID string, uu UpdateUsuario) error {
+func (c Core) Update(ctx context.Context, usuarioID string, up UpdateUsuario) error {
 	if err := validate.CheckID(usuarioID); err != nil {
 		return ErrInvalidID
-	}
-
-	if err := validate.Check(uu); err != nil {
-		return fmt.Errorf("validating data: %w", err)
 	}
 
 	dbUsr, err := c.store.QueryByID(ctx, usuarioID)
@@ -71,14 +67,14 @@ func (c Core) Update(ctx context.Context, usuarioID string, uu UpdateUsuario) er
 		return fmt.Errorf("updating user userID[%s]: %w", usuarioID, err)
 	}
 
-	if uu.Email != nil {
-		dbUsr.Email = *uu.Email
+	if up.Email != nil {
+		dbUsr.Email = up.Email.GetValue()
 	}
-	if uu.Funcao != nil {
-		dbUsr.Funcao = uu.Funcao
+	if up.Funcao != nil {
+		dbUsr.Funcao = up.Funcao
 	}
-	if uu.Senha != nil {
-		pw, err := bcrypt.GenerateFromPassword([]byte(*uu.Senha), bcrypt.DefaultCost)
+	if up.Senha != nil {
+		pw, err := bcrypt.GenerateFromPassword([]byte(up.Senha.GetValue()), bcrypt.DefaultCost)
 		if err != nil {
 			return fmt.Errorf("generating password hash: %w", err)
 		}

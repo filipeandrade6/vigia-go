@@ -50,6 +50,10 @@ func (c Core) Update(ctx context.Context, svID string, up UpdateServidorGravacao
 		return ErrInvalidID
 	}
 
+	if err := validate.Check(up); err != nil {
+		return fmt.Errorf("validating data: %w", err)
+	}
+
 	dbSV, err := c.store.QueryByID(ctx, svID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {

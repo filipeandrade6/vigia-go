@@ -6,9 +6,10 @@ import (
 	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/camera"
+	"github.com/filipeandrade6/vigia-go/internal/core/camera"
+	"github.com/filipeandrade6/vigia-go/internal/core/usuario"
+	"github.com/golang/protobuf/ptypes/wrappers"
 
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
@@ -16,19 +17,13 @@ type GerenciaClient struct {
 	c pb.GerenciaClient
 }
 
-func NewClientGerencia() *GerenciaClient {
-
-	cfg := fmt.Sprintf(
-		"%s:%d",
-		viper.GetString("VIGIA_GER_HOST"), // TODO assim como no DB juntar endereco e porta em uma unica var
-		viper.GetInt("VIGIA_GER_SERVER_PORT"),
-	)
+func NewClientGerencia(dialAddr string) *GerenciaClient {
 
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithBlock())
 
-	conn, err := grpc.Dial(cfg, opts...)
+	conn, err := grpc.Dial(dialAddr, opts...)
 	if err != nil {
 		fmt.Println("Erro aqui no client") // TODO mudar isso aqui
 		panic(err)
@@ -131,4 +126,19 @@ func (g *GerenciaClient) Login(email, senha string) (string, error) {
 	token := t.GetAccessToken()
 
 	return token, nil
+}
+
+func (g *GerenciaClient) UpdateUsuario(usuarioID string, usuario usuario.UpdateUsuario) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	if _, err := g.c.UpdateUsuario(ctx, &pb.UpdateUsuarioReq{
+		UsuarioId: usuarioID,
+		Funcao:    []string{"USER", "MANAGER"},
+		Senha:     &wrappers.StringValue{Value: "secret"},
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }

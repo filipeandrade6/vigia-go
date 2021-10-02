@@ -5,6 +5,8 @@ import (
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/core/usuario/db"
+
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 )
 
 type Usuario struct {
@@ -20,10 +22,16 @@ type NewUsuario struct {
 	Senha  string   `validate:"required"`
 }
 
+// type UpdateUsuario struct {
+// 	Email  *string  `validate:"omitempty,email"`
+// 	Funcao []string `validate:"omitempty"`
+// 	Senha  *string  `validate:"omitempty"`
+// }
+
 type UpdateUsuario struct {
-	Email  *string  `validate:"omitempty,email"`
-	Funcao []string `validate:"omitempty"`
-	Senha  *string  `validate:"omitempty"`
+	Email  *wrappers.StringValue
+	Funcao []string
+	Senha  *wrappers.StringValue
 }
 
 // =============================================================================
@@ -68,16 +76,6 @@ func (u Usuarios) ToProto() []*pb.Usuario {
 
 	for _, usuario := range u {
 		usuarios = append(usuarios, usuario.ToProto())
-	}
-
-	return usuarios
-}
-
-func UsuariosFromProto(u []*pb.Usuario) Usuarios {
-	var usuarios Usuarios
-
-	for _, usuario := range u {
-		usuarios = append(usuarios, FromProto(usuario))
 	}
 
 	return usuarios

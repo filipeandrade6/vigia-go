@@ -57,6 +57,10 @@ func (c Core) Update(ctx context.Context, cameraID string, up UpdateCamera) erro
 		return ErrInvalidID
 	}
 
+	if err := validate.Check(up); err != nil {
+		return fmt.Errorf("validating data: %w", err)
+	}
+
 	dbCam, err := c.store.QueryByID(ctx, cameraID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
@@ -109,7 +113,7 @@ func (c Core) Delete(ctx context.Context, cameraID string) error {
 	return nil
 }
 
-func (c Core) Query(ctx context.Context, query string, pageNumber int, rowsPerPage int) ([]Camera, error) {
+func (c Core) Query(ctx context.Context, query string, pageNumber int, rowsPerPage int) (Cameras, error) {
 	dbCams, err := c.store.Query(ctx, query, pageNumber, rowsPerPage)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {

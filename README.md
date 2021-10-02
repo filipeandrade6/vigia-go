@@ -3,6 +3,14 @@
 
 #### ONDE PAREI
 
+QUAL O USO DO KEYVALUE STORE?
+
+NAO TEM GRPC PARA BROWSER https://github.com/grpc-ecosystem/grpc-gateway/blob/master/examples/internal/proto/examplepb/wrappers.proto
+
+VERIFICAR OS ERRORS NO SERVICE
+
+COMO O EVANS FAZ ITERATIVO - REPL
+
 ADICIONAR AUTHORIZATION POR NIVEL DE SERVIÇO ASSIM COMO O TECH SCHOOL
 
 ARRUMAR O SEED DOWN ESTA SEM OS TESTS PARA OS VALIDATORS
@@ -13,9 +21,9 @@ Add https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-
 
 EU POSSO REGISTRAR OUTROS SERVICOS NO GRPCSERVER - isso permite separar os servicos em arquivos
 
-VER O EVANS no TECH SCHOOL PARA CLIENT DE GRPC - acho que usa o grpc reflect...
-
 CRIAR OS TESTE E FAZER TDD
+
+COLOCAR require de na funcação do usuario ou criar if proibindo nulo	fmt.Println(fullMethodName)
 
 SEPARAR OS SERVIÇOS GRPC EM TIPO - CLIENT FRONT-END / GERENCIA INTER / GRAVACAO
 

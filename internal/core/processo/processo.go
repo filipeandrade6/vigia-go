@@ -54,6 +54,10 @@ func (c Core) Update(ctx context.Context, processoID string, up UpdateProcesso) 
 		return ErrInvalidID
 	}
 
+	if err := validate.Check(up); err != nil {
+		return fmt.Errorf("validating data: %w", err)
+	}
+
 	dbPrc, err := c.store.QueryByID(ctx, processoID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {

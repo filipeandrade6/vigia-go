@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/filipeandrade6/vigia-go/internal/gerencia-admin/config"
 	"github.com/filipeandrade6/vigia-go/internal/gerencia-admin/core"
 	"github.com/spf13/cobra"
 
@@ -28,7 +29,7 @@ to quickly create a Cobra application.`,
 		}
 		defer log.Sync()
 
-		if err := core.Run(log); err != nil {
+		if err := core.Run(log, config.Configuration{}); err != nil {
 			log.Errorw("startup", "ERROR", err)
 			os.Exit(1)
 		}

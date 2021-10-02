@@ -4,6 +4,8 @@ option go_package = "./internal/api/v1";
 
 package gerencia;
 
+import "google/protobuf/wrappers.proto";
+
 service Gerencia {
     rpc Match (MatchReq) returns (MatchRes) {} // TODO streaming de informação de placa e o gerencia processa tudo?
 
@@ -85,7 +87,10 @@ message ReadUsuariosRes {
 }
 
 message UpdateUsuarioReq {
-    Usuario usuario = 1;
+    string usuario_id = 1;
+    repeated string funcao = 2;
+    google.protobuf.StringValue email = 3;
+    google.protobuf.StringValue senha = 4;
 }
 
 message UpdateUsuarioRes {}

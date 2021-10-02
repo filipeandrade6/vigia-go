@@ -8,9 +8,6 @@ import (
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/data/migration"
 
-	// "github.com/filipeandrade6/vigia-go/internal/data/Store/camera"
-	// "github.com/filipeandrade6/vigia-go/internal/data/Store/servidorgravacao"
-	// "github.com/filipeandrade6/vigia-go/internal/data/Store/usuario"
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
 	"github.com/filipeandrade6/vigia-go/internal/core/servidorgravacao"
 	"github.com/filipeandrade6/vigia-go/internal/core/usuario"
@@ -63,7 +60,6 @@ func (g *GerenciaService) AuthFuncOverride(ctx context.Context, fullMethodName s
 	}()
 
 	// TODO se o servico chamado for Login - so encaminha o contexto
-	fmt.Println(fullMethodName)
 	return ctx, nil
 
 	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
@@ -115,11 +111,6 @@ func (g *GerenciaService) CreateUsuario(ctx context.Context, req *pb.CreateUsuar
 		}
 	}()
 
-	// claims, err := auth.GetClaims(ctx)
-	// if err != nil {
-	// 	return &pb.CreateUsuarioRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-	// }
-
 	usr := usuario.FromProto(req.Usuario)
 	nu := usuario.NewUsuario{
 		Email:  usr.Email,
@@ -146,11 +137,6 @@ func (g *GerenciaService) ReadUsuario(ctx context.Context, req *pb.ReadUsuarioRe
 		}
 	}()
 
-	// claims, err := auth.GetClaims(ctx)
-	// if err != nil {
-	// 	return &pb.ReadUsuarioRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-	// }
-
 	usuario, err := g.usuarioCore.QueryByID(ctx, req.GetUsuarioId())
 	if err != nil {
 		switch validate.Cause(err) {
@@ -175,11 +161,6 @@ func (g *GerenciaService) ReadUsuarios(ctx context.Context, req *pb.ReadUsuarios
 			g.log.Errorw("read usuarios", "ERROR", err)
 		}
 	}()
-
-	// claims, err := auth.GetClaims(ctx)
-	// if err != nil {
-	// 	return &pb.ReadUsuariosRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-	// }
 
 	query := req.GetQuery()
 	pageNumber := int(req.GetPageNumber())
@@ -207,21 +188,13 @@ func (g *GerenciaService) UpdateUsuario(ctx context.Context, req *pb.UpdateUsuar
 		}
 	}()
 
-	// claims, err := auth.GetClaims(ctx)
-	// if err != nil {
-	// 	return &pb.UpdateUsuarioRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-	// }
-
-	usr := usuario.FromProto(req.Usuario)
 	upd := usuario.UpdateUsuario{
-		Email:  &usr.Email,
-		Funcao: usr.Funcao,
-		Senha:  &usr.Senha,
+		Email:  req.GetEmail(),
+		Funcao: req.GetFuncao(),
+		Senha:  req.GetSenha(),
 	}
 
-	// TODO colocar no proto o usuarioID ou mandar tudo junto?
-
-	if err := g.usuarioCore.Update(ctx, usr.UsuarioID, upd); err != nil {
+	if err := g.usuarioCore.Update(ctx, req.GetUsuarioId(), upd); err != nil {
 		switch validate.Cause(err) {
 		case database.ErrInvalidID:
 			return &pb.UpdateUsuarioRes{}, status.Error(codes.InvalidArgument, err.Error())
@@ -244,11 +217,6 @@ func (g *GerenciaService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuar
 			g.log.Errorw("delete usuario", "ERROR", err)
 		}
 	}()
-
-	// claims, err := auth.GetClaims(ctx)
-	// if err != nil {
-	// 	return &pb.DeleteUsuarioRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-	// }
 
 	for _, u := range req.GetUsuarioId() {
 		if err := g.usuarioCore.Delete(ctx, u); err != nil {
@@ -300,170 +268,261 @@ func (g *GerenciaService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuar
 // =========================================================================
 // Camera
 
-// func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
-// 	var err error
-// 	defer func() {
-// 		if err != nil {
-// 			g.log.Errorw("create camera", "ERROR", err)
-// 		}
-// 	}()
+func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("create camera", "ERROR", err)
+		}
+	}()
 
-// 	claims, err := auth.GetClaims(ctx)
-// 	if err != nil {
-// 		return &pb.CreateCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-// 	}
+	cam := camera.FromProto(req.Camera)
+	nc := camera.NewCamera{
+		Descricao:  cam.Descricao,
+		EnderecoIP: cam.EnderecoIP,
+		Porta:      cam.Porta,
+		Canal:      cam.Canal,
+		Usuario:    cam.Usuario,
+		Senha:      cam.Senha,
+		Latitude:   cam.Latitude,
+		Longitude:  cam.Longitude,
+	}
 
-// 	cam := camera.FromProto(req.Camera)
+	savedCam, err := g.cameraCore.Create(ctx, nc)
+	if err != nil {
+		if validate.Cause(err) == database.ErrForbidden {
+			return &pb.CreateCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
+		}
+		return &pb.CreateCameraRes{}, status.Error(codes.Internal, err.Error())
+	}
 
-// 	camID, err := g.cameraCore.Create(ctx, cam)
-// 	if err != nil {
-// 		if validate.Cause(err) == database.ErrForbidden {
-// 			return &pb.CreateCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
-// 		}
-// 		return &pb.CreateCameraRes{}, status.Error(codes.Internal, err.Error())
-// 	}
+	return &pb.CreateCameraRes{CameraId: savedCam.CameraID}, nil
+}
 
-// 	return &pb.CreateCameraRes{CameraId: camID}, nil
-// }
+func (g *GerenciaService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq) (*pb.ReadCameraRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("read camera", "ERROR", err)
+		}
+	}()
 
-// func (g *GerenciaService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq) (*pb.ReadCameraRes, error) {
-// 	var err error
-// 	defer func() {
-// 		if err != nil {
-// 			g.log.Errorw("read camera", "ERROR", err)
-// 		}
-// 	}()
+	cam, err := g.cameraCore.QueryByID(ctx, req.GetCameraId())
+	if err != nil {
+		switch validate.Cause(err) {
+		case database.ErrInvalidID:
+			return &pb.ReadCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
+		case database.ErrNotFound:
+			return &pb.ReadCameraRes{}, status.Error(codes.NotFound, err.Error())
+		default:
+			return &pb.ReadCameraRes{}, status.Error(codes.Internal, err.Error())
+		}
+	}
 
-// 	err := auth.GetClaims(ctx)
-// 	if err != nil {
-// 		return &pb.ReadCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-// 	}
+	return &pb.ReadCameraRes{Camera: cam.ToProto()}, nil
+}
 
-// 	cam, err := g.cameraCore.QueryByID(ctx, req.GetCameraId())
-// 	if err != nil {
-// 		switch validate.Cause(err) {
-// 		case database.ErrInvalidID:
-// 			return &pb.ReadCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
-// 		case database.ErrNotFound:
-// 			return &pb.ReadCameraRes{}, status.Error(codes.NotFound, err.Error())
-// 		default:
-// 			return &pb.ReadCameraRes{}, status.Error(codes.Internal, err.Error())
-// 		}
-// 	}
+func (g *GerenciaService) ReadCameras(ctx context.Context, req *pb.ReadCamerasReq) (*pb.ReadCamerasRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("read cameras", "ERROR", err)
+		}
+	}()
 
-// 	return &pb.ReadCameraRes{Camera: cam.ToProto()}, nil
-// }
+	query := req.GetQuery()
+	pageNumber := int(req.GetPageNumber())
+	rowsPerPage := int(req.GetRowsPerPage())
 
-// func (g *GerenciaService) ReadCameras(ctx context.Context, req *pb.ReadCamerasReq) (*pb.ReadCamerasRes, error) {
-// 	var err error
-// 	defer func() {
-// 		if err != nil {
-// 			g.log.Errorw("read cameras", "ERROR", err)
-// 		}
-// 	}()
+	cameras, err := g.cameraCore.Query(ctx, query, pageNumber, rowsPerPage)
+	if err != nil {
+		if validate.Cause(err) == database.ErrNotFound {
+			return &pb.ReadCamerasRes{}, status.Error(codes.NotFound, err.Error())
+		}
+		return &pb.ReadCamerasRes{}, status.Error(codes.Internal, err.Error())
+	}
 
-// 	err := auth.GetClaims(ctx)
-// 	if err != nil {
-// 		return &pb.ReadCamerasRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-// 	}
+	return &pb.ReadCamerasRes{Cameras: cameras.ToProto()}, nil
+}
 
-// 	query := req.GetQuery()
-// 	pageNumber := int(req.GetPageNumber())
-// 	rowsPerPage := int(req.GetRowsPerPage())
+func (g *GerenciaService) UpdateCamera(ctx context.Context, req *pb.UpdateCameraReq) (*pb.UpdateCameraRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("update camera", "ERROR", err)
+		}
+	}()
 
-// 	cameras, err := g.cameraCore.Query(ctx, query, pageNumber, rowsPerPage)
-// 	if err != nil {
-// 		if validate.Cause(err) == database.ErrNotFound {
-// 			return &pb.ReadCamerasRes{}, status.Error(codes.NotFound, err.Error())
-// 		}
-// 		return &pb.ReadCamerasRes{}, status.Error(codes.Internal, err.Error())
-// 	}
+	cam := camera.FromProto(req.Camera)
+	upd := camera.UpdateCamera{
+		Descricao:  &cam.Descricao,
+		EnderecoIP: &cam.EnderecoIP,
+		Porta:      &cam.Porta,
+		Canal:      &cam.Canal,
+		Usuario:    &cam.Usuario,
+		Senha:      &cam.Senha,
+		Latitude:   &cam.Latitude,
+		Longitude:  &cam.Longitude,
+	}
 
-// 	return &pb.ReadCamerasRes{Cameras: cameras.ToProto()}, nil
-// }
+	if err := g.cameraCore.Update(ctx, cam.CameraID, upd); err != nil {
+		switch validate.Cause(err) {
+		case database.ErrForbidden:
+			return &pb.UpdateCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
+		case database.ErrInvalidID:
+			return &pb.UpdateCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
+		default:
+			return &pb.UpdateCameraRes{}, status.Error(codes.Internal, err.Error())
+		}
+	}
+	return &pb.UpdateCameraRes{}, nil
+}
 
-// func (g *GerenciaService) UpdateCamera(ctx context.Context, req *pb.UpdateCameraReq) (*pb.UpdateCameraRes, error) {
-// 	var err error
-// 	defer func() {
-// 		if err != nil {
-// 			g.log.Errorw("update camera", "ERROR", err)
-// 		}
-// 	}()
+func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCameraReq) (*pb.DeleteCameraRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("delete camera", "ERROR", err)
+		}
+	}()
 
-// 	err := auth.GetClaims(ctx)
-// 	if err != nil {
-// 		return &pb.UpdateCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-// 	}
+	for _, c := range req.GetCameraId() {
+		if err := g.cameraCore.Delete(ctx, c); err != nil {
+			switch validate.Cause(err) {
+			case database.ErrForbidden:
+				return &pb.DeleteCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
+			case database.ErrInvalidID:
+				return &pb.DeleteCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
+			default:
+				return &pb.DeleteCameraRes{}, status.Error(codes.Internal, err.Error())
+			}
+		}
+	}
 
-// 	cam := camera.FromProto(req.Camera)
+	return &pb.DeleteCameraRes{}, nil
+}
 
-// 	if err := g.cameraCore.Update(ctx, cam); err != nil {
-// 		switch validate.Cause(err) {
-// 		case database.ErrForbidden:
-// 			return &pb.UpdateCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
-// 		case database.ErrInvalidID:
-// 			return &pb.UpdateCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
-// 		default:
-// 			return &pb.UpdateCameraRes{}, status.Error(codes.Internal, err.Error())
-// 		}
-// 	}
-// 	return &pb.UpdateCameraRes{}, nil
-// }
+// =========================================================================
+// Servidores Gravacao
 
-// func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCameraReq) (*pb.DeleteCameraRes, error) {
-// 	var err error
-// 	defer func() {
-// 		if err != nil {
-// 			g.log.Errorw("delete camera", "ERROR", err)
-// 		}
-// 	}()
+func (g *GerenciaService) CreateServidorGravacao(ctx context.Context, req *pb.CreateServidorGravacaoReq) (*pb.CreateServidorGravacaoRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("create servidor de gravacao", "ERROR", err)
+		}
+	}()
 
-// 	err := auth.GetClaims(ctx)
-// 	if err != nil {
-// 		return &pb.DeleteCameraRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-// 	}
+	sv := servidorgravacao.FromProto(req.ServidorGravacao)
+	nsv := servidorgravacao.NewServidorGravacao{
+		EnderecoIP: sv.EnderecoIP,
+		Porta:      sv.Porta,
+	}
 
-// 	for _, c := range req.GetCameraId() {
-// 		if err := g.cameraCore.Delete(ctx, c); err != nil {
-// 			switch validate.Cause(err) {
-// 			case database.ErrForbidden:
-// 				return &pb.DeleteCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
-// 			case database.ErrInvalidID:
-// 				return &pb.DeleteCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
-// 			default:
-// 				return &pb.DeleteCameraRes{}, status.Error(codes.Internal, err.Error())
-// 			}
-// 		}
-// 	}
+	savedSV, err := g.servidorGravacaoCore.Create(ctx, nsv)
+	if err != nil {
+		if validate.Cause(err) == database.ErrForbidden {
+			return &pb.CreateServidorGravacaoRes{}, status.Error(codes.PermissionDenied, err.Error())
+		}
+		return &pb.CreateServidorGravacaoRes{}, status.Error(codes.Internal, err.Error())
+	}
 
-// 	return &pb.DeleteCameraRes{}, nil
-// }
+	return &pb.CreateServidorGravacaoRes{ServidorGravacaoId: savedSV.ServidorGravacaoID}, nil
+}
 
-// // =========================================================================
-// // Servidores Gravacao
+func (g *GerenciaService) ReadServidorGravacao(ctx context.Context, req *pb.ReadServidorGravacaoReq) (*pb.ReadServidorGravacaoRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("read servidor de gravacao", "ERROR", err)
+		}
+	}()
 
-// func (g *GerenciaService) CreateServidorGravacao(ctx context.Context, req *pb.CreateServidorGravacaoReq) (*pb.CreateServidorGravacaoRes, error) {
-// 	var err error
-// 	defer func() {
-// 		if err != nil {
-// 			g.log.Errorw("create camera", "ERROR", err)
-// 		}
-// 	}()
+	sv, err := g.servidorGravacaoCore.QueryByID(ctx, req.GetServidorGravacaoId())
+	if err != nil {
+		switch validate.Cause(err) {
+		case database.ErrInvalidID:
+			return &pb.ReadServidorGravacaoRes{}, status.Error(codes.InvalidArgument, err.Error())
+		case database.ErrNotFound:
+			return &pb.ReadServidorGravacaoRes{}, status.Error(codes.NotFound, err.Error())
+		default:
+			return &pb.ReadServidorGravacaoRes{}, status.Error(codes.Internal, err.Error())
+		}
+	}
 
-// 	err := auth.GetClaims(ctx)
-// 	if err != nil {
-// 		return &pb.CreateServidorGravacaoRes{}, status.Error(codes.Unauthenticated, "claims missing from context")
-// 	}
+	return &pb.ReadServidorGravacaoRes{ServidorGravacao: sv.ToProto()}, nil
+}
 
-// 	sv := servidorgravacao.FromProto(req.ServidorGravacao)
+func (g *GerenciaService) ReadServidoresGravacao(ctx context.Context, req *pb.ReadServidoresGravacaoReq) (*pb.ReadServidoresGravacaoRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("read servidores de gravacao", "ERROR", err)
+		}
+	}()
 
-// 	svID, err := g.servidorGravacaoCore.Create(ctx, sv)
-// 	if err != nil {
-// 		if validate.Cause(err) == database.ErrForbidden {
-// 			return &pb.CreateServidorGravacaoRes{}, status.Error(codes.PermissionDenied, err.Error())
-// 		}
-// 		return &pb.CreateServidorGravacaoRes{}, status.Error(codes.Internal, err.Error())
-// 	}
+	query := req.GetQuery()
+	pageNumber := int(req.GetPageNumber())
+	rowsPerPage := int(req.GetRowsPerPage())
 
-// 	return &pb.CreateServidorGravacaoRes{ServidorGravacaoId: svID}, nil
-// }
+	svs, err := g.servidorGravacaoCore.Query(ctx, query, pageNumber, rowsPerPage)
+	if err != nil {
+		if validate.Cause(err) == database.ErrNotFound {
+			return &pb.ReadServidoresGravacaoRes{}, status.Error(codes.NotFound, err.Error())
+		}
+		return &pb.ReadServidoresGravacaoRes{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &pb.ReadServidoresGravacaoRes{ServiceGravacao: svs.ToProto()}, nil
+}
+
+func (g *GerenciaService) UpdateServidorGravacao(ctx context.Context, req *pb.UpdateServidorGravacaoReq) (*pb.UpdateServidorGravacaoRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("update servidor de gravacao", "ERROR", err)
+		}
+	}()
+
+	sv := servidorgravacao.FromProto(req.ServidorGravacao)
+	upd := servidorgravacao.UpdateServidorGravacao{
+		EnderecoIP: &sv.EnderecoIP,
+		Porta:      &sv.Porta,
+	}
+
+	if err := g.servidorGravacaoCore.Update(ctx, sv.ServidorGravacaoID, upd); err != nil {
+		switch validate.Cause(err) {
+		case database.ErrForbidden:
+			return &pb.UpdateServidorGravacaoRes{}, status.Error(codes.PermissionDenied, err.Error())
+		case database.ErrInvalidID:
+			return &pb.UpdateServidorGravacaoRes{}, status.Error(codes.InvalidArgument, err.Error())
+		default:
+			return &pb.UpdateServidorGravacaoRes{}, status.Error(codes.Internal, err.Error())
+		}
+	}
+	return &pb.UpdateServidorGravacaoRes{}, nil
+}
+
+func (g *GerenciaService) DeleteServidorGravacao(ctx context.Context, req *pb.DeleteServidorGravacaoReq) (*pb.DeleteServidorGravacaoRes, error) {
+	var err error
+	defer func() {
+		if err != nil {
+			g.log.Errorw("delete servidor de gravacao", "ERROR", err)
+		}
+	}()
+
+	for _, c := range req.GetServidorGravacaoId() {
+		if err := g.servidorGravacaoCore.Delete(ctx, c); err != nil {
+			switch validate.Cause(err) {
+			case database.ErrForbidden:
+				return &pb.DeleteServidorGravacaoRes{}, status.Error(codes.PermissionDenied, err.Error())
+			case database.ErrInvalidID:
+				return &pb.DeleteServidorGravacaoRes{}, status.Error(codes.InvalidArgument, err.Error())
+			default:
+				return &pb.DeleteServidorGravacaoRes{}, status.Error(codes.Internal, err.Error())
+			}
+		}
+	}
+
+	return &pb.DeleteServidorGravacaoRes{}, nil
+}
