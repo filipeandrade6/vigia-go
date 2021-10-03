@@ -8,12 +8,17 @@ INSERT INTO cameras (camera_id, descricao, endereco_ip, porta, canal, usuario, s
     ('d03307d4-2b28-4c23-a004-3da25e5b8aa3', 'desc 2', '45.56.78.89', '1', '1', 'admin', 'admin', '-12.2332', '-42.231')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO servidores_gravacao (servidor_gravacao_id, endereco_ip, porta) VALUES
-    ('d03307d4-2b28-4c23-a004-3da25e5b8bb1', '12.34.67.89', '6543'),
-    ('d03307d4-2b28-4c23-a004-3da25e524bb1', '21.43.76.98', '3456')
+INSERT INTO servidores_gravacao (servidor_gravacao_id, endereco_ip, porta, armazenamento, housekeeper) VALUES
+    ('d03307d4-2b28-4c23-a004-3da25e5b8bb1', '12.34.67.89', '6543', '/', '0 0 * * 0'),
+    ('d03307d4-2b28-4c23-a004-3da25e524bb1', '21.43.76.98', '3456', '/', '0 0 * * 0')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO processos (processo_id, servidor_gravacao_id, camera_id, processador, adaptador, execucao) VALUES
     ('d03307d4-2b28-4c23-a004-3da32e5b8bb1', 'd03307d4-2b28-4c23-a004-3da25e5b8bb1', 'd03307d4-2b28-4c23-a004-3da25e5b8ce3', '1', '1', 'true'),
     ('d03307d4-2b28-4c23-a004-3da32e5b8a61', 'd03307d4-2b28-4c23-a004-3da25e5b8bb1', 'd03307d4-2b28-4c23-a004-3da25e5b8aa3', '1', '1', 'true')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO veiculos (veiculo_id, placa, tipo, cor, marca, info) VALUES
+    ('d03307d4-2b28-4d23-a004-3da32e5b8bb1', 'ABC0000', 'sedan', 'branco', 'honda', 'teste de carro 1'),
+    ('d03307d4-2b28-4d23-a004-3da32e5b8a61', 'ABC0001', 'suv', 'preto', 'hyundai', 'teste de carro 2')
 ON CONFLICT DO NOTHING;

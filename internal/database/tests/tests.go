@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/filipeandrade6/vigia-go/internal/data/migration"
+	"github.com/filipeandrade6/vigia-go/internal/database/migration"
 	"github.com/filipeandrade6/vigia-go/internal/sys/logger"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"

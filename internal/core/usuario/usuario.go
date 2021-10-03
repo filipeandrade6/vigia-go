@@ -15,9 +15,10 @@ import (
 
 // Set of error variables for CRUD operations.
 var (
-	ErrNotFound              = errors.New("user not found")
+	ErrNotFound              = errors.New("usuario not found")
 	ErrInvalidID             = errors.New("ID is not in its proper form")
 	ErrAuthenticationFailure = errors.New("authentication failed") // TODO ver se no service tem metodo login aqui
+	ErrEmailAlreadyExists    = errors.New("email already exists")
 )
 
 type Core struct {
@@ -33,6 +34,10 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 func (c Core) Create(ctx context.Context, nu NewUsuario) (Usuario, error) {
 	if err := validate.Check(nu); err != nil {
 		return Usuario{}, fmt.Errorf("validating data: %w", err)
+	}
+
+	if _, err := c.QueryByEmail(ctx, nu.Email); !errors.Is(err, ErrNotFound) {
+		return Usuario{}, ErrEmailAlreadyExists
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(nu.Senha), bcrypt.DefaultCost)
@@ -54,20 +59,27 @@ func (c Core) Create(ctx context.Context, nu NewUsuario) (Usuario, error) {
 	return toUsuario(dbUsr), nil
 }
 
-func (c Core) Update(ctx context.Context, usuarioID string, up UpdateUsuario) error {
-	if err := validate.CheckID(usuarioID); err != nil {
+func (c Core) Update(ctx context.Context, up UpdateUsuario) error {
+	if err := validate.CheckID(up.UsuarioID); err != nil {
 		return ErrInvalidID
 	}
 
-	dbUsr, err := c.store.QueryByID(ctx, usuarioID)
+	if err := validate.Check(up); err != nil {
+		return fmt.Errorf("validating data: %w", err)
+	}
+
+	dbUsr, err := c.store.QueryByID(ctx, up.UsuarioID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
 			return ErrNotFound
 		}
-		return fmt.Errorf("updating user userID[%s]: %w", usuarioID, err)
+		return fmt.Errorf("updating user userID[%s]: %w", up.UsuarioID, err)
 	}
 
 	if up.Email != nil {
+		if _, err := c.QueryByEmail(ctx, up.Email.GetValue()); !errors.Is(err, ErrNotFound) {
+			return ErrEmailAlreadyExists
+		}
 		dbUsr.Email = up.Email.GetValue()
 	}
 	if up.Funcao != nil {

@@ -3,7 +3,7 @@
 
 #### ONDE PAREI
 
-QUAL O USO DO KEYVALUE STORE?
+HEALTHY CHECK - https://github.com/grpc/grpc/blob/master/doc/health-checking.md
 
 NAO TEM GRPC PARA BROWSER https://github.com/grpc-ecosystem/grpc-gateway/blob/master/examples/internal/proto/examplepb/wrappers.proto
 

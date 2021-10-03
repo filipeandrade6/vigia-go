@@ -7,6 +7,8 @@ package gerencia;
 import "google/protobuf/wrappers.proto";
 
 service Gerencia {
+    rpc Login(LoginReq) returns (LoginRes) {}
+
     rpc Match (MatchReq) returns (MatchRes) {} // TODO streaming de informação de placa e o gerencia processa tudo?
 
     rpc Migrate (MigrateReq) returns (MigrateRes) {}
@@ -17,7 +19,6 @@ service Gerencia {
     rpc ReadUsuarios (ReadUsuariosReq) returns (ReadUsuariosRes) {}
     rpc UpdateUsuario (UpdateUsuarioReq) returns (UpdateUsuarioRes) {}
     rpc DeleteUsuario (DeleteUsuarioReq) returns (DeleteUsuarioRes) {}
-    rpc Login(LoginReq) returns (LoginRes) {}
 
     rpc CreateServidorGravacao (CreateServidorGravacaoReq) returns (CreateServidorGravacaoRes) {}
     rpc ReadServidorGravacao (ReadServidorGravacaoReq) returns (ReadServidorGravacaoRes) {}
@@ -36,7 +37,26 @@ service Gerencia {
     rpc ReadProcessos (ReadProcessosReq) returns (ReadProcessosRes) {}
     rpc UpdateProcesso (UpdateProcessoReq) returns (UpdateProcessoRes) {}
     rpc DeleteProcesso (DeleteProcessoReq) returns (DeleteProcessoRes) {}
+
+    rpc CreateVeiculo (CreateVeiculoReq) returns (CreateVeiculoRes) {}
+    rpc ReadVeiculo (ReadVeiculoReq) returns (ReadVeiculoRes) {}
+    rpc ReadVeiculos (ReadVeiculosReq) returns (ReadVeiculosRes) {}
+    rpc UpdateVeiculo (UpdateVeiculoReq) returns (UpdateVeiculoRes) {}
+    rpc DeleteVeiculo (DeleteVeiculoReq) returns (DeleteVeiculoRes) {}
 }
+
+// =========
+
+message LoginReq{
+    string email = 1;
+    string senha = 2;
+}
+
+message LoginRes{
+    string access_token = 1;
+}
+
+// =========
 
 message MatchReq{
     string registro_id = 1;
@@ -44,6 +64,8 @@ message MatchReq{
 }
 
 message MatchRes{}
+
+// =========
 
 message MigrateReq{
     int32 versao = 1;
@@ -88,8 +110,8 @@ message ReadUsuariosRes {
 
 message UpdateUsuarioReq {
     string usuario_id = 1;
-    repeated string funcao = 2;
     google.protobuf.StringValue email = 3;
+    repeated string funcao = 2;
     google.protobuf.StringValue senha = 4;
 }
 
@@ -100,15 +122,6 @@ message DeleteUsuarioReq {
 }
 
 message DeleteUsuarioRes {}
-
-message LoginReq{
-    string email = 1;
-    string senha = 2;
-}
-
-message LoginRes{
-    string access_token = 1;
-}
 
 // =======================
 
@@ -256,3 +269,59 @@ message DeleteProcessoReq{
 }
 
 message DeleteProcessoRes{}
+
+// =======================
+
+message Veiculo {
+    string veiculo_id = 1;
+    string placa = 2;
+    string tipo = 3;
+    string cor = 4;
+    string marca = 5;
+    string info = 6;
+}
+
+message CreateVeiculoReq {
+    Veiculo veiculo = 1;
+}
+
+message CreateVeiculoRes {
+    string veiculo_id = 1;
+}
+
+message ReadVeiculoReq {
+    string veiculo_id = 1;
+}
+
+message ReadVeiculoRes {
+    Veiculo veiculo = 1;
+}
+
+message ReadVeiculosReq {
+    string query = 1;
+    int32 page_number = 2;
+    int32 rows_per_page = 3;
+}
+
+message ReadVeiculosRes {
+    repeated Veiculo veiculos = 1;
+}
+
+message UpdateVeiculoReq {
+    string veiculo_id = 1;
+    google.protobuf.StringValue placa = 2;
+    google.protobuf.StringValue tipo = 3;
+    google.protobuf.StringValue cor = 4;
+    google.protobuf.StringValue marca = 5;
+    google.protobuf.StringValue info = 6;
+}
+
+message UpdateVeiculoRes {}
+
+message DeleteVeiculoReq {
+    repeated string veiculo_id = 1;
+}
+
+message DeleteVeiculoRes {}
+
+// =========

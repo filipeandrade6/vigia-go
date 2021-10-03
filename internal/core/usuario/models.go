@@ -22,16 +22,11 @@ type NewUsuario struct {
 	Senha  string   `validate:"required"`
 }
 
-// type UpdateUsuario struct {
-// 	Email  *string  `validate:"omitempty,email"`
-// 	Funcao []string `validate:"omitempty"`
-// 	Senha  *string  `validate:"omitempty"`
-// }
-
 type UpdateUsuario struct {
-	Email  *wrappers.StringValue
-	Funcao []string
-	Senha  *wrappers.StringValue
+	UsuarioID string                `validate:"required"`
+	Email     *wrappers.StringValue `validate:"omitempty,email"`
+	Funcao    []string              `validate:"omitempty"`
+	Senha     *wrappers.StringValue `validate:"omitempty"`
 }
 
 // =============================================================================
