@@ -18,19 +18,14 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
+	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error)
 	Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error)
 	Migrate(ctx context.Context, in *MigrateReq, opts ...grpc.CallOption) (*MigrateRes, error)
-	CreateVeiculo(ctx context.Context, in *CreateVeiculoReq, opts ...grpc.CallOption) (*CreateVeiculoRes, error)
-	ReadVeiculo(ctx context.Context, in *ReadVeiculoReq, opts ...grpc.CallOption) (*ReadVeiculoRes, error)
-	ReadVeiculos(ctx context.Context, in *ReadVeiculosReq, opts ...grpc.CallOption) (*ReadVeiculosRes, error)
-	UpdateVeiculo(ctx context.Context, in *UpdateVeiculoReq, opts ...grpc.CallOption) (*UpdateVeiculoRes, error)
-	DeleteVeiculo(ctx context.Context, in *DeleteVeiculoReq, opts ...grpc.CallOption) (*DeleteVeiculoRes, error)
 	CreateUsuario(ctx context.Context, in *CreateUsuarioReq, opts ...grpc.CallOption) (*CreateUsuarioRes, error)
 	ReadUsuario(ctx context.Context, in *ReadUsuarioReq, opts ...grpc.CallOption) (*ReadUsuarioRes, error)
 	ReadUsuarios(ctx context.Context, in *ReadUsuariosReq, opts ...grpc.CallOption) (*ReadUsuariosRes, error)
 	UpdateUsuario(ctx context.Context, in *UpdateUsuarioReq, opts ...grpc.CallOption) (*UpdateUsuarioRes, error)
 	DeleteUsuario(ctx context.Context, in *DeleteUsuarioReq, opts ...grpc.CallOption) (*DeleteUsuarioRes, error)
-	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error)
 	CreateServidorGravacao(ctx context.Context, in *CreateServidorGravacaoReq, opts ...grpc.CallOption) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(ctx context.Context, in *ReadServidorGravacaoReq, opts ...grpc.CallOption) (*ReadServidorGravacaoRes, error)
 	ReadServidoresGravacao(ctx context.Context, in *ReadServidoresGravacaoReq, opts ...grpc.CallOption) (*ReadServidoresGravacaoRes, error)
@@ -46,6 +41,11 @@ type GerenciaClient interface {
 	ReadProcessos(ctx context.Context, in *ReadProcessosReq, opts ...grpc.CallOption) (*ReadProcessosRes, error)
 	UpdateProcesso(ctx context.Context, in *UpdateProcessoReq, opts ...grpc.CallOption) (*UpdateProcessoRes, error)
 	DeleteProcesso(ctx context.Context, in *DeleteProcessoReq, opts ...grpc.CallOption) (*DeleteProcessoRes, error)
+	CreateVeiculo(ctx context.Context, in *CreateVeiculoReq, opts ...grpc.CallOption) (*CreateVeiculoRes, error)
+	ReadVeiculo(ctx context.Context, in *ReadVeiculoReq, opts ...grpc.CallOption) (*ReadVeiculoRes, error)
+	ReadVeiculos(ctx context.Context, in *ReadVeiculosReq, opts ...grpc.CallOption) (*ReadVeiculosRes, error)
+	UpdateVeiculo(ctx context.Context, in *UpdateVeiculoReq, opts ...grpc.CallOption) (*UpdateVeiculoRes, error)
+	DeleteVeiculo(ctx context.Context, in *DeleteVeiculoReq, opts ...grpc.CallOption) (*DeleteVeiculoRes, error)
 }
 
 type gerenciaClient struct {
@@ -54,6 +54,15 @@ type gerenciaClient struct {
 
 func NewGerenciaClient(cc grpc.ClientConnInterface) GerenciaClient {
 	return &gerenciaClient{cc}
+}
+
+func (c *gerenciaClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error) {
+	out := new(LoginRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/Login", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gerenciaClient) Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error) {
@@ -68,51 +77,6 @@ func (c *gerenciaClient) Match(ctx context.Context, in *MatchReq, opts ...grpc.C
 func (c *gerenciaClient) Migrate(ctx context.Context, in *MigrateReq, opts ...grpc.CallOption) (*MigrateRes, error) {
 	out := new(MigrateRes)
 	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/Migrate", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) CreateVeiculo(ctx context.Context, in *CreateVeiculoReq, opts ...grpc.CallOption) (*CreateVeiculoRes, error) {
-	out := new(CreateVeiculoRes)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/CreateVeiculo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) ReadVeiculo(ctx context.Context, in *ReadVeiculoReq, opts ...grpc.CallOption) (*ReadVeiculoRes, error) {
-	out := new(ReadVeiculoRes)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ReadVeiculo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) ReadVeiculos(ctx context.Context, in *ReadVeiculosReq, opts ...grpc.CallOption) (*ReadVeiculosRes, error) {
-	out := new(ReadVeiculosRes)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ReadVeiculos", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) UpdateVeiculo(ctx context.Context, in *UpdateVeiculoReq, opts ...grpc.CallOption) (*UpdateVeiculoRes, error) {
-	out := new(UpdateVeiculoRes)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/UpdateVeiculo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) DeleteVeiculo(ctx context.Context, in *DeleteVeiculoReq, opts ...grpc.CallOption) (*DeleteVeiculoRes, error) {
-	out := new(DeleteVeiculoRes)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/DeleteVeiculo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -158,15 +122,6 @@ func (c *gerenciaClient) UpdateUsuario(ctx context.Context, in *UpdateUsuarioReq
 func (c *gerenciaClient) DeleteUsuario(ctx context.Context, in *DeleteUsuarioReq, opts ...grpc.CallOption) (*DeleteUsuarioRes, error) {
 	out := new(DeleteUsuarioRes)
 	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/DeleteUsuario", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gerenciaClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error) {
-	out := new(LoginRes)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -308,23 +263,63 @@ func (c *gerenciaClient) DeleteProcesso(ctx context.Context, in *DeleteProcessoR
 	return out, nil
 }
 
+func (c *gerenciaClient) CreateVeiculo(ctx context.Context, in *CreateVeiculoReq, opts ...grpc.CallOption) (*CreateVeiculoRes, error) {
+	out := new(CreateVeiculoRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/CreateVeiculo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) ReadVeiculo(ctx context.Context, in *ReadVeiculoReq, opts ...grpc.CallOption) (*ReadVeiculoRes, error) {
+	out := new(ReadVeiculoRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ReadVeiculo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) ReadVeiculos(ctx context.Context, in *ReadVeiculosReq, opts ...grpc.CallOption) (*ReadVeiculosRes, error) {
+	out := new(ReadVeiculosRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ReadVeiculos", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) UpdateVeiculo(ctx context.Context, in *UpdateVeiculoReq, opts ...grpc.CallOption) (*UpdateVeiculoRes, error) {
+	out := new(UpdateVeiculoRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/UpdateVeiculo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gerenciaClient) DeleteVeiculo(ctx context.Context, in *DeleteVeiculoReq, opts ...grpc.CallOption) (*DeleteVeiculoRes, error) {
+	out := new(DeleteVeiculoRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/DeleteVeiculo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GerenciaServer is the server API for Gerencia service.
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
+	Login(context.Context, *LoginReq) (*LoginRes, error)
 	Match(context.Context, *MatchReq) (*MatchRes, error)
 	Migrate(context.Context, *MigrateReq) (*MigrateRes, error)
-	CreateVeiculo(context.Context, *CreateVeiculoReq) (*CreateVeiculoRes, error)
-	ReadVeiculo(context.Context, *ReadVeiculoReq) (*ReadVeiculoRes, error)
-	ReadVeiculos(context.Context, *ReadVeiculosReq) (*ReadVeiculosRes, error)
-	UpdateVeiculo(context.Context, *UpdateVeiculoReq) (*UpdateVeiculoRes, error)
-	DeleteVeiculo(context.Context, *DeleteVeiculoReq) (*DeleteVeiculoRes, error)
 	CreateUsuario(context.Context, *CreateUsuarioReq) (*CreateUsuarioRes, error)
 	ReadUsuario(context.Context, *ReadUsuarioReq) (*ReadUsuarioRes, error)
 	ReadUsuarios(context.Context, *ReadUsuariosReq) (*ReadUsuariosRes, error)
 	UpdateUsuario(context.Context, *UpdateUsuarioReq) (*UpdateUsuarioRes, error)
 	DeleteUsuario(context.Context, *DeleteUsuarioReq) (*DeleteUsuarioRes, error)
-	Login(context.Context, *LoginReq) (*LoginRes, error)
 	CreateServidorGravacao(context.Context, *CreateServidorGravacaoReq) (*CreateServidorGravacaoRes, error)
 	ReadServidorGravacao(context.Context, *ReadServidorGravacaoReq) (*ReadServidorGravacaoRes, error)
 	ReadServidoresGravacao(context.Context, *ReadServidoresGravacaoReq) (*ReadServidoresGravacaoRes, error)
@@ -340,6 +335,11 @@ type GerenciaServer interface {
 	ReadProcessos(context.Context, *ReadProcessosReq) (*ReadProcessosRes, error)
 	UpdateProcesso(context.Context, *UpdateProcessoReq) (*UpdateProcessoRes, error)
 	DeleteProcesso(context.Context, *DeleteProcessoReq) (*DeleteProcessoRes, error)
+	CreateVeiculo(context.Context, *CreateVeiculoReq) (*CreateVeiculoRes, error)
+	ReadVeiculo(context.Context, *ReadVeiculoReq) (*ReadVeiculoRes, error)
+	ReadVeiculos(context.Context, *ReadVeiculosReq) (*ReadVeiculosRes, error)
+	UpdateVeiculo(context.Context, *UpdateVeiculoReq) (*UpdateVeiculoRes, error)
+	DeleteVeiculo(context.Context, *DeleteVeiculoReq) (*DeleteVeiculoRes, error)
 	mustEmbedUnimplementedGerenciaServer()
 }
 
@@ -347,26 +347,14 @@ type GerenciaServer interface {
 type UnimplementedGerenciaServer struct {
 }
 
+func (UnimplementedGerenciaServer) Login(context.Context, *LoginReq) (*LoginRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
 func (UnimplementedGerenciaServer) Match(context.Context, *MatchReq) (*MatchRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Match not implemented")
 }
 func (UnimplementedGerenciaServer) Migrate(context.Context, *MigrateReq) (*MigrateRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Migrate not implemented")
-}
-func (UnimplementedGerenciaServer) CreateVeiculo(context.Context, *CreateVeiculoReq) (*CreateVeiculoRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateVeiculo not implemented")
-}
-func (UnimplementedGerenciaServer) ReadVeiculo(context.Context, *ReadVeiculoReq) (*ReadVeiculoRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReadVeiculo not implemented")
-}
-func (UnimplementedGerenciaServer) ReadVeiculos(context.Context, *ReadVeiculosReq) (*ReadVeiculosRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReadVeiculos not implemented")
-}
-func (UnimplementedGerenciaServer) UpdateVeiculo(context.Context, *UpdateVeiculoReq) (*UpdateVeiculoRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateVeiculo not implemented")
-}
-func (UnimplementedGerenciaServer) DeleteVeiculo(context.Context, *DeleteVeiculoReq) (*DeleteVeiculoRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteVeiculo not implemented")
 }
 func (UnimplementedGerenciaServer) CreateUsuario(context.Context, *CreateUsuarioReq) (*CreateUsuarioRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUsuario not implemented")
@@ -382,9 +370,6 @@ func (UnimplementedGerenciaServer) UpdateUsuario(context.Context, *UpdateUsuario
 }
 func (UnimplementedGerenciaServer) DeleteUsuario(context.Context, *DeleteUsuarioReq) (*DeleteUsuarioRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUsuario not implemented")
-}
-func (UnimplementedGerenciaServer) Login(context.Context, *LoginReq) (*LoginRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedGerenciaServer) CreateServidorGravacao(context.Context, *CreateServidorGravacaoReq) (*CreateServidorGravacaoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateServidorGravacao not implemented")
@@ -431,6 +416,21 @@ func (UnimplementedGerenciaServer) UpdateProcesso(context.Context, *UpdateProces
 func (UnimplementedGerenciaServer) DeleteProcesso(context.Context, *DeleteProcessoReq) (*DeleteProcessoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProcesso not implemented")
 }
+func (UnimplementedGerenciaServer) CreateVeiculo(context.Context, *CreateVeiculoReq) (*CreateVeiculoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateVeiculo not implemented")
+}
+func (UnimplementedGerenciaServer) ReadVeiculo(context.Context, *ReadVeiculoReq) (*ReadVeiculoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadVeiculo not implemented")
+}
+func (UnimplementedGerenciaServer) ReadVeiculos(context.Context, *ReadVeiculosReq) (*ReadVeiculosRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadVeiculos not implemented")
+}
+func (UnimplementedGerenciaServer) UpdateVeiculo(context.Context, *UpdateVeiculoReq) (*UpdateVeiculoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateVeiculo not implemented")
+}
+func (UnimplementedGerenciaServer) DeleteVeiculo(context.Context, *DeleteVeiculoReq) (*DeleteVeiculoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteVeiculo not implemented")
+}
 func (UnimplementedGerenciaServer) mustEmbedUnimplementedGerenciaServer() {}
 
 // UnsafeGerenciaServer may be embedded to opt out of forward compatibility for this service.
@@ -442,6 +442,24 @@ type UnsafeGerenciaServer interface {
 
 func RegisterGerenciaServer(s grpc.ServiceRegistrar, srv GerenciaServer) {
 	s.RegisterService(&Gerencia_ServiceDesc, srv)
+}
+
+func _Gerencia_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/Login",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).Login(ctx, req.(*LoginReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Gerencia_Match_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -476,96 +494,6 @@ func _Gerencia_Migrate_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GerenciaServer).Migrate(ctx, req.(*MigrateReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_CreateVeiculo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateVeiculoReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).CreateVeiculo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/CreateVeiculo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).CreateVeiculo(ctx, req.(*CreateVeiculoReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_ReadVeiculo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReadVeiculoReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).ReadVeiculo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/ReadVeiculo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).ReadVeiculo(ctx, req.(*ReadVeiculoReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_ReadVeiculos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReadVeiculosReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).ReadVeiculos(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/ReadVeiculos",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).ReadVeiculos(ctx, req.(*ReadVeiculosReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_UpdateVeiculo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateVeiculoReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).UpdateVeiculo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/UpdateVeiculo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).UpdateVeiculo(ctx, req.(*UpdateVeiculoReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_DeleteVeiculo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteVeiculoReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).DeleteVeiculo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/DeleteVeiculo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).DeleteVeiculo(ctx, req.(*DeleteVeiculoReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -656,24 +584,6 @@ func _Gerencia_DeleteUsuario_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GerenciaServer).DeleteUsuario(ctx, req.(*DeleteUsuarioReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gerencia_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LoginReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GerenciaServer).Login(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/Login",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).Login(ctx, req.(*LoginReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -948,6 +858,96 @@ func _Gerencia_DeleteProcesso_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gerencia_CreateVeiculo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateVeiculoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).CreateVeiculo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/CreateVeiculo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).CreateVeiculo(ctx, req.(*CreateVeiculoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_ReadVeiculo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadVeiculoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ReadVeiculo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ReadVeiculo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ReadVeiculo(ctx, req.(*ReadVeiculoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_ReadVeiculos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadVeiculosReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ReadVeiculos(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ReadVeiculos",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ReadVeiculos(ctx, req.(*ReadVeiculosReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_UpdateVeiculo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateVeiculoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).UpdateVeiculo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/UpdateVeiculo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).UpdateVeiculo(ctx, req.(*UpdateVeiculoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gerencia_DeleteVeiculo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteVeiculoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).DeleteVeiculo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/DeleteVeiculo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).DeleteVeiculo(ctx, req.(*DeleteVeiculoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Gerencia_ServiceDesc is the grpc.ServiceDesc for Gerencia service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -956,32 +956,16 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GerenciaServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "Login",
+			Handler:    _Gerencia_Login_Handler,
+		},
+		{
 			MethodName: "Match",
 			Handler:    _Gerencia_Match_Handler,
 		},
 		{
 			MethodName: "Migrate",
 			Handler:    _Gerencia_Migrate_Handler,
-		},
-		{
-			MethodName: "CreateVeiculo",
-			Handler:    _Gerencia_CreateVeiculo_Handler,
-		},
-		{
-			MethodName: "ReadVeiculo",
-			Handler:    _Gerencia_ReadVeiculo_Handler,
-		},
-		{
-			MethodName: "ReadVeiculos",
-			Handler:    _Gerencia_ReadVeiculos_Handler,
-		},
-		{
-			MethodName: "UpdateVeiculo",
-			Handler:    _Gerencia_UpdateVeiculo_Handler,
-		},
-		{
-			MethodName: "DeleteVeiculo",
-			Handler:    _Gerencia_DeleteVeiculo_Handler,
 		},
 		{
 			MethodName: "CreateUsuario",
@@ -1002,10 +986,6 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUsuario",
 			Handler:    _Gerencia_DeleteUsuario_Handler,
-		},
-		{
-			MethodName: "Login",
-			Handler:    _Gerencia_Login_Handler,
 		},
 		{
 			MethodName: "CreateServidorGravacao",
@@ -1066,6 +1046,26 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteProcesso",
 			Handler:    _Gerencia_DeleteProcesso_Handler,
+		},
+		{
+			MethodName: "CreateVeiculo",
+			Handler:    _Gerencia_CreateVeiculo_Handler,
+		},
+		{
+			MethodName: "ReadVeiculo",
+			Handler:    _Gerencia_ReadVeiculo_Handler,
+		},
+		{
+			MethodName: "ReadVeiculos",
+			Handler:    _Gerencia_ReadVeiculos_Handler,
+		},
+		{
+			MethodName: "UpdateVeiculo",
+			Handler:    _Gerencia_UpdateVeiculo_Handler,
+		},
+		{
+			MethodName: "DeleteVeiculo",
+			Handler:    _Gerencia_DeleteVeiculo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

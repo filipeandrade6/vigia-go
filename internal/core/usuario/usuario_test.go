@@ -9,7 +9,6 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/database/tests"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
-	// "google.golang.org/protobuf/types/known/wrapperspb"
 	"github.com/google/go-cmp/cmp"
 )
 

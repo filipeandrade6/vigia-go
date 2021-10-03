@@ -5,22 +5,30 @@ import (
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/core/servidorgravacao/db"
+	"github.com/golang/protobuf/ptypes/wrappers"
 )
 
 type ServidorGravacao struct {
 	ServidorGravacaoID string
 	EnderecoIP         string
 	Porta              int
+	Armazenamento      string
+	Housekeeper        string
 }
 
 type NewServidorGravacao struct {
-	EnderecoIP string `validate:"required,ip"`
-	Porta      int    `validate:"required,gte=1,lte=65536"`
+	EnderecoIP    string `validate:"required,ip"`
+	Porta         int    `validate:"required,gte=1,lte=65536"`
+	Armazenamento string `validate:"required"`
+	Housekeeper   string `validate:"required"`
 }
 
 type UpdateServidorGravacao struct {
-	EnderecoIP *string `validate:"omitempty,ip"`
-	Porta      *int    `validate:"omitempty,gte=1,lte=65536"`
+	ServidorGravacaoID string                `validate:"required"`
+	EnderecoIP         *wrappers.StringValue `validate:"omitempty,ip"`
+	Porta              *wrappers.Int32Value  `validate:"omitempty,gte=1,lte=65536"`
+	Armazenamento      *wrappers.StringValue `validate:"omitempty"`
+	Housekeeper        *wrappers.StringValue `validate:"omitempty"`
 }
 
 // =============================================================================
@@ -45,6 +53,8 @@ func (s ServidorGravacao) ToProto() *pb.ServidorGravacao {
 		ServidorGravacaoId: s.ServidorGravacaoID,
 		EnderecoIp:         s.EnderecoIP,
 		Porta:              int32(s.Porta),
+		Armazenamento:      s.Armazenamento,
+		Housekeeper:        s.Housekeeper,
 	}
 }
 
@@ -53,6 +63,8 @@ func FromProto(s *pb.ServidorGravacao) ServidorGravacao {
 		ServidorGravacaoID: s.GetServidorGravacaoId(),
 		EnderecoIP:         s.GetEnderecoIp(),
 		Porta:              int(s.GetPorta()),
+		Armazenamento:      s.GetArmazenamento(),
+		Housekeeper:        s.GetHousekeeper(),
 	}
 }
 

@@ -6,7 +6,9 @@ import (
 	"testing"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/servidorgravacao"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/tests"
+	"github.com/filipeandrade6/vigia-go/internal/database/tests"
+	"github.com/golang/protobuf/ptypes/wrappers"
+
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -18,13 +20,15 @@ func TestServidorGravacao(t *testing.T) {
 
 	ctx := context.Background()
 
-	ns := servidorgravacao.NewServidorGravacao{
-		EnderecoIP: "10.20.30.40",
-		Porta:      5001,
-	}
-
 	t.Log("\tGiven the need to work with Servidores de Gravacao records.")
 	{
+		ns := servidorgravacao.NewServidorGravacao{
+			EnderecoIP:    "15.25.35.45",
+			Porta:         5001,
+			Armazenamento: "/home/filipe/vigia",
+			Housekeeper:   "0 0 * * 0",
+		}
+
 		sv, err := core.Create(ctx, ns)
 		if err != nil {
 			t.Fatalf("\t%s\tShould be able to create servidor de gravacao: %s.", tests.Failed, err)
@@ -37,17 +41,39 @@ func TestServidorGravacao(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to retrieve servidor de gravacao by ID.", tests.Success)
 
+		saved2, err := core.QueryByEnderecoIPPorta(ctx, sv.EnderecoIP, sv.Porta)
+		if saved2.ServidorGravacaoID != saved.ServidorGravacaoID {
+			t.Fatalf("\t%s\tShould be able to retrieve servidor de gravacao by Endereco IP and Porta: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to retrieve servidor de gravacao by Endereco IP and Porta.", tests.Success)
+
 		if diff := cmp.Diff(sv, saved); diff != "" {
 			t.Fatalf("\t%s\tShould get back the same servidor de gravacao. Diff:\n%s", tests.Failed, diff)
 		}
 		t.Logf("\t%s\tShould get back the same servidor de gravacao.", tests.Success)
 
-		upd := servidorgravacao.UpdateServidorGravacao{
-			EnderecoIP: tests.StringPointer("60.50.30.20"),
-			Porta:      tests.IntPointer(2727),
+		nsv2 := servidorgravacao.NewServidorGravacao{
+			EnderecoIP:    "15.25.35.45",
+			Porta:         5001,
+			Armazenamento: "/home/filipe/vigia",
+			Housekeeper:   "0 0 * * 0",
 		}
 
-		if err = core.Update(ctx, sv.ServidorGravacaoID, upd); err != nil {
+		_, err = core.Create(ctx, nsv2)
+		if !errors.Is(err, servidorgravacao.ErrServidorAlreadyExists) {
+			t.Fatalf("\t%s\tShould NOT be able to create servidor de gravacao with an already existing Endereco IP and Porta: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould NOT be able to create servidor de gravacao with an already existing Endereco IP and Porta.", tests.Success)
+
+		upd := servidorgravacao.UpdateServidorGravacao{
+			ServidorGravacaoID: sv.ServidorGravacaoID,
+			EnderecoIP:         &wrappers.StringValue{Value: "60.50.30.20"},
+			Porta:              &wrappers.Int32Value{Value: 2727},
+			Armazenamento:      &wrappers.StringValue{Value: "/home/filipe/vigia2"},
+			Housekeeper:        &wrappers.StringValue{Value: "0 0 * * 1"},
+		}
+
+		if err = core.Update(ctx, upd); err != nil {
 			t.Fatalf("\t%s\tShould be able to update servidor de gravacao: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to update servidor de gravacao.", tests.Success)
@@ -59,12 +85,14 @@ func TestServidorGravacao(t *testing.T) {
 		t.Logf("\t%s\tShould be able to retrieve updated servidor de gravacao.", tests.Success)
 
 		want := sv
-		want.EnderecoIP = *upd.EnderecoIP
-		want.Porta = *upd.Porta
+		want.EnderecoIP = upd.EnderecoIP.GetValue()
+		want.Porta = int(upd.Porta.GetValue())
+		want.Armazenamento = upd.Armazenamento.GetValue()
+		want.Housekeeper = upd.Housekeeper.GetValue()
 
 		var idx int
 		for i, s := range svs {
-			if s.EnderecoIP == want.EnderecoIP {
+			if s.ServidorGravacaoID == sv.ServidorGravacaoID {
 				idx = i
 			}
 		}
@@ -74,10 +102,11 @@ func TestServidorGravacao(t *testing.T) {
 		t.Logf("\t%s\tShould get back the same servidor de gravacao.", tests.Success)
 
 		upd = servidorgravacao.UpdateServidorGravacao{
-			Porta: tests.IntPointer(4343),
+			ServidorGravacaoID: sv.ServidorGravacaoID,
+			Porta:              &wrappers.Int32Value{Value: 4343},
 		}
 
-		if err = core.Update(ctx, sv.ServidorGravacaoID, upd); err != nil {
+		if err = core.Update(ctx, upd); err != nil {
 			t.Fatalf("\t%s\tShould be able to update just some fields of servidor de gravacao: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to update just some fields of servidor de gravacao.", tests.Success)
@@ -88,8 +117,8 @@ func TestServidorGravacao(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to retrieve servidor de gravacao by ID.", tests.Success)
 
-		if saved.Porta != *upd.Porta {
-			t.Fatalf("\t%s\tShould be able to see updated Porta field: got %q want %q.", tests.Failed, saved.Porta, *upd.Porta)
+		if saved.Porta != int(upd.Porta.GetValue()) {
+			t.Fatalf("\t%s\tShould be able to see updated Porta field: got %q want %q.", tests.Failed, saved.Porta, int(upd.Porta.GetValue()))
 		}
 		t.Logf("\t%s\tShould be able to see updated Porta field.", tests.Success)
 

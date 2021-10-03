@@ -45,8 +45,8 @@ func TestCamera(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to retrieve camera by ID.", tests.Success)
 
-		saved1, err := core.QueryByEnderecoIP(ctx, cam.EnderecoIP)
-		if saved1.CameraID != saved.CameraID {
+		saved2, err := core.QueryByEnderecoIP(ctx, cam.EnderecoIP)
+		if saved2.CameraID != saved.CameraID {
 			t.Fatalf("\t%s\tShould be able to retrieve camera by Endereco IP: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to retrieve camera by Endereco IP.", tests.Success)

@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	ErrNotFound  = errors.New("servidor de gravacao not found")
-	ErrInvalidID = errors.New("ID is not in its proper from")
+	ErrNotFound              = errors.New("servidor de gravacao not found")
+	ErrInvalidID             = errors.New("ID is not in its proper from")
+	ErrServidorAlreadyExists = errors.New("servidor de gravacao com endereco_ip:porta already exists")
 )
 
 type Core struct {
@@ -32,6 +33,10 @@ func (c Core) Create(ctx context.Context, nsv NewServidorGravacao) (ServidorGrav
 		return ServidorGravacao{}, fmt.Errorf("validating data: %w", err)
 	}
 
+	if _, err := c.QueryByEnderecoIPPorta(ctx, nsv.EnderecoIP, nsv.Porta); !errors.Is(err, ErrNotFound) {
+		return ServidorGravacao{}, ErrServidorAlreadyExists
+	}
+
 	dbSV := db.ServidorGravacao{
 		ServidorGravacaoID: validate.GenerateID(),
 		EnderecoIP:         nsv.EnderecoIP,
@@ -45,8 +50,8 @@ func (c Core) Create(ctx context.Context, nsv NewServidorGravacao) (ServidorGrav
 	return toServidorGravacao(dbSV), nil
 }
 
-func (c Core) Update(ctx context.Context, svID string, up UpdateServidorGravacao) error {
-	if err := validate.CheckID(svID); err != nil {
+func (c Core) Update(ctx context.Context, up UpdateServidorGravacao) error {
+	if err := validate.CheckID(up.ServidorGravacaoID); err != nil {
 		return ErrInvalidID
 	}
 
@@ -54,19 +59,29 @@ func (c Core) Update(ctx context.Context, svID string, up UpdateServidorGravacao
 		return fmt.Errorf("validating data: %w", err)
 	}
 
-	dbSV, err := c.store.QueryByID(ctx, svID)
+	dbSV, err := c.store.QueryByID(ctx, up.ServidorGravacaoID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
 			return ErrNotFound
 		}
-		return fmt.Errorf("updating servidor de gravacao svID[%s]: %w", svID, err)
+		return fmt.Errorf("updating servidor de gravacao svID[%s]: %w", up.ServidorGravacaoID, err)
 	}
 
 	if up.EnderecoIP != nil {
-		dbSV.EnderecoIP = *up.EnderecoIP
+		dbSV.EnderecoIP = up.EnderecoIP.GetValue()
 	}
 	if up.Porta != nil {
-		dbSV.Porta = *up.Porta
+		dbSV.Porta = int(up.Porta.GetValue())
+	}
+	if up.Armazenamento != nil {
+		dbSV.Armazenamento = up.Armazenamento.GetValue()
+	}
+	if up.Housekeeper != nil {
+		dbSV.Housekeeper = up.Housekeeper.GetValue()
+	}
+
+	if _, err := c.QueryByEnderecoIPPorta(ctx, dbSV.EnderecoIP, dbSV.Porta); !errors.Is(err, ErrNotFound) {
+		return ErrServidorAlreadyExists
 	}
 
 	if err := c.store.Update(ctx, dbSV); err != nil {
@@ -114,4 +129,16 @@ func (c Core) QueryByID(ctx context.Context, svID string) (ServidorGravacao, err
 	}
 
 	return toServidorGravacao(dbSV), nil
+}
+
+func (c Core) QueryByEnderecoIPPorta(ctx context.Context, endereco_ip string, porta int) (ServidorGravacao, error) {
+	dbSv, err := c.store.QueryByEnderecoIPPorta(ctx, endereco_ip, porta)
+	if err != nil {
+		if errors.Is(err, database.ErrDBNotFound) {
+			return ServidorGravacao{}, ErrNotFound
+		}
+		return ServidorGravacao{}, fmt.Errorf("query: %w", err)
+	}
+
+	return toServidorGravacao(dbSv), nil
 }
