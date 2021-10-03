@@ -6,7 +6,8 @@ import (
 	"testing"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/tests"
+	"github.com/filipeandrade6/vigia-go/internal/database/tests"
+	"github.com/golang/protobuf/ptypes/wrappers"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -19,19 +20,19 @@ func TestCamera(t *testing.T) {
 
 	ctx := context.Background()
 
-	nc := camera.NewCamera{
-		Descricao:  "camera testes 1",
-		EnderecoIP: "1.2.3.4",
-		Porta:      1234,
-		Canal:      1,
-		Usuario:    "admin",
-		Senha:      "admin",
-		Latitude:   "-12.4567",
-		Longitude:  "-12.4567",
-	}
-
 	t.Log("\tGiven the need to work with Camera records.")
 	{
+		nc := camera.NewCamera{
+			Descricao:  "camera testes 1",
+			EnderecoIP: "1.2.3.4",
+			Porta:      1234,
+			Canal:      1,
+			Usuario:    "admin",
+			Senha:      "admin",
+			Latitude:   "-12.4567",
+			Longitude:  "-12.4567",
+		}
+
 		cam, err := core.Create(ctx, nc)
 		if err != nil {
 			t.Fatalf("\t%s\tShould be able to create camera: %s.", tests.Failed, err)
@@ -44,42 +45,66 @@ func TestCamera(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to retrieve camera by ID.", tests.Success)
 
+		saved1, err := core.QueryByEnderecoIP(ctx, cam.EnderecoIP)
+		if saved1.CameraID != saved.CameraID {
+			t.Fatalf("\t%s\tShould be able to retrieve camera by Endereco IP: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to retrieve camera by Endereco IP.", tests.Success)
+
 		if diff := cmp.Diff(cam, saved); diff != "" {
 			t.Fatalf("\t%s\tShould get back the same camera. Diff:\n%s", tests.Failed, diff)
 		}
 		t.Logf("\t%s\tShould get back the same camera.", tests.Success)
 
-		upd := camera.UpdateCamera{
-			Descricao:  tests.StringPointer("udpated"),
-			EnderecoIP: tests.StringPointer("123.123.210.210"),
-			Porta:      tests.IntPointer(30),
-			Canal:      tests.IntPointer(8),
-			Usuario:    tests.StringPointer("manager"),
-			Senha:      tests.StringPointer("manager"),
-			Latitude:   tests.StringPointer("-23.4567"),
-			Longitude:  tests.StringPointer("-23.4567"),
+		nc2 := camera.NewCamera{
+			Descricao:  "camera testes 2",
+			EnderecoIP: "1.2.3.4",
+			Porta:      1235,
+			Canal:      2,
+			Usuario:    "manager",
+			Senha:      "manager",
+			Latitude:   "-13.4567",
+			Longitude:  "-13.4567",
 		}
 
-		if err = core.Update(ctx, cam.CameraID, upd); err != nil {
+		_, err = core.Create(ctx, nc2)
+		if !errors.Is(err, camera.ErrCameraAlreadyExists) {
+			t.Fatalf("\t%s\tShould NOT be able to create camera with an already existing Endereco IP: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould NOT be able to create camera with an already existing Endereco IP.", tests.Success)
+
+		upd := camera.UpdateCamera{
+			CameraID:   cam.CameraID,
+			Descricao:  &wrappers.StringValue{Value: "camera atualizada"},
+			EnderecoIP: &wrappers.StringValue{Value: "123.123.210.210"},
+			Porta:      &wrappers.Int32Value{Value: 2020},
+			Canal:      &wrappers.Int32Value{Value: 7},
+			Usuario:    &wrappers.StringValue{Value: "user"},
+			Senha:      &wrappers.StringValue{Value: "user"},
+			Latitude:   &wrappers.StringValue{Value: "-10.1010"},
+			Longitude:  &wrappers.StringValue{Value: "-10.1010"},
+		}
+
+		if err = core.Update(ctx, upd); err != nil {
 			t.Fatalf("\t%s\tShould be able to update camera: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to update camera.", tests.Success)
 
 		cams, err := core.Query(ctx, "", 1, 3)
 		if err != nil {
-			t.Fatalf("\t%s\tShould be able to retrieve updated camera: %s.", tests.Failed, err)
+			t.Fatalf("\t%s\tShould be able to retrieve cameras: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tShould be able to retrieve updated camera.", tests.Success)
+		t.Logf("\t%s\tShould be able to retrieve cameras.", tests.Success)
 
 		want := cam
-		want.Descricao = *upd.Descricao
-		want.EnderecoIP = *upd.EnderecoIP
-		want.Porta = *upd.Porta
-		want.Canal = *upd.Canal
-		want.Usuario = *upd.Usuario
-		want.Senha = *upd.Senha
-		want.Latitude = *upd.Latitude
-		want.Longitude = *upd.Longitude
+		want.Descricao = upd.Descricao.GetValue()
+		want.EnderecoIP = upd.EnderecoIP.GetValue()
+		want.Porta = int(upd.Porta.GetValue())
+		want.Canal = int(upd.Canal.GetValue())
+		want.Usuario = upd.Usuario.GetValue()
+		want.Senha = upd.Senha.GetValue()
+		want.Latitude = upd.Latitude.GetValue()
+		want.Longitude = upd.Longitude.GetValue()
 
 		var idx int
 		for i, c := range cams {
@@ -93,10 +118,11 @@ func TestCamera(t *testing.T) {
 		t.Logf("\t%s\tShould get back the same camera.", tests.Success)
 
 		upd = camera.UpdateCamera{
-			Porta: tests.IntPointer(54321),
+			CameraID: cam.CameraID,
+			Porta:    &wrappers.Int32Value{Value: 5321},
 		}
 
-		if err = core.Update(ctx, cam.CameraID, upd); err != nil {
+		if err = core.Update(ctx, upd); err != nil {
 			t.Fatalf("\t%s\tShould be able to update just some fields of camera: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to update just some fields of camera.", tests.Success)
@@ -107,10 +133,8 @@ func TestCamera(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to retrieve updated camera.", tests.Success)
 
-		t.Logf("%+v", saved)
-
-		if saved.Porta != *upd.Porta {
-			t.Fatalf("\t%s\tShould be able to see updated Porta field: got %q want %q.", tests.Failed, saved.Porta, *upd.Porta)
+		if saved.Porta != int(upd.Porta.GetValue()) {
+			t.Fatalf("\t%s\tShould be able to see updated Porta field: got %q want %q.", tests.Failed, saved.Porta, int(upd.Porta.GetValue()))
 		}
 		t.Logf("\t%s\tShould be able to see updated Porta field.", tests.Success)
 

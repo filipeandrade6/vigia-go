@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	ErrNotFound  = errors.New("camera not found")
-	ErrInvalidID = errors.New("ID is not in its proper from")
+	ErrNotFound            = errors.New("camera not found")
+	ErrInvalidID           = errors.New("ID is not in its proper from")
+	ErrCameraAlreadyExists = errors.New("camera already exists")
 )
 
 type Core struct {
@@ -31,6 +32,10 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 func (c Core) Create(ctx context.Context, nc NewCamera) (Camera, error) {
 	if err := validate.Check(nc); err != nil {
 		return Camera{}, fmt.Errorf("validating data: %w", err)
+	}
+
+	if _, err := c.QueryByEnderecoIP(ctx, nc.EnderecoIP); !errors.Is(err, ErrNotFound) {
+		return Camera{}, ErrCameraAlreadyExists
 	}
 
 	dbCam := db.Camera{
@@ -52,8 +57,8 @@ func (c Core) Create(ctx context.Context, nc NewCamera) (Camera, error) {
 	return toCamera(dbCam), nil
 }
 
-func (c Core) Update(ctx context.Context, cameraID string, up UpdateCamera) error {
-	if err := validate.CheckID(cameraID); err != nil {
+func (c Core) Update(ctx context.Context, up UpdateCamera) error {
+	if err := validate.CheckID(up.CameraID); err != nil {
 		return ErrInvalidID
 	}
 
@@ -61,37 +66,40 @@ func (c Core) Update(ctx context.Context, cameraID string, up UpdateCamera) erro
 		return fmt.Errorf("validating data: %w", err)
 	}
 
-	dbCam, err := c.store.QueryByID(ctx, cameraID)
+	dbCam, err := c.store.QueryByID(ctx, up.CameraID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
 			return ErrNotFound
 		}
-		return fmt.Errorf("updating camera cameraID[%s]: %w", cameraID, err)
+		return fmt.Errorf("updating camera cameraID[%s]: %w", up.CameraID, err)
 	}
 
 	if up.Descricao != nil {
-		dbCam.Descricao = *up.Descricao
+		dbCam.Descricao = up.Descricao.GetValue()
 	}
 	if up.EnderecoIP != nil {
-		dbCam.EnderecoIP = *up.EnderecoIP
+		if _, err := c.QueryByEnderecoIP(ctx, up.EnderecoIP.GetValue()); !errors.Is(err, ErrNotFound) {
+			return ErrCameraAlreadyExists
+		}
+		dbCam.EnderecoIP = up.EnderecoIP.GetValue()
 	}
 	if up.Porta != nil {
-		dbCam.Porta = *up.Porta
+		dbCam.Porta = int(up.Porta.GetValue())
 	}
 	if up.Canal != nil {
-		dbCam.Canal = *up.Canal
+		dbCam.Canal = int(up.Canal.GetValue())
 	}
 	if up.Usuario != nil {
-		dbCam.Usuario = *up.Usuario
+		dbCam.Usuario = up.Usuario.GetValue()
 	}
 	if up.Senha != nil {
-		dbCam.Senha = *up.Senha
+		dbCam.Senha = up.Senha.GetValue()
 	}
 	if up.Latitude != nil {
-		dbCam.Latitude = *up.Latitude
+		dbCam.Latitude = up.Latitude.GetValue()
 	}
 	if up.Longitude != nil {
-		dbCam.Longitude = *up.Longitude
+		dbCam.Longitude = up.Longitude.GetValue()
 	}
 
 	if err := c.store.Update(ctx, dbCam); err != nil {

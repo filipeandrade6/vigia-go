@@ -75,3 +75,13 @@ func (u Usuarios) ToProto() []*pb.Usuario {
 
 	return usuarios
 }
+
+func UsuariosFromProto(u []*pb.Usuario) Usuarios { // TODO ver se esta sendo utilizado
+	var usrs Usuarios
+
+	for _, usr := range u {
+		usrs = append(usrs, FromProto(usr))
+	}
+
+	return usrs
+}

@@ -7,8 +7,9 @@ import (
 
 	"github.com/filipeandrade6/vigia-go/internal/core/usuario"
 	"github.com/filipeandrade6/vigia-go/internal/database/tests"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
+	"github.com/golang/protobuf/ptypes/wrappers"
+	// "google.golang.org/protobuf/types/known/wrapperspb"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -42,6 +43,12 @@ func TestUsuario(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to retrieve usuario by ID.", tests.Success)
 
+		saved2, err := core.QueryByEmail(ctx, usr.Email)
+		if saved2.UsuarioID != saved.UsuarioID {
+			t.Fatalf("\t%s\tShould be able to retrieve usuario by Email: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to retrieve usuario by Email.", tests.Success)
+
 		if diff := cmp.Diff(usr, saved); diff != "" {
 			t.Fatalf("\t%s\tShould get back the same usuario. Diff:\n%s", tests.Failed, diff)
 		}
@@ -61,7 +68,9 @@ func TestUsuario(t *testing.T) {
 
 		upd := usuario.UpdateUsuario{
 			UsuarioID: usr.UsuarioID,
-			Email:     &wrapperspb.StringValue{Value: "filipe@vigia2.com.br"},
+			Email:     &wrappers.StringValue{Value: "filipe@vigia2.com.br"},
+			Funcao:    []string{"ADMIN", "MANAGER", "USER"},
+			Senha:     &wrappers.StringValue{Value: "123456"},
 		}
 
 		if err = core.Update(ctx, upd); err != nil {
@@ -69,29 +78,44 @@ func TestUsuario(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to update usuario.", tests.Success)
 
-		upd2 := usuario.UpdateUsuario{
+		usrs, err := core.Query(ctx, "", 1, 3)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to retrieve usuarios: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to retrieve usuarios.", tests.Success)
+
+		var idx int
+		for i, u := range usrs {
+			if u.UsuarioID == usr.UsuarioID {
+				idx = i
+			}
+		}
+
+		if usrs[idx].Email != upd.Email.GetValue() || cmp.Diff(usrs[idx].Funcao, upd.Funcao) != "" {
+			t.Fatalf("\t%s\tShould get back the same usuario.", tests.Failed)
+		}
+		t.Logf("\t%s\tShould get back the same usuario.", tests.Success)
+
+		upd = usuario.UpdateUsuario{
 			UsuarioID: usr.UsuarioID,
-			Email:     &wrapperspb.StringValue{Value: "filipe@vigia2.com.br"},
+			Email:     &wrappers.StringValue{Value: "filipe@vigia3.com.br"},
 		}
 
-		if err = core.Update(ctx, upd2); !errors.Is(err, usuario.ErrEmailAlreadyExists) {
-			t.Fatalf("\t%s\tShould NOT be able to update usuario Email to an already existing Email: %s.", tests.Failed, err)
+		if err = core.Update(ctx, upd); err != nil {
+			t.Fatalf("\t%s\tShould be able to update just some fields of usuario: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tShould NOT be able to update usuario Email to an already existing Email.", tests.Success)
+		t.Logf("\t%s\tShould be able to update just some fields of usuario.", tests.Success)
 
-		saved, err = core.QueryByEmail(ctx, upd.Email.GetValue())
+		saved, err = core.QueryByID(ctx, usr.UsuarioID)
 		if err != nil {
 			t.Fatalf("\t%s\tShould be able to retrieve usuario by Email: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to retrieve usuario by Email.", tests.Success)
 
 		if saved.Email != upd.Email.GetValue() {
-			t.Errorf("\t%s\tShould be able to see updates to Email.", tests.Failed)
-			t.Logf("\t\tGot: %v", saved.Email)
-			t.Logf("\t\tExp: %v", upd.Email.GetValue())
-		} else {
-			t.Logf("\t%s\tShould be able to see updates to Email.", tests.Success)
+			t.Fatalf("\t%s\tShould be able to see updated Email field: got %q want %q.", tests.Failed, saved.Email, upd.Email.GetValue())
 		}
+		t.Logf("\t%s\tShould be able to see updated Email field.", tests.Success)
 
 		if err := core.Delete(ctx, usr.UsuarioID); err != nil {
 			t.Fatalf("\t%s\tShould be able to delete usuario: %s.", tests.Failed, err)

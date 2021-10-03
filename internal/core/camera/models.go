@@ -5,6 +5,7 @@ import (
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/core/camera/db"
+	"github.com/golang/protobuf/ptypes/wrappers"
 )
 
 // TODO colcoar campos agregados e data de criacao e edicao
@@ -33,14 +34,15 @@ type NewCamera struct {
 }
 
 type UpdateCamera struct {
-	Descricao  *string `validate:"omitempty"`
-	EnderecoIP *string `validate:"omitempty,ip"`
-	Porta      *int    `validate:"omitempty,gte=1,lte=65536"`
-	Canal      *int    `validate:"omitempty,gte=0,lte=10"`
-	Usuario    *string `validate:"omitempty"`
-	Senha      *string `validate:"omitempty"`
-	Latitude   *string `validate:"omitempty,latitude"`
-	Longitude  *string `validate:"omitempty,longitude"`
+	CameraID   string                `validate:"required"`
+	Descricao  *wrappers.StringValue `validate:"omitempty"`
+	EnderecoIP *wrappers.StringValue `validate:"omitempty,ip"`
+	Porta      *wrappers.Int32Value  `validate:"omitempty,gte=1,lte=65536"`
+	Canal      *wrappers.Int32Value  `validate:"omitempty,gte=0,lte=10"`
+	Usuario    *wrappers.StringValue `validate:"omitempty"`
+	Senha      *wrappers.StringValue `validate:"omitempty"`
+	Latitude   *wrappers.StringValue `validate:"omitempty,latitude"`
+	Longitude  *wrappers.StringValue `validate:"omitempty,longitude"`
 }
 
 // =============================================================================
@@ -100,7 +102,7 @@ func (c Cameras) ToProto() []*pb.Camera {
 	return cams
 }
 
-func CamerasFromProto(c []*pb.Camera) Cameras {
+func CamerasFromProto(c []*pb.Camera) Cameras { // TODO ver se esta sendo utilizado
 	var cams Cameras
 
 	for _, cam := range c {
