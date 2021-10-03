@@ -5,6 +5,7 @@ import (
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/core/veiculo/db"
+	"github.com/golang/protobuf/ptypes/wrappers"
 )
 
 // TODO colcoar campos agregados e data de criacao e edicao
@@ -27,11 +28,12 @@ type NewVeiculo struct {
 }
 
 type UpdateVeiculo struct {
-	Placa *string `validate:"omitempty"`
-	Tipo  *string `validate:"omitempty"`
-	Cor   *string `validate:"omitempty"`
-	Marca *string `validate:"omitempty"`
-	Info  *string `validate:"omitempty"`
+	VeiculoID string                `validate:"required"`
+	Placa     *wrappers.StringValue `validate:"omitempty"`
+	Tipo      *wrappers.StringValue `validate:"omitempty"`
+	Cor       *wrappers.StringValue `validate:"omitempty"`
+	Marca     *wrappers.StringValue `validate:"omitempty"`
+	Info      *wrappers.StringValue `validate:"omitempty"`
 }
 
 // =============================================================================

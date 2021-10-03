@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	ErrNotFound  = errors.New("veiculo not found")
-	ErrInvalidID = errors.New("ID is not in its proper from")
+	ErrNotFound           = errors.New("veiculo not found")
+	ErrInvalidID          = errors.New("ID is not in its proper from")
+	ErrPlacaAlreadyExists = errors.New("placa already exists")
 )
 
 type Core struct {
@@ -33,6 +34,10 @@ func (c Core) Create(ctx context.Context, nv NewVeiculo) (Veiculo, error) {
 		return Veiculo{}, fmt.Errorf("validating data: %w", err)
 	}
 
+	if _, err := c.QueryByPlaca(ctx, nv.Placa); !errors.Is(err, ErrNotFound) {
+		return Veiculo{}, ErrPlacaAlreadyExists
+	}
+
 	dbVei := db.Veiculo{
 		VeiculoID: validate.GenerateID(),
 		Placa:     nv.Placa,
@@ -49,8 +54,8 @@ func (c Core) Create(ctx context.Context, nv NewVeiculo) (Veiculo, error) {
 	return toVeiculo(dbVei), nil
 }
 
-func (c Core) Update(ctx context.Context, veiculoID string, up UpdateVeiculo) error {
-	if err := validate.CheckID(veiculoID); err != nil {
+func (c Core) Update(ctx context.Context, up UpdateVeiculo) error {
+	if err := validate.CheckID(up.VeiculoID); err != nil {
 		return ErrInvalidID
 	}
 
@@ -58,28 +63,31 @@ func (c Core) Update(ctx context.Context, veiculoID string, up UpdateVeiculo) er
 		return fmt.Errorf("validating data: %w", err)
 	}
 
-	dbVei, err := c.store.QueryByID(ctx, veiculoID)
+	dbVei, err := c.store.QueryByID(ctx, up.VeiculoID)
 	if err != nil {
 		if errors.Is(err, database.ErrDBNotFound) {
 			return ErrNotFound
 		}
-		return fmt.Errorf("updating veiculo veiculoID[%s]: %w", veiculoID, err)
+		return fmt.Errorf("updating veiculo veiculoID[%s]: %w", up.VeiculoID, err)
 	}
 
 	if up.Placa != nil {
-		dbVei.Placa = *up.Placa
+		if _, err := c.QueryByPlaca(ctx, up.Placa.GetValue()); !errors.Is(err, ErrNotFound) {
+			return ErrPlacaAlreadyExists
+		}
+		dbVei.Placa = up.Placa.GetValue()
 	}
 	if up.Tipo != nil {
-		dbVei.Tipo = *up.Tipo
+		dbVei.Tipo = up.Tipo.GetValue()
 	}
 	if up.Cor != nil {
-		dbVei.Cor = *up.Cor
+		dbVei.Cor = up.Cor.GetValue()
 	}
 	if up.Marca != nil {
-		dbVei.Marca = *up.Marca
+		dbVei.Marca = up.Marca.GetValue()
 	}
 	if up.Info != nil {
-		dbVei.Info = *up.Info
+		dbVei.Info = up.Info.GetValue()
 	}
 
 	if err := c.store.Update(ctx, dbVei); err != nil {
