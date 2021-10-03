@@ -62,5 +62,7 @@ func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRe
 	}
 	g.gerencia = nil
 
+	// TODO interromper os core?
+
 	return &pb.RemoverRegistroRes{}, nil
 }

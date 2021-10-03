@@ -6,14 +6,19 @@ package gravacao;
 
 service Gravacao {
     rpc Registrar (RegistrarReq) returns (RegistrarRes) {}
-    rpc RemoverRegistro (RemoverRegistroReq) returns (RemoverRegistroRes) {}
 
     rpc InfoProcessos (InfoProcessosReq) returns (InfoProcessosResp) {}
     rpc ConfigurarProcesso (ConfigurarProcessoReq) returns (ConfigurarProcessoResp) {}
     rpc AtualizarListaVeiculos (AtualizarListaVeiculosReq) returns (AtualizarListaVeiculosResp) {}
+
     // rpc statusArmazenamento (StatusArmazenamentoParams) returns (StatusArmazenamento) {}
     // rpc configurarHousekeeping (HousekeepingConfig) returns (StatusHousekeeping) {}
 
+    rpc CreateProcesso (CreateProcessoReq) returns (CreateProcessoRes) {}
+    rpc ReadProcesso (ReadProcessoReq) returns (ReadProcessoRes) {}
+    rpc ReadProcessos (ReadProcessosReq) returns (ReadProcessosRes) {}
+    rpc UpdateProcesso (UpdateProcessoReq) returns (UpdateProcessoRes) {}
+    rpc DeleteProcesso (DeleteProcessoReq) returns (DeleteProcessoRes) {}
 
     rpc IniciarProcessamento (IniciarProcessamentoReq) returns (IniciarProcessamentoResp) {}
 }
@@ -32,13 +37,52 @@ message RegistrarReq {
 
 message RegistrarRes {}
 
-message RemoverRegistroReq{}
+// ===================
 
-message RemoverRegistroRes{}
+message Processo {
+    string processo_id = 1;
+    string servidor_gravacao_id = 2;
+    string camera_id = 3;
+    int32 processador = 4;
+    int32 adaptador = 5;
+    bool execucao = 6;
+}
 
+message CreateProcessoReq {
+    Processo processo = 1;
+}
 
+message CreateProcessoRes {
+    string processo_id = 1;
+}
 
+message ReadProcessoReq {
+    string processo_id =1;
+}
 
+message ReadProcessoRes {
+    Processo processo = 1;
+}
+
+message ReadProcessosReq {}
+
+message ReadProcessosRes {
+    repeated Processo processos = 1;
+}
+
+message UpdateProcessoReq {
+    Processo processo = 1;
+}
+
+message UpdateProcessoRes {}
+
+message DeleteProcessoReq {
+    string processo_id = 1;
+}
+
+message DeleteProcessoRes {}
+
+// ===================
 
 message IniciarProcessamentoReq{}
 
