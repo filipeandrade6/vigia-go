@@ -3,36 +3,17 @@
 
 #### ONDE PAREI
 
-APLICAR WRAPPER E UNIQUE CONSTRAIN IGUAL USUARIO PARA OS OUTROS SERVICOS
+NÃO COMITAR O .ENV FILE PARA O VCS(GIT) AS CONFIG DEVE SER FORNECIDAS NA APLICACAO
 
 HEALTHY CHECK - https://github.com/grpc/grpc/blob/master/doc/health-checking.md
 
 NAO TEM GRPC PARA BROWSER https://github.com/grpc-ecosystem/grpc-gateway/blob/master/examples/internal/proto/examplepb/wrappers.proto
 
-VERIFICAR OS ERRORS NO SERVICE
-
 COMO O EVANS FAZ ITERATIVO - REPL
 
 ADICIONAR AUTHORIZATION POR NIVEL DE SERVIÇO ASSIM COMO O TECH SCHOOL
 
-ARRUMAR O SEED DOWN ESTA SEM OS TESTS PARA OS VALIDATORS
-
-ADICIONAR TESTES PARA OS VALIDADORES E UNIQUE DO PG
-
-Add https://github.com/grpc/grpc-go/blob/master/Documentation/server-reflection-tutorial.md ?
-
-EU POSSO REGISTRAR OUTROS SERVICOS NO GRPCSERVER - isso permite separar os servicos em arquivos
-
-CRIAR OS TESTE E FAZER TDD
-
 COLOCAR require de na funcação do usuario ou criar if proibindo nulo	fmt.Println(fullMethodName)
-
-SEPARAR OS SERVIÇOS GRPC EM TIPO - CLIENT FRONT-END / GERENCIA INTER / GRAVACAO
-
-ELE SEPAROU
- - ERROS NO DB DE database.ErrDBNotFound
- - ERROS de aplicação validate.ErrNotFound
- - ERROS viraram erro de validate - fora do doman de db
 
 #### TODO
 

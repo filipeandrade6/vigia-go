@@ -12,6 +12,8 @@ import (
 	"go.uber.org/zap"
 )
 
+// TODO atualizar isso aqui quando chegar a hora
+
 var (
 	ErrNotFound  = errors.New("processo not found")
 	ErrInvalidID = errors.New("ID is not in its proper from")

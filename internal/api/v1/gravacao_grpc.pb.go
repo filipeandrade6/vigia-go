@@ -18,6 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GravacaoClient interface {
+	Registrar(ctx context.Context, in *RegistrarReq, opts ...grpc.CallOption) (*RegistrarRes, error)
+	RemoverRegistro(ctx context.Context, in *RemoverRegistroReq, opts ...grpc.CallOption) (*RemoverRegistroRes, error)
 	InfoProcessos(ctx context.Context, in *InfoProcessosReq, opts ...grpc.CallOption) (*InfoProcessosResp, error)
 	ConfigurarProcesso(ctx context.Context, in *ConfigurarProcessoReq, opts ...grpc.CallOption) (*ConfigurarProcessoResp, error)
 	AtualizarListaVeiculos(ctx context.Context, in *AtualizarListaVeiculosReq, opts ...grpc.CallOption) (*AtualizarListaVeiculosResp, error)
@@ -30,6 +32,24 @@ type gravacaoClient struct {
 
 func NewGravacaoClient(cc grpc.ClientConnInterface) GravacaoClient {
 	return &gravacaoClient{cc}
+}
+
+func (c *gravacaoClient) Registrar(ctx context.Context, in *RegistrarReq, opts ...grpc.CallOption) (*RegistrarRes, error) {
+	out := new(RegistrarRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/Registrar", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gravacaoClient) RemoverRegistro(ctx context.Context, in *RemoverRegistroReq, opts ...grpc.CallOption) (*RemoverRegistroRes, error) {
+	out := new(RemoverRegistroRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/RemoverRegistro", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gravacaoClient) InfoProcessos(ctx context.Context, in *InfoProcessosReq, opts ...grpc.CallOption) (*InfoProcessosResp, error) {
@@ -72,6 +92,8 @@ func (c *gravacaoClient) IniciarProcessamento(ctx context.Context, in *IniciarPr
 // All implementations must embed UnimplementedGravacaoServer
 // for forward compatibility
 type GravacaoServer interface {
+	Registrar(context.Context, *RegistrarReq) (*RegistrarRes, error)
+	RemoverRegistro(context.Context, *RemoverRegistroReq) (*RemoverRegistroRes, error)
 	InfoProcessos(context.Context, *InfoProcessosReq) (*InfoProcessosResp, error)
 	ConfigurarProcesso(context.Context, *ConfigurarProcessoReq) (*ConfigurarProcessoResp, error)
 	AtualizarListaVeiculos(context.Context, *AtualizarListaVeiculosReq) (*AtualizarListaVeiculosResp, error)
@@ -83,6 +105,12 @@ type GravacaoServer interface {
 type UnimplementedGravacaoServer struct {
 }
 
+func (UnimplementedGravacaoServer) Registrar(context.Context, *RegistrarReq) (*RegistrarRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Registrar not implemented")
+}
+func (UnimplementedGravacaoServer) RemoverRegistro(context.Context, *RemoverRegistroReq) (*RemoverRegistroRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoverRegistro not implemented")
+}
 func (UnimplementedGravacaoServer) InfoProcessos(context.Context, *InfoProcessosReq) (*InfoProcessosResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InfoProcessos not implemented")
 }
@@ -106,6 +134,42 @@ type UnsafeGravacaoServer interface {
 
 func RegisterGravacaoServer(s grpc.ServiceRegistrar, srv GravacaoServer) {
 	s.RegisterService(&Gravacao_ServiceDesc, srv)
+}
+
+func _Gravacao_Registrar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegistrarReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).Registrar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/Registrar",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).Registrar(ctx, req.(*RegistrarReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gravacao_RemoverRegistro_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoverRegistroReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).RemoverRegistro(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/RemoverRegistro",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).RemoverRegistro(ctx, req.(*RemoverRegistroReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Gravacao_InfoProcessos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -187,6 +251,14 @@ var Gravacao_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "gravacao.Gravacao",
 	HandlerType: (*GravacaoServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Registrar",
+			Handler:    _Gravacao_Registrar_Handler,
+		},
+		{
+			MethodName: "RemoverRegistro",
+			Handler:    _Gravacao_RemoverRegistro_Handler,
+		},
 		{
 			MethodName: "InfoProcessos",
 			Handler:    _Gravacao_InfoProcessos_Handler,

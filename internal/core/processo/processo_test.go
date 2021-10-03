@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/processo"
-	"github.com/filipeandrade6/vigia-go/internal/data/store/tests"
+	"github.com/filipeandrade6/vigia-go/internal/database/tests"
 
 	"github.com/google/go-cmp/cmp"
 )

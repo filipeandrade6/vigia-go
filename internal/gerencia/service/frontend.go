@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-	"github.com/filipeandrade6/vigia-go/internal/data/migration"
+	"github.com/filipeandrade6/vigia-go/internal/database/migration"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
 	"github.com/filipeandrade6/vigia-go/internal/core/servidorgravacao"
@@ -26,32 +26,35 @@ import (
 
 // TODO criar campo servicos - e registrar os servicos para não colocar tudo em um?
 
-type GerenciaService struct {
-	pb.UnimplementedGerenciaServer
+type FrontendService struct {
+	pb.UnimplementedFrontendServer
 	log                  *zap.SugaredLogger
 	auth                 *auth.Auth
+	dbCfg                database.Config
 	cameraCore           camera.Core
 	usuarioCore          usuario.Core
 	servidorGravacaoCore servidorgravacao.Core
 }
 
-func NewGerenciaService(
+func NewFrontendService(
 	log *zap.SugaredLogger,
 	auth *auth.Auth,
+	dbCfg database.Config,
 	cameraCore camera.Core,
 	usuarioCore usuario.Core,
 	servidorGravacaoCore servidorgravacao.Core,
-) *GerenciaService {
-	return &GerenciaService{
+) *FrontendService {
+	return &FrontendService{
 		log:                  log,
 		auth:                 auth,
+		dbCfg:                dbCfg,
 		cameraCore:           cameraCore,
 		usuarioCore:          usuarioCore,
 		servidorGravacaoCore: servidorGravacaoCore,
 	}
 }
 
-func (g *GerenciaService) AuthFuncOverride(ctx context.Context, fullMethodName string) (context.Context, error) {
+func (g *FrontendService) AuthFuncOverride(ctx context.Context, fullMethodName string) (context.Context, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -79,7 +82,7 @@ func (g *GerenciaService) AuthFuncOverride(ctx context.Context, fullMethodName s
 // =========================================================================
 // Migrate
 
-func (g *GerenciaService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.MigrateRes, error) {
+func (g *FrontendService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.MigrateRes, error) {
 
 	// TODO add claims/auth
 	version := req.GetVersao()
@@ -103,7 +106,7 @@ func (g *GerenciaService) Migrate(ctx context.Context, req *pb.MigrateReq) (*pb.
 // =========================================================================
 // Usuario
 
-func (g *GerenciaService) CreateUsuario(ctx context.Context, req *pb.CreateUsuarioReq) (*pb.CreateUsuarioRes, error) {
+func (g *FrontendService) CreateUsuario(ctx context.Context, req *pb.CreateUsuarioReq) (*pb.CreateUsuarioRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -129,7 +132,7 @@ func (g *GerenciaService) CreateUsuario(ctx context.Context, req *pb.CreateUsuar
 	return &pb.CreateUsuarioRes{UsuarioId: savedUsr.UsuarioID}, nil
 }
 
-func (g *GerenciaService) ReadUsuario(ctx context.Context, req *pb.ReadUsuarioReq) (*pb.ReadUsuarioRes, error) {
+func (g *FrontendService) ReadUsuario(ctx context.Context, req *pb.ReadUsuarioReq) (*pb.ReadUsuarioRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -154,7 +157,7 @@ func (g *GerenciaService) ReadUsuario(ctx context.Context, req *pb.ReadUsuarioRe
 	return &pb.ReadUsuarioRes{Usuario: usuario.ToProto()}, err
 }
 
-func (g *GerenciaService) ReadUsuarios(ctx context.Context, req *pb.ReadUsuariosReq) (*pb.ReadUsuariosRes, error) {
+func (g *FrontendService) ReadUsuarios(ctx context.Context, req *pb.ReadUsuariosReq) (*pb.ReadUsuariosRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -180,7 +183,7 @@ func (g *GerenciaService) ReadUsuarios(ctx context.Context, req *pb.ReadUsuarios
 	return &pb.ReadUsuariosRes{Usuarios: usuarios.ToProto()}, nil
 }
 
-func (g *GerenciaService) UpdateUsuario(ctx context.Context, req *pb.UpdateUsuarioReq) (*pb.UpdateUsuarioRes, error) {
+func (g *FrontendService) UpdateUsuario(ctx context.Context, req *pb.UpdateUsuarioReq) (*pb.UpdateUsuarioRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -194,7 +197,7 @@ func (g *GerenciaService) UpdateUsuario(ctx context.Context, req *pb.UpdateUsuar
 		Senha:  req.GetSenha(),
 	}
 
-	if err := g.usuarioCore.Update(ctx, req.GetUsuarioId(), upd); err != nil {
+	if err := g.usuarioCore.Update(ctx, upd); err != nil {
 		switch validate.Cause(err) {
 		case database.ErrInvalidID:
 			return &pb.UpdateUsuarioRes{}, status.Error(codes.InvalidArgument, err.Error())
@@ -210,7 +213,7 @@ func (g *GerenciaService) UpdateUsuario(ctx context.Context, req *pb.UpdateUsuar
 	return &pb.UpdateUsuarioRes{}, nil
 }
 
-func (g *GerenciaService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuarioReq) (*pb.DeleteUsuarioRes, error) {
+func (g *FrontendService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuarioReq) (*pb.DeleteUsuarioRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -234,7 +237,7 @@ func (g *GerenciaService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuar
 	return &pb.DeleteUsuarioRes{}, nil
 }
 
-// func (g *GerenciaService) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginRes, error) {
+// func (g *FrontendService) Login(ctx context.Context, req *pb.LoginReq) (*pb.LoginRes, error) {
 // 	var err error
 // 	defer func() {
 // 		if err != nil {
@@ -268,7 +271,7 @@ func (g *GerenciaService) DeleteUsuario(ctx context.Context, req *pb.DeleteUsuar
 // =========================================================================
 // Camera
 
-func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
+func (g *FrontendService) CreateCamera(ctx context.Context, req *pb.CreateCameraReq) (*pb.CreateCameraRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -299,7 +302,7 @@ func (g *GerenciaService) CreateCamera(ctx context.Context, req *pb.CreateCamera
 	return &pb.CreateCameraRes{CameraId: savedCam.CameraID}, nil
 }
 
-func (g *GerenciaService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq) (*pb.ReadCameraRes, error) {
+func (g *FrontendService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq) (*pb.ReadCameraRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -322,7 +325,7 @@ func (g *GerenciaService) ReadCamera(ctx context.Context, req *pb.ReadCameraReq)
 	return &pb.ReadCameraRes{Camera: cam.ToProto()}, nil
 }
 
-func (g *GerenciaService) ReadCameras(ctx context.Context, req *pb.ReadCamerasReq) (*pb.ReadCamerasRes, error) {
+func (g *FrontendService) ReadCameras(ctx context.Context, req *pb.ReadCamerasReq) (*pb.ReadCamerasRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -345,40 +348,40 @@ func (g *GerenciaService) ReadCameras(ctx context.Context, req *pb.ReadCamerasRe
 	return &pb.ReadCamerasRes{Cameras: cameras.ToProto()}, nil
 }
 
-func (g *GerenciaService) UpdateCamera(ctx context.Context, req *pb.UpdateCameraReq) (*pb.UpdateCameraRes, error) {
-	var err error
-	defer func() {
-		if err != nil {
-			g.log.Errorw("update camera", "ERROR", err)
-		}
-	}()
+// func (g *FrontendService) UpdateCamera(ctx context.Context, req *pb.UpdateCameraReq) (*pb.UpdateCameraRes, error) {
+// 	var err error
+// 	defer func() {
+// 		if err != nil {
+// 			g.log.Errorw("update camera", "ERROR", err)
+// 		}
+// 	}()
 
-	cam := camera.FromProto(req.Camera)
-	upd := camera.UpdateCamera{
-		Descricao:  &cam.Descricao,
-		EnderecoIP: &cam.EnderecoIP,
-		Porta:      &cam.Porta,
-		Canal:      &cam.Canal,
-		Usuario:    &cam.Usuario,
-		Senha:      &cam.Senha,
-		Latitude:   &cam.Latitude,
-		Longitude:  &cam.Longitude,
-	}
+// 	cam := camera.FromProto(req.Camera)
+// 	upd := camera.UpdateCamera{
+// 		Descricao:  &cam.Descricao,
+// 		EnderecoIP: &cam.EnderecoIP,
+// 		Porta:      &cam.Porta,
+// 		Canal:      &cam.Canal,
+// 		Usuario:    &cam.Usuario,
+// 		Senha:      &cam.Senha,
+// 		Latitude:   &cam.Latitude,
+// 		Longitude:  &cam.Longitude,
+// 	}
 
-	if err := g.cameraCore.Update(ctx, cam.CameraID, upd); err != nil {
-		switch validate.Cause(err) {
-		case database.ErrForbidden:
-			return &pb.UpdateCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
-		case database.ErrInvalidID:
-			return &pb.UpdateCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
-		default:
-			return &pb.UpdateCameraRes{}, status.Error(codes.Internal, err.Error())
-		}
-	}
-	return &pb.UpdateCameraRes{}, nil
-}
+// 	if err := g.cameraCore.Update(ctx, cam.CameraID, upd); err != nil {
+// 		switch validate.Cause(err) {
+// 		case database.ErrForbidden:
+// 			return &pb.UpdateCameraRes{}, status.Error(codes.PermissionDenied, err.Error())
+// 		case database.ErrInvalidID:
+// 			return &pb.UpdateCameraRes{}, status.Error(codes.InvalidArgument, err.Error())
+// 		default:
+// 			return &pb.UpdateCameraRes{}, status.Error(codes.Internal, err.Error())
+// 		}
+// 	}
+// 	return &pb.UpdateCameraRes{}, nil
+// }
 
-func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCameraReq) (*pb.DeleteCameraRes, error) {
+func (g *FrontendService) DeleteCamera(ctx context.Context, req *pb.DeleteCameraReq) (*pb.DeleteCameraRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -405,7 +408,7 @@ func (g *GerenciaService) DeleteCamera(ctx context.Context, req *pb.DeleteCamera
 // =========================================================================
 // Servidores Gravacao
 
-func (g *GerenciaService) CreateServidorGravacao(ctx context.Context, req *pb.CreateServidorGravacaoReq) (*pb.CreateServidorGravacaoRes, error) {
+func (g *FrontendService) CreateServidorGravacao(ctx context.Context, req *pb.CreateServidorGravacaoReq) (*pb.CreateServidorGravacaoRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -430,7 +433,7 @@ func (g *GerenciaService) CreateServidorGravacao(ctx context.Context, req *pb.Cr
 	return &pb.CreateServidorGravacaoRes{ServidorGravacaoId: savedSV.ServidorGravacaoID}, nil
 }
 
-func (g *GerenciaService) ReadServidorGravacao(ctx context.Context, req *pb.ReadServidorGravacaoReq) (*pb.ReadServidorGravacaoRes, error) {
+func (g *FrontendService) ReadServidorGravacao(ctx context.Context, req *pb.ReadServidorGravacaoReq) (*pb.ReadServidorGravacaoRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -453,7 +456,7 @@ func (g *GerenciaService) ReadServidorGravacao(ctx context.Context, req *pb.Read
 	return &pb.ReadServidorGravacaoRes{ServidorGravacao: sv.ToProto()}, nil
 }
 
-func (g *GerenciaService) ReadServidoresGravacao(ctx context.Context, req *pb.ReadServidoresGravacaoReq) (*pb.ReadServidoresGravacaoRes, error) {
+func (g *FrontendService) ReadServidoresGravacao(ctx context.Context, req *pb.ReadServidoresGravacaoReq) (*pb.ReadServidoresGravacaoRes, error) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -476,34 +479,34 @@ func (g *GerenciaService) ReadServidoresGravacao(ctx context.Context, req *pb.Re
 	return &pb.ReadServidoresGravacaoRes{ServiceGravacao: svs.ToProto()}, nil
 }
 
-func (g *GerenciaService) UpdateServidorGravacao(ctx context.Context, req *pb.UpdateServidorGravacaoReq) (*pb.UpdateServidorGravacaoRes, error) {
-	var err error
-	defer func() {
-		if err != nil {
-			g.log.Errorw("update servidor de gravacao", "ERROR", err)
-		}
-	}()
+// func (g *FrontendService) UpdateServidorGravacao(ctx context.Context, req *pb.UpdateServidorGravacaoReq) (*pb.UpdateServidorGravacaoRes, error) {
+// 	var err error
+// 	defer func() {
+// 		if err != nil {
+// 			g.log.Errorw("update servidor de gravacao", "ERROR", err)
+// 		}
+// 	}()
 
-	sv := servidorgravacao.FromProto(req.ServidorGravacao)
-	upd := servidorgravacao.UpdateServidorGravacao{
-		EnderecoIP: &sv.EnderecoIP,
-		Porta:      &sv.Porta,
-	}
+// 	sv := servidorgravacao.FromProto(req.ServidorGravacao)
+// 	upd := servidorgravacao.UpdateServidorGravacao{
+// 		EnderecoIP: &sv.EnderecoIP,
+// 		Porta:      &sv.Porta,
+// 	}
 
-	if err := g.servidorGravacaoCore.Update(ctx, sv.ServidorGravacaoID, upd); err != nil {
-		switch validate.Cause(err) {
-		case database.ErrForbidden:
-			return &pb.UpdateServidorGravacaoRes{}, status.Error(codes.PermissionDenied, err.Error())
-		case database.ErrInvalidID:
-			return &pb.UpdateServidorGravacaoRes{}, status.Error(codes.InvalidArgument, err.Error())
-		default:
-			return &pb.UpdateServidorGravacaoRes{}, status.Error(codes.Internal, err.Error())
-		}
-	}
-	return &pb.UpdateServidorGravacaoRes{}, nil
-}
+// 	if err := g.servidorGravacaoCore.Update(ctx, sv.ServidorGravacaoID, upd); err != nil {
+// 		switch validate.Cause(err) {
+// 		case database.ErrForbidden:
+// 			return &pb.UpdateServidorGravacaoRes{}, status.Error(codes.PermissionDenied, err.Error())
+// 		case database.ErrInvalidID:
+// 			return &pb.UpdateServidorGravacaoRes{}, status.Error(codes.InvalidArgument, err.Error())
+// 		default:
+// 			return &pb.UpdateServidorGravacaoRes{}, status.Error(codes.Internal, err.Error())
+// 		}
+// 	}
+// 	return &pb.UpdateServidorGravacaoRes{}, nil
+// }
 
-func (g *GerenciaService) DeleteServidorGravacao(ctx context.Context, req *pb.DeleteServidorGravacaoReq) (*pb.DeleteServidorGravacaoRes, error) {
+func (g *FrontendService) DeleteServidorGravacao(ctx context.Context, req *pb.DeleteServidorGravacaoReq) (*pb.DeleteServidorGravacaoRes, error) {
 	var err error
 	defer func() {
 		if err != nil {

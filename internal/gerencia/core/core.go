@@ -10,10 +10,7 @@ import (
 	"runtime"
 	"syscall"
 
-	// "github.com/ardanlabs/service/app/services/sales-api/handlers"
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-	// "github.com/filipeandrade6/vigia-go/internal/data/store/camera"
-	// "github.com/filipeandrade6/vigia-go/internal/data/store/usuario"
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
 	"github.com/filipeandrade6/vigia-go/internal/core/servidorgravacao"
 	"github.com/filipeandrade6/vigia-go/internal/core/usuario"
@@ -43,11 +40,6 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 
 	// =========================================================================
 	// Load Configuration
-
-	// cfg, err := config.ParseConfig(build)
-	// if err != nil {
-	// 	log.Fatalw("errors getting config", "ERROR", err)
-	// }
 
 	log.Infow("startup", "config", fmt.Sprintf("%+v", cfg)) // TODO esconder senhas
 
@@ -127,20 +119,32 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 
 	serverErrors := make(chan error, 1)
 
-	// cameraStore := camera.NewStore(log, db)
-	// usuarioStore := usuario.NewStore(log, db)
-
 	cameraCore := camera.NewCore(log, db)
 	usuarioCore := usuario.NewCore(log, db)
 	servidorgravacaoCore := servidorgravacao.NewCore(log, db)
 
-	svc := service.NewGerenciaService(log, auth, cameraCore, usuarioCore, servidorgravacaoCore)
+	svc := service.NewFrontendService(
+		log,
+		auth,
+		database.Config{
+			User:         cfg.Database.User,
+			Password:     cfg.Database.Password,
+			Host:         cfg.Database.Host,
+			Name:         cfg.Database.Name,
+			MaxIDLEConns: cfg.Database.MaxIDLEConns,
+			MaxOpenConns: cfg.Database.MaxOpenConns,
+			SSLMode:      cfg.Database.Host,
+		},
+		cameraCore,
+		usuarioCore,
+		servidorgravacaoCore,
+	)
 
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(nil)),
 	)
 
-	pb.RegisterGerenciaServer(grpcServer, svc)
+	pb.RegisterFrontendServer(grpcServer, svc)
 
 	go func() {
 		lis, err := net.Listen(cfg.Service.Conn, fmt.Sprintf(":%d", cfg.Service.Port))

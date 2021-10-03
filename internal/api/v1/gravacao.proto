@@ -5,6 +5,9 @@ option go_package = "./internal/api/v1";
 package gravacao;
 
 service Gravacao {
+    rpc Registrar (RegistrarReq) returns (RegistrarRes) {}
+    rpc RemoverRegistro (RemoverRegistroReq) returns (RemoverRegistroRes) {}
+
     rpc InfoProcessos (InfoProcessosReq) returns (InfoProcessosResp) {}
     rpc ConfigurarProcesso (ConfigurarProcessoReq) returns (ConfigurarProcessoResp) {}
     rpc AtualizarListaVeiculos (AtualizarListaVeiculosReq) returns (AtualizarListaVeiculosResp) {}
@@ -14,6 +17,28 @@ service Gravacao {
 
     rpc IniciarProcessamento (IniciarProcessamentoReq) returns (IniciarProcessamentoResp) {}
 }
+
+message RegistrarReq {
+    string endereco_ip = 1;
+    int32 porta = 2;
+    string db_host = 3;
+    string db_user = 4;
+    string db_password = 5;
+    string db_name = 6;
+    int32 db_maxidleconns = 7;
+    int32 db_maxopenconns = 8;
+    string db_sslmode = 9;
+}
+
+message RegistrarRes {}
+
+message RemoverRegistroReq{}
+
+message RemoverRegistroRes{}
+
+
+
+
 
 message IniciarProcessamentoReq{}
 
