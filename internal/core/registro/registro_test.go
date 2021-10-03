@@ -25,7 +25,7 @@ func TestRegistro(t *testing.T) {
 		now := time.Now()
 
 		nr := registro.Registro{
-			ProcessoID:   "d03307d4-2b28-4c23-a004-3da32e5b8bb1",
+			ProcessoID:   "d03307d4-2b28-4c23-a004-3da32e5b8a61",
 			Placa:        "XXX1111",
 			TipoVeiculo:  "sedan",
 			CorVeiculo:   "prata",
@@ -49,7 +49,11 @@ func TestRegistro(t *testing.T) {
 		nr.RegistroID = reg
 		nr.Armazenamento = fmt.Sprintf("%d_%s", now.Unix(), reg)
 
-		if diff := cmp.Diff(nr, saved); diff != "" {
+		want := nr
+		want.Armazenamento = fmt.Sprintf("%d_%s", now.Unix(), reg)
+		want.CriadoEm = saved.CriadoEm
+
+		if diff := cmp.Diff(want, saved); diff != "" {
 			t.Fatalf("\t%s\tShould get back the same registro. Diff:\n%s", tests.Failed, diff)
 		}
 		t.Logf("\t%s\tShould get back the same registro.", tests.Success)

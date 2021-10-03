@@ -5,7 +5,7 @@ CREATE TABLE registros (
     tipo_veiculo TEXT NOT NULL,
     cor_veiculo TEXT NOT NULL,
     marca_veiculo TEXT NOT NULL,
-    armazenamento INT NOT NULL,
+    armazenamento TEXT NOT NULL,
     confianca DECIMAL NOT NULL,
     criado_em TIMESTAMP WITH TIME ZONE NOT NULL,
 
