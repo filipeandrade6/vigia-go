@@ -23,62 +23,19 @@ func NewStore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Store {
 
 func (s Store) Create(ctx context.Context, reg Registro) error {
 	const q = `
-	INSERT INTO cameras
-		(registro_id, processo_id, placa, tipo_veiculo, cor_veiculo, marca_veiculo, armazenamento, confianca)
+	INSERT INTO registros
+		(registro_id, processo_id, placa, tipo_veiculo, cor_veiculo, marca_veiculo, armazenamento, confianca, criado_em)
 	VALUES
-		(:registro_id, :processo_id, :placa, :tipo_veiculo, :cor_veiculo, :marca_veiculo, :armazenamento, :confianca)`
+		(:registro_id, :processo_id, :placa, :tipo_veiculo, :cor_veiculo, :marca_veiculo, :armazenamento, :confianca, :criado_em)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.sqlxDB, q, reg); err != nil {
-		return fmt.Errorf("inserting camera: %w", err)
+		return fmt.Errorf("inserting registro: %w", err)
 	}
 
 	return nil
 }
 
-func (s Store) Update(ctx context.Context, cam Camera) error {
-	const q = `
-	UPDATE
-		cameras
-	SET
-		"descricao" = :descricao,
-		"endereco_ip" = :endereco_ip,
-		"porta" = :porta,
-		"canal" = :canal,
-		"usuario" = :usuario,
-		"senha" = :senha,
-		"latitude" = :latitude,
-		"longitude" = :longitude
-	WHERE
-		camera_id = :camera_id`
-
-	if err := database.NamedExecContext(ctx, s.log, s.sqlxDB, q, cam); err != nil {
-		return fmt.Errorf("updating camera cameraID[%s]: %w", cam.CameraID, err)
-	}
-
-	return nil
-}
-
-func (s Store) Delete(ctx context.Context, cameraID string) error {
-	data := struct {
-		CameraID string `db:"camera_id"`
-	}{
-		CameraID: cameraID,
-	}
-
-	const q = `
-	DELETE FROM
-		cameras
-	WHERE
-		camera_id = :camera_id`
-
-	if err := database.NamedExecContext(ctx, s.log, s.sqlxDB, q, data); err != nil {
-		return fmt.Errorf("deleting camera cameraID[%s]: %w", cameraID, err)
-	}
-
-	return nil
-}
-
-func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerPage int) ([]Camera, error) {
+func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerPage int) ([]Registro, error) {
 	data := struct {
 		Query       string `db:"query"`
 		Offset      int    `db:"offset"`
@@ -93,65 +50,42 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 	SELECT
 		*
 	FROM
-		cameras
+		registros
 	WHERE
-		CONCAT(camera_id, descricao, endereco_ip, porta, canal, usuario, senha, latitude, longitude)
+		CONCAT(registro_id, processo_id, placa, tipo_veiculo, cor_veiculo, marca_veiculo, armazenamento, confianca, criado_em)
 	ILIKE
 		:query
 	ORDER BY
-		descricao
+		criado_em
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
 
-	var cams []Camera
+	var cams []Registro
 	if err := database.NamedQuerySlice(ctx, s.log, s.sqlxDB, q, data, &cams); err != nil {
-		return nil, fmt.Errorf("selecting cameras [%s]: %w", query, err)
+		return nil, fmt.Errorf("selecting registros [%s]: %w", query, err)
 	}
 
 	return cams, nil
 }
 
-func (s Store) QueryByID(ctx context.Context, cameraID string) (Camera, error) {
+func (s Store) QueryByID(ctx context.Context, registroID string) (Registro, error) {
 	data := struct {
-		CameraID string `db:"camera_id"`
+		RegistroID string `db:"registro_id"`
 	}{
-		CameraID: cameraID,
+		RegistroID: registroID,
 	}
 
 	const q = `
 	SELECT
 		*
 	FROM
-		cameras
+		registros
 	WHERE
-		camera_id = :camera_id`
+		registro_id = :registro_id`
 
-	var cam Camera
-	if err := database.NamedQueryStruct(ctx, s.log, s.sqlxDB, q, data, &cam); err != nil {
-		return Camera{}, fmt.Errorf("selecting camera cameraID[%q]: %w", cameraID, err)
+	var reg Registro
+	if err := database.NamedQueryStruct(ctx, s.log, s.sqlxDB, q, data, &reg); err != nil {
+		return Registro{}, fmt.Errorf("selecting registro registroID[%q]: %w", registroID, err)
 	}
 
-	return cam, nil
-}
-
-func (s Store) QueryByEnderecoIP(ctx context.Context, endereco_ip string) (Camera, error) {
-	data := struct {
-		EnderecoIP string `db:"endereco_ip"`
-	}{
-		EnderecoIP: endereco_ip,
-	}
-
-	const q = `
-	SELECT
-		*
-	FROM
-		cameras
-	WHERE
-		endereco_ip = :endereco_ip`
-
-	var cam Camera
-	if err := database.NamedQueryStruct(ctx, s.log, s.sqlxDB, q, data, &cam); err != nil {
-		return Camera{}, fmt.Errorf("selecting camera enderecoIP[%q]: %w", endereco_ip, err)
-	}
-
-	return cam, nil
+	return reg, nil
 }

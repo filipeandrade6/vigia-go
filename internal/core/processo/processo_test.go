@@ -124,9 +124,9 @@ func TestProcesso(t *testing.T) {
 		t.Logf("\t%s\tShould be able to retrieve processo for page 1.", tests.Success)
 
 		if len(prc1) != 1 {
-			t.Fatalf("\t%s\tShould have a single servidor de gravacao: %s.", tests.Failed, err)
+			t.Fatalf("\t%s\tShould have a single processo: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tShould have a single servidor de gravacao.", tests.Success)
+		t.Logf("\t%s\tShould have a single processo.", tests.Success)
 
 		prc2, err := core.Query(ctx, "", 2, 1)
 		if err != nil {
@@ -135,9 +135,9 @@ func TestProcesso(t *testing.T) {
 		t.Logf("\t%s\tShould be able to retrieve processo for page 2.", tests.Success)
 
 		if len(prc2) != 1 {
-			t.Fatalf("\t%s\tShould have a single servidor de gravacao: %s.", tests.Failed, err)
+			t.Fatalf("\t%s\tShould have a single processo: %s.", tests.Failed, err)
 		}
-		t.Logf("\t%s\tShould have a single servidor de gravacao.", tests.Success)
+		t.Logf("\t%s\tShould have a single processo.", tests.Success)
 
 		if prc1[0].ProcessoID == prc2[0].ProcessoID {
 			t.Logf("\t\tServidor1: %v", prc1[0].ProcessoID)

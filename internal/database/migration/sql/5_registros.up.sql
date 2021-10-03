@@ -6,8 +6,10 @@ CREATE TABLE registros (
     cor_veiculo TEXT NOT NULL,
     marca_veiculo TEXT NOT NULL,
     armazenamento INT NOT NULL,
-    confianca FLOAT(2) NOT NULL,
+    confianca DECIMAL NOT NULL,
+    criado_em TIMESTAMP WITH TIME ZONE NOT NULL,
+
 
     PRIMARY KEY (registro_id),
-    FOREIGN KEY (processo_id) REFERENCES processos(processo_id) ON DELETE CASCADE
+    FOREIGN KEY (processo_id) REFERENCES processos(processo_id) ON DELETE NO ACTION
 );

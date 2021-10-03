@@ -1,113 +1,74 @@
 package registro
 
-// import (
-// 	"unsafe"
+import (
+	"time"
+	"unsafe"
 
-// 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
-// 	"github.com/filipeandrade6/vigia-go/internal/core/camera/db"
-// 	"github.com/golang/protobuf/ptypes/wrappers"
-// )
+	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/filipeandrade6/vigia-go/internal/core/registro/db"
+)
 
-// // TODO colcoar campos agregados e data de criacao e edicao
+// TODO colcoar campos agregados e data de criacao e edicao
 
-// type Camera struct {
-// 	CameraID   string
-// 	Descricao  string
-// 	EnderecoIP string
-// 	Porta      int
-// 	Canal      int
-// 	Usuario    string
-// 	Senha      string
-// 	Latitude   string
-// 	Longitude  string
-// }
+type Registro struct {
+	RegistroID    string
+	ProcessoID    string
+	Placa         string
+	TipoVeiculo   string
+	CorVeiculo    string
+	MarcaVeiculo  string
+	Armazenamento string
+	Confianca     float32
+	CriadoEm      time.Time
+}
 
-// type NewCamera struct {
-// 	Descricao  string `validate:"required"`
-// 	EnderecoIP string `validate:"required,ip"`
-// 	Porta      int    `validate:"required,gte=1,lte=65536"`
-// 	Canal      int    `validate:"required,gte=0,lte=10"`
-// 	Usuario    string `validate:"required"`
-// 	Senha      string `validate:"required"`
-// 	Latitude   string `validate:"required,latitude"`
-// 	Longitude  string `validate:"required,longitude"`
-// }
+// =============================================================================
 
-// type UpdateCamera struct {
-// 	CameraID   string                `validate:"required"`
-// 	Descricao  *wrappers.StringValue `validate:"omitempty"`
-// 	EnderecoIP *wrappers.StringValue `validate:"omitempty,ip"`
-// 	Porta      *wrappers.Int32Value  `validate:"omitempty,gte=1,lte=65536"`
-// 	Canal      *wrappers.Int32Value  `validate:"omitempty,gte=0,lte=10"`
-// 	Usuario    *wrappers.StringValue `validate:"omitempty"`
-// 	Senha      *wrappers.StringValue `validate:"omitempty"`
-// 	Latitude   *wrappers.StringValue `validate:"omitempty,latitude"`
-// 	Longitude  *wrappers.StringValue `validate:"omitempty,longitude"`
-// }
+func toRegistro(dbReg db.Registro) Registro {
+	r := (*Registro)(unsafe.Pointer(&dbReg))
+	return *r
+}
 
-// // =============================================================================
+func toRegistroSlice(dbRegs []db.Registro) []Registro {
+	regs := make([]Registro, len(dbRegs))
+	for i, dbReg := range dbRegs {
+		regs[i] = toRegistro(dbReg)
+	}
+	return regs
+}
 
-// func toCamera(dbCam db.Camera) Camera {
-// 	c := (*Camera)(unsafe.Pointer(&dbCam))
-// 	return *c
-// }
+// =============================================================================
 
-// func toCameraSlice(dbCams []db.Camera) []Camera {
-// 	cams := make([]Camera, len(dbCams))
-// 	for i, dbCam := range dbCams {
-// 		cams[i] = toCamera(dbCam)
-// 	}
-// 	return cams
-// }
+func (r Registro) ToProto() *pb.Registro {
+	return &pb.Registro{
+		RegistroId: r.RegistroID,
+	}
+}
 
-// // =============================================================================
+func FromProto(r *pb.Registro) Registro {
+	return Registro{
+		RegistroID: r.GetRegistroId(),
+	}
+}
 
-// func (c Camera) ToProto() *pb.Camera {
-// 	return &pb.Camera{
-// 		CameraId:   c.CameraID,
-// 		Descricao:  c.Descricao,
-// 		EnderecoIp: c.EnderecoIP,
-// 		Porta:      int32(c.Porta),
-// 		Canal:      int32(c.Canal),
-// 		Usuario:    c.Usuario,
-// 		Senha:      c.Senha,
-// 		Latitude:   c.Latitude,
-// 		Longitude:  c.Longitude,
-// 	}
-// }
+type Registros []Registro
 
-// func FromProto(c *pb.Camera) Camera {
-// 	return Camera{
-// 		CameraID:   c.GetCameraId(),
-// 		Descricao:  c.GetDescricao(),
-// 		EnderecoIP: c.GetEnderecoIp(),
-// 		Porta:      int(c.GetPorta()),
-// 		Canal:      int(c.GetCanal()),
-// 		Usuario:    c.GetUsuario(),
-// 		Senha:      c.GetSenha(),
-// 		Latitude:   c.GetLatitude(),
-// 		Longitude:  c.GetLongitude(),
-// 	}
-// }
+func (r Registros) ToProto() []*pb.Registro {
+	var regs []*pb.Registro
 
-// type Cameras []Camera
+	for _, reg := range r {
+		regs = append(regs, reg.ToProto())
+	}
 
-// func (c Cameras) ToProto() []*pb.Camera {
-// 	var cams []*pb.Camera
+	return regs
+}
 
-// 	for _, cam := range c {
-// 		cams = append(cams, cam.ToProto())
-// 	}
+func RegistrosFromProto(r []*pb.Registro) Registros { // TODO ver se esta sendo utilizado
+	var regs Registros
 
-// 	return cams
-// }
+	for _, reg := range r {
+		regs = append(regs, FromProto(reg))
+	}
 
-// func CamerasFromProto(c []*pb.Camera) Cameras { // TODO ver se esta sendo utilizado
-// 	var cams Cameras
-
-// 	for _, cam := range c {
-// 		cams = append(cams, FromProto(cam))
-// 	}
-
-// 	return cams
-// }
+	return regs
+}

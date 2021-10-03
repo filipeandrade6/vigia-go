@@ -3,6 +3,8 @@
 
 #### ONDE PAREI
 
+VER OS CASCADE
+
 NÃO COMITAR O .ENV FILE PARA O VCS(GIT) AS CONFIG DEVE SER FORNECIDAS NA APLICACAO
 
 HEALTHY CHECK - https://github.com/grpc/grpc/blob/master/doc/health-checking.md
