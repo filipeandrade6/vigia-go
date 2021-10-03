@@ -3,6 +3,8 @@
 
 #### ONDE PAREI
 
+APLICAR WRAPPER E UNIQUE CONSTRAIN IGUAL USUARIO PARA OS OUTROS SERVICOS
+
 HEALTHY CHECK - https://github.com/grpc/grpc/blob/master/doc/health-checking.md
 
 NAO TEM GRPC PARA BROWSER https://github.com/grpc-ecosystem/grpc-gateway/blob/master/examples/internal/proto/examplepb/wrappers.proto
