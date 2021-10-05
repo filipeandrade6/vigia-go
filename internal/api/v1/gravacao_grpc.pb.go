@@ -20,10 +20,12 @@ const _ = grpc.SupportPackageIsVersion7
 type GravacaoClient interface {
 	Registrar(ctx context.Context, in *RegistrarReq, opts ...grpc.CallOption) (*RegistrarRes, error)
 	RemoverRegistro(ctx context.Context, in *RemoverRegistroReq, opts ...grpc.CallOption) (*RemoverRegistroRes, error)
-	InfoProcessos(ctx context.Context, in *InfoProcessosReq, opts ...grpc.CallOption) (*InfoProcessosResp, error)
-	ConfigurarProcesso(ctx context.Context, in *ConfigurarProcessoReq, opts ...grpc.CallOption) (*ConfigurarProcessoResp, error)
 	AtualizarListaVeiculos(ctx context.Context, in *AtualizarListaVeiculosReq, opts ...grpc.CallOption) (*AtualizarListaVeiculosResp, error)
-	IniciarProcessamento(ctx context.Context, in *IniciarProcessamentoReq, opts ...grpc.CallOption) (*IniciarProcessamentoResp, error)
+	CreateProcesso(ctx context.Context, in *CreateProcessoReq, opts ...grpc.CallOption) (*CreateProcessoRes, error)
+	ReadProcesso(ctx context.Context, in *ReadProcessoReq, opts ...grpc.CallOption) (*ReadProcessoRes, error)
+	ReadProcessos(ctx context.Context, in *ReadProcessosReq, opts ...grpc.CallOption) (*ReadProcessosRes, error)
+	UpdateProcesso(ctx context.Context, in *UpdateProcessoReq, opts ...grpc.CallOption) (*UpdateProcessoRes, error)
+	DeleteProcesso(ctx context.Context, in *DeleteProcessoReq, opts ...grpc.CallOption) (*DeleteProcessoRes, error)
 }
 
 type gravacaoClient struct {
@@ -52,24 +54,6 @@ func (c *gravacaoClient) RemoverRegistro(ctx context.Context, in *RemoverRegistr
 	return out, nil
 }
 
-func (c *gravacaoClient) InfoProcessos(ctx context.Context, in *InfoProcessosReq, opts ...grpc.CallOption) (*InfoProcessosResp, error) {
-	out := new(InfoProcessosResp)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/InfoProcessos", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gravacaoClient) ConfigurarProcesso(ctx context.Context, in *ConfigurarProcessoReq, opts ...grpc.CallOption) (*ConfigurarProcessoResp, error) {
-	out := new(ConfigurarProcessoResp)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/ConfigurarProcesso", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *gravacaoClient) AtualizarListaVeiculos(ctx context.Context, in *AtualizarListaVeiculosReq, opts ...grpc.CallOption) (*AtualizarListaVeiculosResp, error) {
 	out := new(AtualizarListaVeiculosResp)
 	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/AtualizarListaVeiculos", in, out, opts...)
@@ -79,9 +63,45 @@ func (c *gravacaoClient) AtualizarListaVeiculos(ctx context.Context, in *Atualiz
 	return out, nil
 }
 
-func (c *gravacaoClient) IniciarProcessamento(ctx context.Context, in *IniciarProcessamentoReq, opts ...grpc.CallOption) (*IniciarProcessamentoResp, error) {
-	out := new(IniciarProcessamentoResp)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/IniciarProcessamento", in, out, opts...)
+func (c *gravacaoClient) CreateProcesso(ctx context.Context, in *CreateProcessoReq, opts ...grpc.CallOption) (*CreateProcessoRes, error) {
+	out := new(CreateProcessoRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/CreateProcesso", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gravacaoClient) ReadProcesso(ctx context.Context, in *ReadProcessoReq, opts ...grpc.CallOption) (*ReadProcessoRes, error) {
+	out := new(ReadProcessoRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/ReadProcesso", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gravacaoClient) ReadProcessos(ctx context.Context, in *ReadProcessosReq, opts ...grpc.CallOption) (*ReadProcessosRes, error) {
+	out := new(ReadProcessosRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/ReadProcessos", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gravacaoClient) UpdateProcesso(ctx context.Context, in *UpdateProcessoReq, opts ...grpc.CallOption) (*UpdateProcessoRes, error) {
+	out := new(UpdateProcessoRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/UpdateProcesso", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gravacaoClient) DeleteProcesso(ctx context.Context, in *DeleteProcessoReq, opts ...grpc.CallOption) (*DeleteProcessoRes, error) {
+	out := new(DeleteProcessoRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/DeleteProcesso", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,10 +114,12 @@ func (c *gravacaoClient) IniciarProcessamento(ctx context.Context, in *IniciarPr
 type GravacaoServer interface {
 	Registrar(context.Context, *RegistrarReq) (*RegistrarRes, error)
 	RemoverRegistro(context.Context, *RemoverRegistroReq) (*RemoverRegistroRes, error)
-	InfoProcessos(context.Context, *InfoProcessosReq) (*InfoProcessosResp, error)
-	ConfigurarProcesso(context.Context, *ConfigurarProcessoReq) (*ConfigurarProcessoResp, error)
 	AtualizarListaVeiculos(context.Context, *AtualizarListaVeiculosReq) (*AtualizarListaVeiculosResp, error)
-	IniciarProcessamento(context.Context, *IniciarProcessamentoReq) (*IniciarProcessamentoResp, error)
+	CreateProcesso(context.Context, *CreateProcessoReq) (*CreateProcessoRes, error)
+	ReadProcesso(context.Context, *ReadProcessoReq) (*ReadProcessoRes, error)
+	ReadProcessos(context.Context, *ReadProcessosReq) (*ReadProcessosRes, error)
+	UpdateProcesso(context.Context, *UpdateProcessoReq) (*UpdateProcessoRes, error)
+	DeleteProcesso(context.Context, *DeleteProcessoReq) (*DeleteProcessoRes, error)
 	mustEmbedUnimplementedGravacaoServer()
 }
 
@@ -111,17 +133,23 @@ func (UnimplementedGravacaoServer) Registrar(context.Context, *RegistrarReq) (*R
 func (UnimplementedGravacaoServer) RemoverRegistro(context.Context, *RemoverRegistroReq) (*RemoverRegistroRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoverRegistro not implemented")
 }
-func (UnimplementedGravacaoServer) InfoProcessos(context.Context, *InfoProcessosReq) (*InfoProcessosResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method InfoProcessos not implemented")
-}
-func (UnimplementedGravacaoServer) ConfigurarProcesso(context.Context, *ConfigurarProcessoReq) (*ConfigurarProcessoResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ConfigurarProcesso not implemented")
-}
 func (UnimplementedGravacaoServer) AtualizarListaVeiculos(context.Context, *AtualizarListaVeiculosReq) (*AtualizarListaVeiculosResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AtualizarListaVeiculos not implemented")
 }
-func (UnimplementedGravacaoServer) IniciarProcessamento(context.Context, *IniciarProcessamentoReq) (*IniciarProcessamentoResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IniciarProcessamento not implemented")
+func (UnimplementedGravacaoServer) CreateProcesso(context.Context, *CreateProcessoReq) (*CreateProcessoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateProcesso not implemented")
+}
+func (UnimplementedGravacaoServer) ReadProcesso(context.Context, *ReadProcessoReq) (*ReadProcessoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadProcesso not implemented")
+}
+func (UnimplementedGravacaoServer) ReadProcessos(context.Context, *ReadProcessosReq) (*ReadProcessosRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadProcessos not implemented")
+}
+func (UnimplementedGravacaoServer) UpdateProcesso(context.Context, *UpdateProcessoReq) (*UpdateProcessoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProcesso not implemented")
+}
+func (UnimplementedGravacaoServer) DeleteProcesso(context.Context, *DeleteProcessoReq) (*DeleteProcessoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteProcesso not implemented")
 }
 func (UnimplementedGravacaoServer) mustEmbedUnimplementedGravacaoServer() {}
 
@@ -172,42 +200,6 @@ func _Gravacao_RemoverRegistro_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_InfoProcessos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoProcessosReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GravacaoServer).InfoProcessos(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/InfoProcessos",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).InfoProcessos(ctx, req.(*InfoProcessosReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gravacao_ConfigurarProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ConfigurarProcessoReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GravacaoServer).ConfigurarProcesso(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/ConfigurarProcesso",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).ConfigurarProcesso(ctx, req.(*ConfigurarProcessoReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Gravacao_AtualizarListaVeiculos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AtualizarListaVeiculosReq)
 	if err := dec(in); err != nil {
@@ -226,20 +218,92 @@ func _Gravacao_AtualizarListaVeiculos_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_IniciarProcessamento_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IniciarProcessamentoReq)
+func _Gravacao_CreateProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateProcessoReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).IniciarProcessamento(ctx, in)
+		return srv.(GravacaoServer).CreateProcesso(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/IniciarProcessamento",
+		FullMethod: "/gravacao.Gravacao/CreateProcesso",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).IniciarProcessamento(ctx, req.(*IniciarProcessamentoReq))
+		return srv.(GravacaoServer).CreateProcesso(ctx, req.(*CreateProcessoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gravacao_ReadProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadProcessoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).ReadProcesso(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/ReadProcesso",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).ReadProcesso(ctx, req.(*ReadProcessoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gravacao_ReadProcessos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadProcessosReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).ReadProcessos(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/ReadProcessos",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).ReadProcessos(ctx, req.(*ReadProcessosReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gravacao_UpdateProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProcessoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).UpdateProcesso(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/UpdateProcesso",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).UpdateProcesso(ctx, req.(*UpdateProcessoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gravacao_DeleteProcesso_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteProcessoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).DeleteProcesso(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/DeleteProcesso",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).DeleteProcesso(ctx, req.(*DeleteProcessoReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -260,20 +324,28 @@ var Gravacao_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Gravacao_RemoverRegistro_Handler,
 		},
 		{
-			MethodName: "InfoProcessos",
-			Handler:    _Gravacao_InfoProcessos_Handler,
-		},
-		{
-			MethodName: "ConfigurarProcesso",
-			Handler:    _Gravacao_ConfigurarProcesso_Handler,
-		},
-		{
 			MethodName: "AtualizarListaVeiculos",
 			Handler:    _Gravacao_AtualizarListaVeiculos_Handler,
 		},
 		{
-			MethodName: "IniciarProcessamento",
-			Handler:    _Gravacao_IniciarProcessamento_Handler,
+			MethodName: "CreateProcesso",
+			Handler:    _Gravacao_CreateProcesso_Handler,
+		},
+		{
+			MethodName: "ReadProcesso",
+			Handler:    _Gravacao_ReadProcesso_Handler,
+		},
+		{
+			MethodName: "ReadProcessos",
+			Handler:    _Gravacao_ReadProcessos_Handler,
+		},
+		{
+			MethodName: "UpdateProcesso",
+			Handler:    _Gravacao_UpdateProcesso_Handler,
+		},
+		{
+			MethodName: "DeleteProcesso",
+			Handler:    _Gravacao_DeleteProcesso_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

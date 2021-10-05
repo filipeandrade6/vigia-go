@@ -13,20 +13,30 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type Processo struct {
+}
+
 type GravacaoService struct {
 	pb.UnimplementedGravacaoServer
 
 	log *zap.SugaredLogger
 
-	gerencia *GerenciaClient
+	gerencia       *GerenciaClient
+	processos      map[string]Processo
+	processoErrors chan error
 
 	registroCore registro.Core
 	veiculoCore  veiculo.Core
 }
 
 func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
+	processoErrors := make(chan error)
+	processos := make(map[string]Processo)
+
 	return &GravacaoService{
-		log: log,
+		log:            log,
+		processos:      processos,
+		processoErrors: processoErrors,
 	}
 }
 
@@ -65,4 +75,24 @@ func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRe
 	// TODO interromper os core?
 
 	return &pb.RemoverRegistroRes{}, nil
+}
+
+func (g *GravacaoService) CreateProcesso(ctx context.Context, req *pb.CreateProcessoReq) (*pb.CreateProcessoRes, error) {
+	return &pb.CreateProcessoRes{}, nil
+}
+
+func (g *GravacaoService) ReadProcesso(ctx context.Context, req *pb.ReadProcessoReq) (*pb.ReadProcessoRes, error) {
+	return &pb.ReadProcessoRes{}, nil
+}
+
+func (g *GravacaoService) ReadProcessos(ctx context.Context, req *pb.ReadProcessosReq) (*pb.ReadProcessosRes, error) {
+	return &pb.ReadProcessosRes{}, nil
+}
+
+func (g *GravacaoService) UpdateProcesso(ctx context.Context, req *pb.UpdateProcessoReq) (*pb.UpdateProcessoRes, error) {
+	return &pb.UpdateProcessoRes{}, nil
+}
+
+func (g *GravacaoService) DeleteProcesso(ctx context.Context, req *pb.DeleteProcessoReq) (*pb.DeleteProcessoRes, error) {
+	return &pb.DeleteProcessoRes{}, nil
 }

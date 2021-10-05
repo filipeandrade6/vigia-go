@@ -6,9 +6,8 @@ package gravacao;
 
 service Gravacao {
     rpc Registrar (RegistrarReq) returns (RegistrarRes) {}
+    rpc RemoverRegistro (RemoverRegistroReq) returns (RemoverRegistroRes) {}
 
-    rpc InfoProcessos (InfoProcessosReq) returns (InfoProcessosResp) {}
-    rpc ConfigurarProcesso (ConfigurarProcessoReq) returns (ConfigurarProcessoResp) {}
     rpc AtualizarListaVeiculos (AtualizarListaVeiculosReq) returns (AtualizarListaVeiculosResp) {}
 
     // rpc statusArmazenamento (StatusArmazenamentoParams) returns (StatusArmazenamento) {}
@@ -19,8 +18,6 @@ service Gravacao {
     rpc ReadProcessos (ReadProcessosReq) returns (ReadProcessosRes) {}
     rpc UpdateProcesso (UpdateProcessoReq) returns (UpdateProcessoRes) {}
     rpc DeleteProcesso (DeleteProcessoReq) returns (DeleteProcessoRes) {}
-
-    rpc IniciarProcessamento (IniciarProcessamentoReq) returns (IniciarProcessamentoResp) {}
 }
 
 message RegistrarReq {
@@ -36,6 +33,12 @@ message RegistrarReq {
 }
 
 message RegistrarRes {}
+
+// ===================
+
+message RemoverRegistroReq {}
+
+message RemoverRegistroRes {}
 
 // ===================
 
@@ -84,54 +87,6 @@ message DeleteProcessoRes {}
 
 // ===================
 
-message IniciarProcessamentoReq{}
-
-message IniciarProcessamentoResp{
-    string status = 1;
-}
-
-message InfoProcessosReq {}
-
-message InfoProcessosResp {
-    message Processo {
-        int32 id = 1;
-        int32 camera_id = 2;
-        string processador_caminho = 3;
-        enum StatusProcesso {
-            PARADO = 0;
-            EXECUTANDO = 1;
-        }
-        StatusProcesso status = 4;
-    }
-    repeated Processo processos = 1;
-}
-
-message ConfigurarProcessoReq {
-    enum Acao {
-        CONFIGURAR = 0;
-        INICIAR = 1;
-        PARAR = 2;
-        REMOVER = 3;
-        INFO = 4;
-    }
-    Acao acao = 1;
-    int32 id = 2;
-    int32 camera_id = 3;
-    string processador_caminho = 4;
-}
-
-// TODO colocar info do processo abaixo (consumo armazenamento, veiculos, etc)
-
-message ConfigurarProcessoResp {
-    enum Status {
-        INEXSISTENTE = 0;
-        EXECUTANDO = 1;
-        PARADO = 2;
-    }
-    Status status = 1;
-    string Armazenamento = 2;
-    int32 contador_capturas = 3;
-}
 
 message AtualizarListaVeiculosReq {
     message Veiculo {
