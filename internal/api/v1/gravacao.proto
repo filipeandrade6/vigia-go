@@ -13,11 +13,11 @@ service Gravacao {
     // rpc statusArmazenamento (StatusArmazenamentoParams) returns (StatusArmazenamento) {}
     // rpc configurarHousekeeping (HousekeepingConfig) returns (StatusHousekeeping) {}
 
-    rpc CreateProcesso (CreateProcessoReq) returns (CreateProcessoRes) {}
-    rpc ReadProcesso (ReadProcessoReq) returns (ReadProcessoRes) {}
-    rpc ReadProcessos (ReadProcessosReq) returns (ReadProcessosRes) {}
-    rpc UpdateProcesso (UpdateProcessoReq) returns (UpdateProcessoRes) {}
-    rpc DeleteProcesso (DeleteProcessoReq) returns (DeleteProcessoRes) {}
+    rpc CreateProcessoG (CreateProcessoGReq) returns (CreateProcessoGRes) {}
+    rpc ReadProcessoG (ReadProcessoGReq) returns (ReadProcessoGRes) {}
+    rpc ReadProcessoGs (ReadProcessoGsReq) returns (ReadProcessoGsRes) {}
+    rpc UpdateProcessoG (UpdateProcessoGReq) returns (UpdateProcessoGRes) {}
+    rpc DeleteProcessoG (DeleteProcessoGReq) returns (DeleteProcessoGRes) {}
 }
 
 message RegistrarReq {
@@ -42,8 +42,8 @@ message RemoverRegistroRes {}
 
 // ===================
 
-message Processo {
-    string processo_id = 1;
+message ProcessoG {
+    string ProcessoG_id = 1;
     string servidor_gravacao_id = 2;
     string camera_id = 3;
     int32 processador = 4;
@@ -51,39 +51,39 @@ message Processo {
     bool execucao = 6;
 }
 
-message CreateProcessoReq {
-    Processo processo = 1;
+message CreateProcessoGReq {
+    ProcessoG ProcessoG = 1;
 }
 
-message CreateProcessoRes {
-    string processo_id = 1;
+message CreateProcessoGRes {
+    string ProcessoG_id = 1;
 }
 
-message ReadProcessoReq {
-    string processo_id =1;
+message ReadProcessoGReq {
+    string ProcessoG_id =1;
 }
 
-message ReadProcessoRes {
-    Processo processo = 1;
+message ReadProcessoGRes {
+    ProcessoG ProcessoG = 1;
 }
 
-message ReadProcessosReq {}
+message ReadProcessoGsReq {}
 
-message ReadProcessosRes {
-    repeated Processo processos = 1;
+message ReadProcessoGsRes {
+    repeated ProcessoG ProcessoGs = 1;
 }
 
-message UpdateProcessoReq {
-    Processo processo = 1;
+message UpdateProcessoGReq {
+    ProcessoG ProcessoG = 1;
 }
 
-message UpdateProcessoRes {}
+message UpdateProcessoGRes {}
 
-message DeleteProcessoReq {
-    string processo_id = 1;
+message DeleteProcessoGReq {
+    string ProcessoG_id = 1;
 }
 
-message DeleteProcessoRes {}
+message DeleteProcessoGRes {}
 
 // ===================
 
