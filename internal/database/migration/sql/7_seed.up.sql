@@ -13,9 +13,9 @@ INSERT INTO servidores_gravacao (servidor_gravacao_id, endereco_ip, porta, armaz
     ('d03307d4-2b28-4c23-a004-3da25e524bb1', '21.43.76.98', '3456', '/', '0 0 * * 0')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO processos (processo_id, servidor_gravacao_id, camera_id, processador, adaptador, execucao) VALUES
-    ('d03307d4-2b28-4c23-a004-3da32e5b8bb1', 'd03307d4-2b28-4c23-a004-3da25e5b8bb1', 'd03307d4-2b28-4c23-a004-3da25e5b8ce3', '1', '1', TRUE),
-    ('d03307d4-2b28-4c23-a004-3da32e5b8a61', 'd03307d4-2b28-4c23-a004-3da25e5b8bb1', 'd03307d4-2b28-4c23-a004-3da25e5b8aa3', '1', '1', TRUE)
+INSERT INTO processos (processo_id, servidor_gravacao_id, camera_id, processador, adaptador) VALUES
+    ('d03307d4-2b28-4c23-a004-3da32e5b8bb1', 'd03307d4-2b28-4c23-a004-3da25e5b8bb1', 'd03307d4-2b28-4c23-a004-3da25e5b8ce3', '1', '1'),
+    ('d03307d4-2b28-4c23-a004-3da32e5b8a61', 'd03307d4-2b28-4c23-a004-3da25e5b8bb1', 'd03307d4-2b28-4c23-a004-3da25e5b8aa3', '1', '1')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO veiculos (veiculo_id, placa, tipo, cor, marca, info) VALUES

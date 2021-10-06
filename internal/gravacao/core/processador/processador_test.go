@@ -3,6 +3,7 @@ package processador_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
 	"github.com/filipeandrade6/vigia-go/internal/core/processo"
@@ -18,9 +19,9 @@ func TestProcessador(t *testing.T) {
 	log, db, teardown := tests.New(t)
 	t.Cleanup(teardown)
 
+	cameraCore := camera.NewCore(log, db)
 	processoCore := processo.NewCore(log, db)
 	registroCore := registro.NewCore(log, db)
-	cameraCore := camera.NewCore(log, db)
 	veiculoCore := veiculo.NewCore(log, db)
 
 	ctx := context.Background()
@@ -30,16 +31,24 @@ func TestProcessador(t *testing.T) {
 		errChan := make(chan error)
 		matchChan := make(chan string)
 
+		ticker := time.NewTicker(5 * time.Second)
+
+		np := processador.NewProcessador("d03307d4-2b28-4c23-a004-3da25e5b8bb1", "/home/filipe", processoCore, cameraCore, registroCore, veiculoCore, errChan, matchChan)
+		err := np.AtualizarMatchList(ctx)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to update matchlist: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to update matchlist.", tests.Success)
+
+		go np.Gerenciar()
+
 		nProcesso := processo.NewProcesso{
 			ServidorGravacaoID: "d03307d4-2b28-4c23-a004-3da25e5b8bb1",
 			CameraID:           "d03307d4-2b28-4c23-a004-3da25e5b8ce3",
 			Processador:        1,
 			Adaptador:          1,
-			Execucao:           false,
+			// Execucao:           false,
 		}
-
-		np := processador.NewProcessador("d03307d4-2b28-4c23-a004-3da25e5b8bb1", "/home/filipe", processoCore, cameraCore, registroCore, errChan, matchChan)
-		go np.Gerenciar()
 
 		prc, err := processoCore.Create(ctx, nProcesso)
 		if err != nil {
@@ -64,16 +73,16 @@ func TestProcessador(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to start processo.", tests.Success)
 
-		registroMatch := <-matchChan
-
-		regSaved, err := registroCore.Query(ctx, prc.ProcessoID, 1, 1)
-		if len(regSaved) <= 0 {
-			t.Fatalf("\t%s\tShould have received registro by processoID: %s.", tests.Failed, err)
+		var registroMatch string
+		select {
+		case r := <-matchChan:
+			registroMatch = r
+		case <-ticker.C:
+			t.Fatalf("\t%s\tShould NOT wait more than 5 seconds for match.", tests.Failed)
 		}
-		t.Logf("\t%s\tShould have received registro by processoID", tests.Success)
 
 		err = np.StartProcesso(ctx, prc.ProcessoID) // TODO criar erros e colocar errors.Is(ssxxx,xxxx)
-		if err != nil {
+		if err == nil {
 			t.Fatalf("\t%s\tShould get already executing error: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould get already executing error.", tests.Success)
@@ -97,14 +106,16 @@ func TestProcessador(t *testing.T) {
 		t.Logf("\t%s\tShould be able to retrieve registro by registro.", tests.Success)
 
 		err = np.StopProcesso(ctx, prc.ProcessoID) // TODO criar erros e colocar errors.Is(ssxxx,xxxx)
-		if err != nil {
+		if err == nil {
 			t.Fatalf("\t%s\tShould get already stopped error: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould get already stopped error.", tests.Success)
 
 		select {
-		case <-errChan:
-			t.Fatalf("\t%s\tShould NOT get error: %s.", tests.Failed, err)
+		case err := <-errChan:
+			t.Fatalf("\t%s\tShould NOT get any error from channel: %s.", tests.Failed, err)
+		case <-ticker.C:
+			t.Logf("\t%s\tShould NOT get any error from channel.", tests.Success)
 		}
 	}
 }

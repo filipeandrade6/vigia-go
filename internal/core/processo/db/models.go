@@ -6,5 +6,5 @@ type Processo struct {
 	CameraID           string `db:"camera_id"`
 	Processador        int    `db:"processador"`
 	Adaptador          int    `db:"adaptador"`
-	Execucao           bool   `db:"execucao"`
+	// Execucao           bool   `db:"execucao"`
 }

@@ -24,9 +24,9 @@ func NewStore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Store {
 func (s Store) Create(ctx context.Context, prc Processo) error {
 	const q = `
 	INSERT INTO processos
-		(processo_id, servidor_gravacao_id, camera_id, processador, adaptador, execucao)
+		(processo_id, servidor_gravacao_id, camera_id, processador, adaptador)
 	VALUES
-		(:processo_id, :servidor_gravacao_id, :camera_id, :processador, :adaptador, :execucao)`
+		(:processo_id, :servidor_gravacao_id, :camera_id, :processador, :adaptador)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.sqlxDB, q, prc); err != nil {
 		return fmt.Errorf("inserting processo: %w", err)
@@ -43,8 +43,7 @@ func (s Store) Update(ctx context.Context, prc Processo) error {
 		"servidor_gravacao_id" = :servidor_gravacao_id,
 		"camera_id" = :camera_id,
 		"processador" = :processador,
-		"adaptador" = :adaptador,
-		"execucao" = :execucao
+		"adaptador" = :adaptador
 	WHERE
 		processo_id = :processo_id`
 
@@ -92,11 +91,11 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 	FROM
 		processos
 	WHERE
-		CONCAT(processo_id, servidor_gravacao_id, camera_id, processador, adaptador, execucao)
+		CONCAT(processo_id, servidor_gravacao_id, camera_id, processador, adaptador)
 	ILIKE
 		:query
 	ORDER BY
-		execucao
+		servidor_gravacao_id
 	OFFSET :offset ROWS FETCH NEXT :rows_per_page ROWS ONLY`
 
 	var prcs []Processo

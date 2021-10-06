@@ -28,16 +28,14 @@ func NewCore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Core {
 }
 
 func (c Core) Create(ctx context.Context, r Registro) (string, error) {
-	regID := validate.GenerateID()
-
 	dbReg := db.Registro{
-		RegistroID:    regID,
+		RegistroID:    r.RegistroID,
 		ProcessoID:    r.ProcessoID,
 		Placa:         r.Placa,
 		TipoVeiculo:   r.TipoVeiculo,
 		CorVeiculo:    r.CorVeiculo,
 		MarcaVeiculo:  r.MarcaVeiculo,
-		Armazenamento: fmt.Sprintf("%d_%s", r.CriadoEm.Unix(), regID), // TODO melhorar isso aqui?
+		Armazenamento: r.Armazenamento,
 		Confianca:     r.Confianca,
 		CriadoEm:      r.CriadoEm,
 	}

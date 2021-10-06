@@ -8,6 +8,7 @@ import (
 
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
 	"github.com/filipeandrade6/vigia-go/internal/database/tests"
+	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -25,6 +26,7 @@ func TestRegistro(t *testing.T) {
 		now := time.Now()
 
 		nr := registro.Registro{
+			RegistroID:   validate.GenerateID(),
 			ProcessoID:   "d03307d4-2b28-4c23-a004-3da32e5b8a61",
 			Placa:        "XXX1111",
 			TipoVeiculo:  "sedan",
@@ -50,7 +52,7 @@ func TestRegistro(t *testing.T) {
 		nr.Armazenamento = fmt.Sprintf("%d_%s", now.Unix(), reg)
 
 		want := nr
-		want.Armazenamento = fmt.Sprintf("%d_%s", now.Unix(), reg)
+		want.Armazenamento = saved.Armazenamento
 		want.CriadoEm = saved.CriadoEm
 
 		if diff := cmp.Diff(want, saved); diff != "" {

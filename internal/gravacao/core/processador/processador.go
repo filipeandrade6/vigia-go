@@ -2,38 +2,38 @@ package processador
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
 	"github.com/filipeandrade6/vigia-go/internal/core/processo"
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
+	"github.com/filipeandrade6/vigia-go/internal/core/veiculo"
 )
 
 type Processador struct {
-	ProcessoID         string
-	ServidorGravacaoID string
-	ProcessoCore       processo.Core
+	ProcessoCore       processo.Core // TODO ver se é usado pointer nos core...
 	CameraCore         camera.Core
-	RegistroCore       registro.Core // TODO pointer?
+	RegistroCore       registro.Core
+	VeiculoCore        veiculo.Core
+	ServidorGravacaoID string
 	Armazenamento      string
 	SuperrChan         chan error
 	MatchChan          chan string
 
-	processos map[string]*Processo // TODO pointer e todo o resto?
+	processos map[string]*Processo
 	matchlist map[string]bool
 
 	errChan chan error
 	regChan chan registro.Registro
 }
 
-// TODO como o adaptador vai funcionar?
-func NewProcessador(servidorGravacaoID, armazenamento string, processoCore processo.Core, cameraCore camera.Core, registroCore registro.Core, SuperrChan chan error, MatchChan chan string) *Processador {
+func NewProcessador(servidorGravacaoID, armazenamento string, processoCore processo.Core, cameraCore camera.Core, registroCore registro.Core, veiculoCore veiculo.Core, SuperrChan chan error, MatchChan chan string) *Processador {
 	return &Processador{
-		ServidorGravacaoID: servidorGravacaoID, // é usado aonde?
+		ServidorGravacaoID: servidorGravacaoID,
 		ProcessoCore:       processoCore,
 		CameraCore:         cameraCore,
 		RegistroCore:       registroCore,
+		VeiculoCore:        veiculoCore,
 		Armazenamento:      armazenamento,
 		SuperrChan:         SuperrChan,
 		MatchChan:          MatchChan,
@@ -49,21 +49,19 @@ func (p *Processador) Gerenciar() {
 	for {
 		select {
 		case reg := <-p.regChan:
+			go p.Salvar(reg, p.SuperrChan)
+
 			if _, ok := p.matchlist[reg.Placa]; ok {
 				p.MatchChan <- reg.RegistroID
 			}
-
-			go p.Salvar(reg, p.SuperrChan) // coloquei em uma nova goroutine, ve se aumenta a performance
-
 		case err := <-p.errChan:
-			// TODO ve o tipo de problema e tem como recuperar - manda ou para notificação ou para SuperrChan
-			p.SuperrChan <- err
+			p.SuperrChan <- err // TODO ve o tipo de problema e tem como recuperar - manda ou para notificação ou para SuperrChan
 		}
 	}
 }
 
 func (p *Processador) StartProcesso(ctx context.Context, processoID string) error {
-	prclist, ok := p.processos[processoID] // se já estiver na lista de processos inicia o processo.
+	prclist, ok := p.processos[processoID]
 	if ok {
 		if err := prclist.Start(); err != nil {
 			if err.Error() == "processo already executing" {
@@ -79,7 +77,7 @@ func (p *Processador) StartProcesso(ctx context.Context, processoID string) erro
 	}
 
 	if prc.ServidorGravacaoID != p.ServidorGravacaoID {
-		return errors.New("this processo don't belong in this servidor de gravacao")
+		return fmt.Errorf("this processo don't belong in this servidor de gravacao")
 	}
 
 	cam, err := p.CameraCore.QueryByID(ctx, prc.CameraID)
@@ -87,16 +85,7 @@ func (p *Processador) StartProcesso(ctx context.Context, processoID string) erro
 		return fmt.Errorf("query camera processoID[%s]: %w", processoID, err)
 	}
 
-	np := NewProcesso(
-		prc.ProcessoID,
-		prc.ServidorGravacaoID,
-		p.Armazenamento,
-		prc.Processador,
-		prc.Adaptador,
-		cam,
-		p.regChan,
-		p.errChan,
-	)
+	np := NewProcesso(prc, cam, p.ServidorGravacaoID, p.Armazenamento, p.regChan, p.errChan)
 
 	if err := np.Start(); err != nil {
 		return fmt.Errorf("initializing processo processoID[%q]: %w", processoID, err)
@@ -107,7 +96,6 @@ func (p *Processador) StartProcesso(ctx context.Context, processoID string) erro
 	return nil
 }
 
-// TODO receber contexto...
 func (p *Processador) StopProcesso(ctx context.Context, processoID string) error {
 	prclist, ok := p.processos[processoID]
 	if ok {
@@ -130,4 +118,17 @@ func (p *Processador) Salvar(reg registro.Registro, errChan chan error) {
 	if err != nil {
 		errChan <- err
 	}
+}
+
+func (p *Processador) AtualizarMatchList(ctx context.Context) error {
+	veiculos, err := p.VeiculoCore.Query(ctx, "", 1, 1000000) // TODO arrumar depois
+	if err != nil {
+		return fmt.Errorf("querying veiculos database")
+	}
+
+	for _, veiculo := range veiculos {
+		p.matchlist[veiculo.Placa] = true
+	}
+
+	return nil
 }

@@ -15,7 +15,7 @@ type Processo struct {
 	CameraID           string
 	Processador        int
 	Adaptador          int
-	Execucao           bool
+	// Execucao           bool
 }
 
 type NewProcesso struct {
@@ -23,7 +23,7 @@ type NewProcesso struct {
 	CameraID           string `validate:"required"`
 	Processador        int    `validate:"required"`
 	Adaptador          int    `validate:"required"`
-	Execucao           bool
+	// Execucao           bool
 }
 
 type UpdateProcesso struct {
@@ -31,7 +31,7 @@ type UpdateProcesso struct {
 	CameraID           *string `validate:"omitempty"`
 	Processador        *int    `validate:"omitempty"`
 	Adaptador          *int    `validate:"omitempty"`
-	Execucao           *bool   `validate:"omitempty"`
+	// Execucao           *bool   `validate:"omitempty"`
 }
 
 // =============================================================================
@@ -58,7 +58,7 @@ func (p Processo) ToProto() *pb.Processo {
 		CameraId:           p.CameraID,
 		Processador:        int32(p.Processador),
 		Adaptador:          int32(p.Adaptador),
-		Execucao:           p.Execucao,
+		// Execucao:           p.Execucao,
 	}
 }
 
@@ -69,7 +69,7 @@ func FromProto(p *pb.Processo) Processo {
 		CameraID:           p.GetCameraId(),
 		Processador:        int(p.GetProcessador()),
 		Adaptador:          int(p.GetAdaptador()),
-		Execucao:           p.GetExecucao(),
+		// Execucao:           p.GetExecucao(),
 	}
 }
 
