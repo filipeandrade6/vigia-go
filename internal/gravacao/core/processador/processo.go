@@ -5,23 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ardanlabs/service/business/sys/validate"
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
+	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 )
-
-type Registro struct {
-	RegistroID         string
-	ProcessoID         string
-	CameraID           string
-	ServidorGravacaoID string
-	Placa              string
-	CorVeiculo         string
-	TipoVeiculo        string
-	MarcaVeiculo       string
-	Armazenamento      string
-	Horario            time.Time
-}
 
 type Processo struct {
 	ProcessoID         string        // identificador do processo
@@ -40,6 +27,7 @@ type Processo struct {
 }
 
 func NewProcesso(
+	processoID string,
 	servidorGravacaoID string,
 	armazenamento string,
 	processador int,
@@ -48,7 +36,7 @@ func NewProcesso(
 	regChan chan registro.Registro,
 	ErrChan chan error) *Processo {
 	return &Processo{
-		ProcessoID:         validate.GenerateID(),
+		ProcessoID:         processoID,
 		ServidorGravacaoID: servidorGravacaoID,
 		Armazenamento:      armazenamento,
 		Processador:        processador,
@@ -102,13 +90,15 @@ func (p *Processo) processar() {
 		case r := <-outChan:
 			// TODO check se é mensagem de registro adaptador?
 			reg := registro.Registro{
-				ProcessoID:   p.ProcessoID,
-				Placa:        r,
-				TipoVeiculo:  "sedan",
-				CorVeiculo:   "prata",
-				MarcaVeiculo: "honda",
-				Confianca:    0.50,
-				CriadoEm:     time.Now(),
+				RegistroID:    validate.GenerateID(), // TODO gerar dentro do dahua
+				ProcessoID:    p.ProcessoID,
+				Placa:         r,
+				TipoVeiculo:   "sedan",
+				CorVeiculo:    "prata",
+				MarcaVeiculo:  "honda",
+				Armazenamento: "home/filipe/xxxxx",
+				Confianca:     0.50,
+				CriadoEm:      time.Now(),
 			}
 
 			p.regChan <- reg

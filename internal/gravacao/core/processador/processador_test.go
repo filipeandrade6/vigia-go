@@ -33,9 +33,6 @@ func TestProcessador(t *testing.T) {
 			}
 		}()
 
-		np := processador.NewProcessador("d03307d4-2b28-4c23-a004-3da25e5b8bb1", "/home/filipe", cameraCore, registroCore, SupErrChan)
-		go np.Gerenciar()
-
 		nProcesso := processo.NewProcesso{
 			ServidorGravacaoID: "d03307d4-2b28-4c23-a004-3da25e5b8bb1",
 			CameraID:           "d03307d4-2b28-4c23-a004-3da25e5b8ce3",
@@ -44,23 +41,59 @@ func TestProcessador(t *testing.T) {
 			Execucao:           false,
 		}
 
-		prcID, err := processoCore.Create(ctx, nProcesso)
+		np := processador.NewProcessador("d03307d4-2b28-4c23-a004-3da25e5b8bb1", "/home/filipe", processoCore, cameraCore, registroCore, SupErrChan)
+		go np.Gerenciar()
+
+		prc, err := processoCore.Create(ctx, nProcesso)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		err := np.NovoProcesso(prcID, "d03307d4-2b28-4c23-a004-3da25e5b8ce3", 1, 1)
+		fmt.Printf("\nprocessoID: %s\n", prc.ProcessoID)
+
+		err = np.StartProcesso(ctx, prc.ProcessoID)
 		if err != nil {
 			t.Fatal(err)
 		}
-
-		fmt.Printf("\n\nprocessoID: %s\n", prcID)
-
-		np.StartProcesso(prcID)
 
 		time.Sleep(time.Duration(5 * time.Second))
 
-		np.StopProcesso(prcID)
+		nProcesso2 := nProcesso
+		nProcesso2.CameraID = "d03307d4-2b28-4c23-a004-3da25e5b8aa3"
+
+		prc2, err := processoCore.Create(ctx, nProcesso)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		err = np.StartProcesso(ctx, prc2.ProcessoID)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		np.StopProcesso(prc.ProcessoID)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fmt.Println("pausando o segundo")
+
+		err = np.StopProcesso(prc2.ProcessoID)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fmt.Println("iniciando o primeiro")
+
+		err = np.StartProcesso(ctx, prc.ProcessoID)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		err = np.StartProcesso(ctx, prc.ProcessoID)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		placas, _ := registroCore.Query(context.Background(), "", 1, 100)
 		fmt.Println(placas)
