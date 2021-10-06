@@ -19,7 +19,7 @@ INSERT INTO processos (processo_id, servidor_gravacao_id, camera_id, processador
 ON CONFLICT DO NOTHING;
 
 INSERT INTO veiculos (veiculo_id, placa, tipo, cor, marca, info) VALUES
-    ('d03307d4-2b28-4d23-a004-3da32e5b8bb1', 'ABC0000', 'sedan', 'branco', 'honda', 'teste de carro 1'),
+    ('d03307d4-2b28-4d23-a004-3da32e5b8bb1', 'ABC0015', 'sedan', 'branco', 'honda', 'teste de carro 1'),
     ('d03307d4-2b28-4d23-a004-3da32e5b8a61', 'ABC0001', 'suv', 'preto', 'hyundai', 'teste de carro 2')
 ON CONFLICT DO NOTHING;
 

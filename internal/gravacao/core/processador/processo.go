@@ -34,7 +34,8 @@ func NewProcesso(
 	adaptador int,
 	camera camera.Camera,
 	regChan chan registro.Registro,
-	ErrChan chan error) *Processo {
+	ErrChan chan error,
+) *Processo {
 	return &Processo{
 		ProcessoID:         processoID,
 		ServidorGravacaoID: servidorGravacaoID,
@@ -49,7 +50,7 @@ func NewProcesso(
 
 func (p *Processo) Start() error {
 	if p.Status {
-		return errors.New("processo ja em execucao")
+		return errors.New("processo already executing")
 	}
 
 	p.stopChan = make(chan struct{})
@@ -63,7 +64,7 @@ func (p *Processo) Start() error {
 
 func (p *Processo) Stop() error {
 	if !p.Status {
-		return errors.New("processo ja em pausa")
+		return errors.New("processo already paused")
 	}
 
 	// TODO colocar context?
@@ -78,31 +79,13 @@ func (p *Processo) Stop() error {
 func (p *Processo) processar() {
 	defer close(p.stoppedChan)
 
-	outChan := make(chan string)
 	ErrChan := make(chan error)
-
 	stopCmdChan := make(chan struct{})
 
-	go dahua(outChan, ErrChan, stopCmdChan)
+	go dahua(p.regChan, ErrChan, stopCmdChan, p.ProcessoID, p.Armazenamento)
 
 	for {
 		select {
-		case r := <-outChan:
-			// TODO check se é mensagem de registro adaptador?
-			reg := registro.Registro{
-				RegistroID:    validate.GenerateID(), // TODO gerar dentro do dahua
-				ProcessoID:    p.ProcessoID,
-				Placa:         r,
-				TipoVeiculo:   "sedan",
-				CorVeiculo:    "prata",
-				MarcaVeiculo:  "honda",
-				Armazenamento: "home/filipe/xxxxx",
-				Confianca:     0.50,
-				CriadoEm:      time.Now(),
-			}
-
-			p.regChan <- reg
-
 		case err := <-ErrChan:
 			p.ErrChan <- fmt.Errorf("processoID[%s]: %w", p.ProcessoID, err)
 			// return TODO colocar o return aqui ou chamar o stop?
@@ -116,8 +99,28 @@ func (p *Processo) processar() {
 }
 
 // TODO vai ser a funcao no package Dahua
-func dahua(outChan chan string, ErrChan chan error, stopCmdChan chan struct{}) {
-	outChan <- "TESTE0001"
-	ErrChan <- errors.New("erro na dahua")
-	<-stopCmdChan
+func dahua(outChan chan registro.Registro, ErrChan chan error, stopCmdChan chan struct{}, processoID string, armazenamento string) {
+	var i int
+	for {
+		select {
+		default:
+			time.Sleep(time.Duration(time.Millisecond * 500))
+			r := registro.Registro{
+				RegistroID:    validate.GenerateID(), // TODO gerar dentro do dahua
+				ProcessoID:    processoID,
+				Placa:         fmt.Sprintf("ABC%04d", i),
+				TipoVeiculo:   "sedan",
+				CorVeiculo:    "prata",
+				MarcaVeiculo:  "honda",
+				Armazenamento: "",
+				Confianca:     0.50,
+				CriadoEm:      time.Now(),
+			}
+			r.Armazenamento = fmt.Sprintf("%s/%d_%s", armazenamento, r.CriadoEm.Unix(), r.RegistroID)
+			outChan <- r
+			i++
+		case <-stopCmdChan:
+			return
+		}
+	}
 }
