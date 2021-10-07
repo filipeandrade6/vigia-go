@@ -31,7 +31,7 @@ func TestProcessador(t *testing.T) {
 		errChan := make(chan error)
 		matchChan := make(chan string)
 
-		ticker := time.NewTicker(5 * time.Second)
+		ticker := time.NewTicker(4 * time.Second)
 
 		np := processador.NewProcessador("d03307d4-2b28-4c23-a004-3da25e5b8bb1", "/home/filipe", processoCore, cameraCore, registroCore, veiculoCore, errChan, matchChan)
 		err := np.AtualizarMatchList(ctx)

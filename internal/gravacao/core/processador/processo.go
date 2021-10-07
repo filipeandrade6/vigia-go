@@ -11,93 +11,69 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 )
 
+var (
+	ErrAlreadyStarted = errors.New("processo already started")
+	ErrAlreadyStopped = errors.New("processo already stopped")
+)
+
 type Processo struct {
 	processo.Processo
 	camera.Camera
 
-	servidorgravacao string
-	armazenamento    string
+	servidorGravacaoID string
+	armazenamento      string
 
-	// ProcessoID         string        // identificador do processo
-	// ServidorGravacaoID string        // identificador do servidor de gravacao
-	// Camera             camera.Camera // configurações da câmera
-	// Processador        int           // processador utilizado
-	// Adaptador          int           // adaptador utilizado
-	// Armazenamento      string        // local onde será salvo as imagens
+	status bool
 
-	Status bool // true: executando, false: parado
-
-	regChan     chan registro.Registro // channel onde será enviado os registros TODO no Processador
-	errChan     chan error             // channel onde será enviado erro
-	stopChan    chan struct{}          // channel de sinalização para parar o processamento
-	stoppedChan chan struct{}          // channel de sinalização que o processamento foi parado
+	regChan     chan registro.Registro
+	errChan     chan error
+	stopChan    chan struct{}
+	stoppedChan chan struct{}
 }
 
 func NewProcesso(
 	prc processo.Processo,
 	cam camera.Camera,
-	servidorgravacao string,
+	servidorGravacaoID string,
 	armazenamento string,
 	regChan chan registro.Registro,
 	errChan chan error,
 ) *Processo {
 	return &Processo{
-		Processo:         prc,
-		Camera:           cam,
-		servidorgravacao: servidorgravacao,
-		armazenamento:    armazenamento,
-		regChan:          make(chan registro.Registro),
-		errChan:          make(chan error),
-		Status:           false,
+		Processo:           prc,
+		Camera:             cam,
+		servidorGravacaoID: servidorGravacaoID,
+		armazenamento:      armazenamento,
+		regChan:            regChan,
+		errChan:            make(chan error),
+		status:             false,
 	}
 }
 
-// func NewProcesso(
-// 	processoID string,
-// 	servidorGravacaoID string,
-// 	armazenamento string,
-// 	processador int,
-// 	adaptador int,
-// 	camera camera.Camera,
-// 	regChan chan registro.Registro,
-// 	errChan chan error,
-// ) *Processo {
-// 	return &Processo{
-// 		ProcessoID:         processoID,
-// 		ServidorGravacaoID: servidorGravacaoID,
-// 		Armazenamento:      armazenamento,
-// 		Processador:        processador,
-// 		Adaptador:          adaptador,
-// 		Camera:             camera,
-// 		regChan:            regChan,
-// 		errChan:            errChan,
-// 	}
-// }
-
 func (p *Processo) Start() error {
-	if p.Status {
-		return errors.New("processo already executing")
+	if p.status {
+		return ErrAlreadyStarted
 	}
 
 	p.stopChan = make(chan struct{})
 	p.stoppedChan = make(chan struct{})
 
 	go p.processar()
-	p.Status = true
+
+	p.status = true
 
 	return nil
 }
 
 func (p *Processo) Stop() error {
-	if !p.Status {
-		return errors.New("processo already paused")
+	if !p.status {
+		return ErrAlreadyStopped
 	}
 
-	// TODO colocar context?
 	close(p.stopChan)
 	<-p.stoppedChan
 
-	p.Status = false
+	p.status = false
 
 	return nil
 }
@@ -114,7 +90,8 @@ func (p *Processo) processar() {
 		select {
 		case err := <-errChan:
 			p.errChan <- fmt.Errorf("processoID[%s]: %w", p.ProcessoID, err)
-			// return TODO colocar o return aqui ou chamar o stop?
+			p.status = false
+			return
 
 		case <-p.stopChan:
 			// SIGINT ou SIGTERM o processo acima... gracefully shutdown
@@ -130,7 +107,7 @@ func dahua(outChan chan registro.Registro, errChan chan error, stopCmdChan chan 
 	for {
 		select {
 		default:
-			time.Sleep(time.Duration(time.Millisecond * 500))
+			time.Sleep(time.Duration(time.Millisecond * 200))
 			r := registro.Registro{
 				RegistroID:    validate.GenerateID(), // TODO gerar dentro do dahua
 				ProcessoID:    processoID,
