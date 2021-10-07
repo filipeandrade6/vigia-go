@@ -5,5 +5,5 @@ type ServidorGravacao struct {
 	EnderecoIP         string `db:"endereco_ip"`
 	Porta              int    `db:"porta"`
 	Armazenamento      string `db:"armazenamento"`
-	Housekeeper        string `db:"housekeeper"`
+	HorasRetencao      int    `db:"horas_retencao"`
 }

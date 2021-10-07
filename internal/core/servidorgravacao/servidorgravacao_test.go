@@ -26,7 +26,7 @@ func TestServidorGravacao(t *testing.T) {
 			EnderecoIP:    "15.25.35.45",
 			Porta:         5001,
 			Armazenamento: "/home/filipe/vigia",
-			Housekeeper:   "0 0 * * 0",
+			HorasRetencao: 1,
 		}
 
 		sv, err := core.Create(ctx, ns)
@@ -56,7 +56,7 @@ func TestServidorGravacao(t *testing.T) {
 			EnderecoIP:    "15.25.35.45",
 			Porta:         5001,
 			Armazenamento: "/home/filipe/vigia",
-			Housekeeper:   "0 0 * * 0",
+			HorasRetencao: 2,
 		}
 
 		_, err = core.Create(ctx, nsv2)
@@ -70,7 +70,7 @@ func TestServidorGravacao(t *testing.T) {
 			EnderecoIP:         &wrappers.StringValue{Value: "60.50.30.20"},
 			Porta:              &wrappers.Int32Value{Value: 2727},
 			Armazenamento:      &wrappers.StringValue{Value: "/home/filipe/vigia2"},
-			Housekeeper:        &wrappers.StringValue{Value: "0 0 * * 1"},
+			HorasRetencao:      &wrappers.Int32Value{Value: 2},
 		}
 
 		if err = core.Update(ctx, upd); err != nil {
@@ -88,7 +88,7 @@ func TestServidorGravacao(t *testing.T) {
 		want.EnderecoIP = upd.EnderecoIP.GetValue()
 		want.Porta = int(upd.Porta.GetValue())
 		want.Armazenamento = upd.Armazenamento.GetValue()
-		want.Housekeeper = upd.Housekeeper.GetValue()
+		want.HorasRetencao = int(upd.HorasRetencao.GetValue())
 
 		var idx int
 		for i, s := range svs {

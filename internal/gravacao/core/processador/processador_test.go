@@ -38,7 +38,7 @@ func TestProcessador(t *testing.T) {
 
 		ticker := time.NewTicker(4 * time.Second)
 
-		np := processador.NewProcessador("d03307d4-2b28-4c23-a004-3da25e5b8bb1", "/home/filipe", processoCore, cameraCore, registroCore, veiculoCore, errChan, matchChan)
+		np := processador.NewProcessador("d03307d4-2b28-4c23-a004-3da25e5b8bb1", "/home/filipe", 1, processoCore, cameraCore, registroCore, veiculoCore, errChan, matchChan)
 		err := np.AtualizarMatchList(ctx)
 		if err != nil {
 			t.Fatalf("\t%s\tShould be able to update matchlist: %s.", tests.Failed, err)

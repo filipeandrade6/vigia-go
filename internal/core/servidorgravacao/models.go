@@ -13,14 +13,14 @@ type ServidorGravacao struct {
 	EnderecoIP         string
 	Porta              int
 	Armazenamento      string
-	Housekeeper        string
+	HorasRetencao      int
 }
 
 type NewServidorGravacao struct {
 	EnderecoIP    string `validate:"required,ip"`
 	Porta         int    `validate:"required,gte=1,lte=65536"`
 	Armazenamento string `validate:"required"`
-	Housekeeper   string `validate:"required"`
+	HorasRetencao int    `validate:"required"`
 }
 
 type UpdateServidorGravacao struct {
@@ -28,7 +28,7 @@ type UpdateServidorGravacao struct {
 	EnderecoIP         *wrappers.StringValue `validate:"omitempty,ip"`
 	Porta              *wrappers.Int32Value  `validate:"omitempty,gte=1,lte=65536"`
 	Armazenamento      *wrappers.StringValue `validate:"omitempty"`
-	Housekeeper        *wrappers.StringValue `validate:"omitempty"`
+	HorasRetencao      *wrappers.Int32Value  `validate:"omitempty"`
 }
 
 // =============================================================================
@@ -54,7 +54,7 @@ func (s ServidorGravacao) ToProto() *pb.ServidorGravacao {
 		EnderecoIp:         s.EnderecoIP,
 		Porta:              int32(s.Porta),
 		Armazenamento:      s.Armazenamento,
-		Housekeeper:        s.Housekeeper,
+		HorasRetencao:      int32(s.HorasRetencao),
 	}
 }
 
@@ -64,7 +64,7 @@ func FromProto(s *pb.ServidorGravacao) ServidorGravacao {
 		EnderecoIP:         s.GetEnderecoIp(),
 		Porta:              int(s.GetPorta()),
 		Armazenamento:      s.GetArmazenamento(),
-		Housekeeper:        s.GetHousekeeper(),
+		HorasRetencao:      int(s.GetHorasRetencao()),
 	}
 }
 

@@ -24,9 +24,9 @@ func NewStore(log *zap.SugaredLogger, sqlxDB *sqlx.DB) Store {
 func (s Store) Create(ctx context.Context, sv ServidorGravacao) error {
 	const q = `
 	INSERT INTO servidores_gravacao
-		(servidor_gravacao_id, endereco_ip, porta, armazenamento, housekeeper)
+		(servidor_gravacao_id, endereco_ip, porta, armazenamento, horas_retencao)
 	VALUES
-		(:servidor_gravacao_id, :endereco_ip, :porta, :armazenamento, :housekeeper)`
+		(:servidor_gravacao_id, :endereco_ip, :porta, :armazenamento, :horas_retencao)`
 
 	if err := database.NamedExecContext(ctx, s.log, s.sqlxDB, q, sv); err != nil {
 		return fmt.Errorf("inserting servidor de gravacao: %w", err)
@@ -43,7 +43,7 @@ func (s Store) Update(ctx context.Context, sv ServidorGravacao) error {
 		"endereco_ip" = :endereco_ip,
 		"porta" = :porta,
 		"armazenamento" = :armazenamento,
-		"housekeeper" = :housekeeper
+		"horas_retencao" = :horas_retencao
 	WHERE
 		servidor_gravacao_id = :servidor_gravacao_id`
 
@@ -91,7 +91,7 @@ func (s Store) Query(ctx context.Context, query string, pageNumber int, rowsPerP
 	FROM
 		servidores_gravacao
 	WHERE
-		CONCAT(servidor_gravacao_id, endereco_ip, porta, armazenamento, housekeeper)
+		CONCAT(servidor_gravacao_id, endereco_ip, porta, armazenamento, horas_retencao)
 	ILIKE
 		:query
 	ORDER BY

@@ -76,8 +76,8 @@ func (c Core) Update(ctx context.Context, up UpdateServidorGravacao) error {
 	if up.Armazenamento != nil {
 		dbSV.Armazenamento = up.Armazenamento.GetValue()
 	}
-	if up.Housekeeper != nil {
-		dbSV.Housekeeper = up.Housekeeper.GetValue()
+	if up.HorasRetencao != nil {
+		dbSV.HorasRetencao = int(up.HorasRetencao.GetValue())
 	}
 
 	if _, err := c.QueryByEnderecoIPPorta(ctx, dbSV.EnderecoIP, dbSV.Porta); !errors.Is(err, ErrNotFound) {

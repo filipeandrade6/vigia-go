@@ -8,9 +8,9 @@ INSERT INTO cameras (camera_id, descricao, endereco_ip, porta, canal, usuario, s
     ('d03307d4-2b28-4c23-a004-3da25e5b8aa3', 'desc 2', '45.56.78.89', '1', '1', 'admin', 'admin', '-12.2332', '-42.231')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO servidores_gravacao (servidor_gravacao_id, endereco_ip, porta, armazenamento, housekeeper) VALUES
-    ('d03307d4-2b28-4c23-a004-3da25e5b8bb1', '12.34.67.89', '6543', '/', '0 0 * * 0'),
-    ('d03307d4-2b28-4c23-a004-3da25e524bb1', '21.43.76.98', '3456', '/', '0 0 * * 0')
+INSERT INTO servidores_gravacao (servidor_gravacao_id, endereco_ip, porta, armazenamento, horas_retencao) VALUES
+    ('d03307d4-2b28-4c23-a004-3da25e5b8bb1', '12.34.67.89', '6543', '/', '1'),
+    ('d03307d4-2b28-4c23-a004-3da25e524bb1', '21.43.76.98', '3456', '/', '1')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO processos (processo_id, servidor_gravacao_id, camera_id, processador, adaptador) VALUES

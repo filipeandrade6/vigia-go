@@ -4,7 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
 	"github.com/filipeandrade6/vigia-go/internal/core/processo"
@@ -30,11 +33,14 @@ type Processador struct {
 	processos map[string]*Processo
 	matchlist map[string]bool
 
+	housekeeperStatus bool
+	horasRetencao     int
+
 	internalErrChan chan error
 	regChan         chan registro.Registro
 }
 
-func NewProcessador(servidorGravacaoID, armazenamento string, processoCore processo.Core, cameraCore camera.Core, registroCore registro.Core, veiculoCore veiculo.Core, SuperrChan chan error, MatchChan chan string) *Processador {
+func NewProcessador(servidorGravacaoID, armazenamento string, horasRetencao int, processoCore processo.Core, cameraCore camera.Core, registroCore registro.Core, veiculoCore veiculo.Core, SuperrChan chan error, MatchChan chan string) *Processador {
 	return &Processador{
 		servidorGravacaoID: servidorGravacaoID,
 		processoCore:       processoCore,
@@ -45,15 +51,21 @@ func NewProcessador(servidorGravacaoID, armazenamento string, processoCore proce
 		errChan:            SuperrChan,
 		matchChan:          MatchChan,
 
-		mutex:           &sync.RWMutex{},
-		processos:       make(map[string]*Processo),
-		matchlist:       make(map[string]bool),
+		mutex:     &sync.RWMutex{},
+		processos: make(map[string]*Processo),
+		matchlist: make(map[string]bool),
+
+		housekeeperStatus: true,
+		horasRetencao:     horasRetencao,
+
 		regChan:         make(chan registro.Registro),
 		internalErrChan: make(chan error),
 	}
 }
 
 func (p *Processador) Gerenciar() {
+	ticker := time.NewTicker(time.Hour)
+
 	for {
 		select {
 		case reg := <-p.regChan:
@@ -64,8 +76,14 @@ func (p *Processador) Gerenciar() {
 				p.matchChan <- reg.RegistroID
 			}
 			p.mutex.RUnlock()
+
 		case err := <-p.internalErrChan:
 			p.errChan <- err // TODO ve o tipo de problema e tem como recuperar - manda ou para notificação ou para SuperrChan
+
+		case <-ticker.C:
+			if p.housekeeperStatus {
+				go p.begintHousekeeper(p.horasRetencao, p.errChan)
+			}
 		}
 	}
 }
@@ -169,8 +187,20 @@ func (p *Processador) RemoveAllProcessos(ctx context.Context) error {
 	return nil
 }
 
+func (p *Processador) ShowAllProcessos(ctx context.Context) (map[string]bool, error) {
+	prc := make(map[string]bool)
+
+	p.mutex.RLock()
+	for _, processo := range p.processos {
+		prc[processo.ProcessoID] = processo.status
+	}
+	p.mutex.RUnlock()
+
+	return prc, nil
+}
+
 func (p *Processador) AtualizarMatchList(ctx context.Context) error {
-	veiculos, err := p.veiculoCore.Query(ctx, "", 1, 1000000) // TODO arrumar depois
+	veiculos, err := p.veiculoCore.QueryAll(ctx)
 	if err != nil {
 		return fmt.Errorf("querying veiculos database")
 	}
@@ -185,13 +215,38 @@ func (p *Processador) AtualizarMatchList(ctx context.Context) error {
 	return nil
 }
 
-func (p *Processador) AtualizarHousekeeper() error {
-
+// ===============
+// TODO mover os arquivos? - como funciona? -         Update no gerencia depois chama essa funcao...
+func (p *Processador) AtualizarHousekeeper(ctx context.Context, horasRetencao int) {
+	p.horasRetencao = horasRetencao
 }
 
-// TODO implementar
-func (p *Processador) SystemInfo(ctx context.Context) error {
-	return nil
+func (p *Processador) StartHousekeeper() {
+	p.housekeeperStatus = true
+}
+
+func (p *Processador) StopHousekeeper() {
+	p.housekeeperStatus = false
+}
+
+func (p *Processador) begintHousekeeper(expireTime int, errChan chan error) {
+	d := time.Now().Add(time.Duration(-expireTime) * time.Hour)
+
+	err := filepath.Walk(p.armazenamento, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err // TODO testar com diretorio errado...
+		}
+
+		if info.ModTime().Before(d) {
+			os.Remove(path)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		errChan <- err
+	}
 }
 
 func (p *Processador) createRegistro(reg registro.Registro, errChan chan error) {
