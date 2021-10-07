@@ -2,6 +2,7 @@ package processador_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -14,6 +15,10 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 )
+
+// TODO teste de adicionar placa
+// TODO teste de atualizar matchlist removendo e ver se aparece
+// TODO teste parar processo que não existe
 
 func TestProcessador(t *testing.T) {
 	log, db, teardown := tests.New(t)
@@ -81,8 +86,7 @@ func TestProcessador(t *testing.T) {
 			t.Fatalf("\t%s\tShould NOT wait more than 5 seconds for match.", tests.Failed)
 		}
 
-		err = np.StartProcesso(ctx, prc.ProcessoID) // TODO criar erros e colocar errors.Is(ssxxx,xxxx)
-		if err == nil {
+		if err = np.StartProcesso(ctx, prc.ProcessoID); !errors.As(err, &processador.ErrAlreadyStarted) {
 			t.Fatalf("\t%s\tShould get already executing error: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould get already executing error.", tests.Success)
@@ -105,8 +109,7 @@ func TestProcessador(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to retrieve registro by registro.", tests.Success)
 
-		err = np.StopProcesso(ctx, prc.ProcessoID) // TODO criar erros e colocar errors.Is(ssxxx,xxxx)
-		if err == nil {
+		if err = np.StopProcesso(ctx, prc.ProcessoID); !errors.As(err, &processador.ErrAlreadyStopped) {
 			t.Fatalf("\t%s\tShould get already stopped error: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould get already stopped error.", tests.Success)

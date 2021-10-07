@@ -113,6 +113,12 @@ func TestProcesso(t *testing.T) {
 			t.Fatalf("\t%s\tShould NOT be able to retrieve deleted processo: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould NOT be able to retrieve deleted processo.", tests.Success)
+
+		prcs, err = core.QueryAll(ctx)
+		if err != nil || len(prcs) != 2 {
+			t.Fatalf("\t%s\tShould be able to retrieve 2 processos: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to retrieve 2 processos.", tests.Success)
 	}
 
 	t.Log("\tGiven the need to page through Processo records.")

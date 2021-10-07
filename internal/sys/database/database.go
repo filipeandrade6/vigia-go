@@ -180,3 +180,31 @@ func NamedQueryStruct(ctx context.Context, log *zap.SugaredLogger, sqlxDB *sqlx.
 
 // 	return strings.Trim(query, " ")
 // }
+
+// QuerySlice is a helper function for executing queries that return a
+// collection of data to be unmarshaled into a slice.
+func QuerySlice(ctx context.Context, log *zap.SugaredLogger, sqlxDB *sqlx.DB, query string, dest interface{}) error {
+	// q := queryString(query, data)
+	// log.Infow("database.NamedQuerySlice", "traceid", web.GetTraceID(ctx), "query", q)
+
+	val := reflect.ValueOf(dest)
+	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Slice {
+		return errors.New("must provide a pointer to a slice")
+	}
+
+	rows, err := sqlxDB.QueryxContext(ctx, query)
+	if err != nil {
+		return err
+	}
+
+	slice := val.Elem()
+	for rows.Next() {
+		v := reflect.New(slice.Type().Elem())
+		if err := rows.StructScan(v.Interface()); err != nil {
+			return err
+		}
+		slice.Set(reflect.Append(slice, v.Elem()))
+	}
+
+	return nil
+}

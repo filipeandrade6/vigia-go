@@ -130,3 +130,15 @@ func (c Core) QueryByID(ctx context.Context, processoID string) (Processo, error
 
 	return toProcesso(dbPrc), nil
 }
+
+func (c Core) QueryAll(ctx context.Context) ([]Processo, error) {
+	dbPrcs, err := c.store.QueryAll(ctx)
+	if err != nil {
+		if errors.Is(err, database.ErrDBNotFound) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query: %w", err)
+	}
+
+	return toProcessoSlice(dbPrcs), nil
+}

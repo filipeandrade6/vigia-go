@@ -152,3 +152,18 @@ func (s Store) QueryByPlaca(ctx context.Context, placa string) (Veiculo, error) 
 
 	return vei, nil
 }
+
+func (s Store) QueryAll(ctx context.Context) ([]Veiculo, error) {
+	const q = `
+	SELECT
+		*
+	FROM
+		veiculos`
+
+	var veis []Veiculo
+	if err := database.QuerySlice(ctx, s.log, s.sqlxDB, q, &veis); err != nil {
+		return nil, fmt.Errorf("selecting veiculos: %w", err)
+	}
+
+	return veis, nil
+}

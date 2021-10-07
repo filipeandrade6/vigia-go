@@ -128,3 +128,18 @@ func (s Store) QueryByID(ctx context.Context, processoID string) (Processo, erro
 
 	return prc, nil
 }
+
+func (s Store) QueryAll(ctx context.Context) ([]Processo, error) {
+	const q = `
+	SELECT
+		*
+	FROM
+		processos`
+
+	var prcs []Processo
+	if err := database.QuerySlice(ctx, s.log, s.sqlxDB, q, &prcs); err != nil {
+		return nil, fmt.Errorf("selecting processos: %w", err)
+	}
+
+	return prcs, nil
+}

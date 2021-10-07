@@ -138,6 +138,12 @@ func TestVeiculo(t *testing.T) {
 			t.Fatalf("\t%s\tShould NOT be able to retrieve veiculo: %s.", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould NOT be able to retrieve veiculo.", tests.Success)
+
+		veis, err = core.QueryAll(ctx)
+		if err != nil || len(veis) != 2 {
+			t.Fatalf("\t%s\tShould be able to retrieve 2 veiculos: %s.", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to retrieve 2 veiculos.", tests.Success)
 	}
 
 	t.Log("\tGiven the need to page through Veiculo records.")

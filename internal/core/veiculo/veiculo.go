@@ -148,3 +148,15 @@ func (c Core) QueryByPlaca(ctx context.Context, placa string) (Veiculo, error) {
 
 	return toVeiculo(dbVei), nil
 }
+
+func (c Core) QueryAll(ctx context.Context) ([]Veiculo, error) {
+	dbVeis, err := c.store.QueryAll(ctx)
+	if err != nil {
+		if errors.Is(err, database.ErrDBNotFound) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query: %w", err)
+	}
+
+	return toVeiculoSlice(dbVeis), nil
+}

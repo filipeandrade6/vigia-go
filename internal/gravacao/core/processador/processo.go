@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	ErrAlreadyStarted = errors.New("processo already started")
-	ErrAlreadyStopped = errors.New("processo already stopped")
+	ErrAlreadyStarted   = errors.New("processo already started")
+	ErrAlreadyStopped   = errors.New("processo already stopped")
+	ErrWrongCredentials = errors.New("user/password wrong")
+	ErrCameraOffline    = errors.New("camera offline")
 )
 
 type Processo struct {
@@ -50,32 +52,20 @@ func NewProcesso(
 	}
 }
 
-func (p *Processo) Start() error {
-	if p.status {
-		return ErrAlreadyStarted
-	}
-
+func (p *Processo) Start() {
 	p.stopChan = make(chan struct{})
 	p.stoppedChan = make(chan struct{})
 
 	go p.processar()
 
 	p.status = true
-
-	return nil
 }
 
-func (p *Processo) Stop() error {
-	if !p.status {
-		return ErrAlreadyStopped
-	}
-
+func (p *Processo) Stop() {
 	close(p.stopChan)
 	<-p.stoppedChan
 
 	p.status = false
-
-	return nil
 }
 
 func (p *Processo) processar() {
@@ -94,8 +84,7 @@ func (p *Processo) processar() {
 			return
 
 		case <-p.stopChan:
-			// SIGINT ou SIGTERM o processo acima... gracefully shutdown
-			close(stopCmdChan)
+			close(stopCmdChan) // TODO SIGINT ou SIGTERM o processo acima... gracefully shutdown
 			return
 		}
 	}
