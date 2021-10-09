@@ -16,12 +16,6 @@ VER OS CASCADE
 
 NÃO COMITAR O .ENV FILE PARA O VCS(GIT) AS CONFIG DEVE SER FORNECIDAS NA APLICACAO
 
-HEALTHY CHECK - https://github.com/grpc/grpc/blob/master/doc/health-checking.md
-
-NAO TEM GRPC PARA BROWSER https://github.com/grpc-ecosystem/grpc-gateway/blob/master/examples/internal/proto/examplepb/wrappers.proto
-
-COMO O EVANS FAZ ITERATIVO - REPL
-
 ADICIONAR AUTHORIZATION POR NIVEL DE SERVIÇO ASSIM COMO O TECH SCHOOL
 
 COLOCAR require de na funcação do usuario ou criar if proibindo nulo	fmt.Println(fullMethodName)
@@ -29,8 +23,9 @@ COLOCAR require de na funcação do usuario ou criar if proibindo nulo	fmt.Print
 #### TODO
 
 - [ ] Colocar interface no querier
-- [ ] Execução gRPC em contexto e Health Server https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869
+- [ ] Execução gRPC em contexto e Health Server https://gist.github.com/akhenakh/38dbfea70dc36964e23acc19777f3869 - https://github.com/grpc/grpc/blob/master/doc/health-checking.md
 - [ ] Verificar timezone na aplicação e quando abre o banco de dados
+- [ ] Atualizar armazenamento mover imagens para novo local
 
 #### comandos *Makefile*:
 
@@ -39,7 +34,7 @@ COLOCAR require de na funcação do usuario ou criar if proibindo nulo	fmt.Print
 - `make test` executa os testes
 - `make create-postgres` cria o container Docker de Postgres para desenvolvimento
 - `make create-pgadmin` cria o container Docker de pgAdmin para desenvolvimento
-- `make postgrse` reinicia o container Postgres
+- `make postgres` reinicia o container Postgres
 - `make pgadmin` reinicia o container pgAdmin
 
 ### FEDORA

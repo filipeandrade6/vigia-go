@@ -12,8 +12,6 @@ import (
 )
 
 var (
-	ErrAlreadyStarted   = errors.New("processo already started")
-	ErrAlreadyStopped   = errors.New("processo already stopped")
 	ErrWrongCredentials = errors.New("user/password wrong")
 	ErrCameraOffline    = errors.New("camera offline")
 )

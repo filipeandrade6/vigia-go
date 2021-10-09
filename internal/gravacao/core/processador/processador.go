@@ -17,10 +17,12 @@ import (
 
 var (
 	ErrProcessoNotFound = errors.New("processo not found")
+	ErrAlreadyStarted   = errors.New("processo already started")
+	ErrAlreadyStopped   = errors.New("processo already stopped")
 )
 
 type Processador struct {
-	processoCore       processo.Core // TODO ver se é usado pointer nos core...
+	processoCore       processo.Core
 	cameraCore         camera.Core
 	registroCore       registro.Core
 	veiculoCore        veiculo.Core
@@ -28,6 +30,8 @@ type Processador struct {
 	armazenamento      string
 	errChan            chan error
 	matchChan          chan string
+	stopChan           chan struct{}
+	stoppedChan        chan struct{}
 
 	mutex     *sync.RWMutex
 	processos map[string]*Processo
@@ -40,7 +44,19 @@ type Processador struct {
 	regChan         chan registro.Registro
 }
 
-func NewProcessador(servidorGravacaoID, armazenamento string, horasRetencao int, processoCore processo.Core, cameraCore camera.Core, registroCore registro.Core, veiculoCore veiculo.Core, SuperrChan chan error, MatchChan chan string) *Processador {
+func NewProcessador(
+	servidorGravacaoID string,
+	armazenamento string,
+	horasRetencao int,
+	processoCore processo.Core,
+	cameraCore camera.Core,
+	registroCore registro.Core,
+	veiculoCore veiculo.Core,
+	errChan chan error,
+	matchChan chan string,
+	stopChan chan struct{}, // TODO utilizar?
+	stoppedChan chan struct{},
+) *Processador {
 	return &Processador{
 		servidorGravacaoID: servidorGravacaoID,
 		processoCore:       processoCore,
@@ -48,8 +64,10 @@ func NewProcessador(servidorGravacaoID, armazenamento string, horasRetencao int,
 		registroCore:       registroCore,
 		veiculoCore:        veiculoCore,
 		armazenamento:      armazenamento,
-		errChan:            SuperrChan,
-		matchChan:          MatchChan,
+		errChan:            errChan,
+		matchChan:          matchChan,
+		stopChan:           stopChan,
+		stoppedChan:        stoppedChan,
 
 		mutex:     &sync.RWMutex{},
 		processos: make(map[string]*Processo),
@@ -62,6 +80,8 @@ func NewProcessador(servidorGravacaoID, armazenamento string, horasRetencao int,
 		internalErrChan: make(chan error),
 	}
 }
+
+// =================================================================================
 
 func (p *Processador) Gerenciar() {
 	ticker := time.NewTicker(time.Hour)
@@ -82,11 +102,20 @@ func (p *Processador) Gerenciar() {
 
 		case <-ticker.C:
 			if p.housekeeperStatus {
-				go p.begintHousekeeper(p.horasRetencao, p.errChan)
+				go p.begintHousekeeper()
 			}
+
+		case <-p.stopChan:
+			if err := p.StopAllProcessos(context.Background()); err != nil {
+				p.errChan <- err
+			}
+
+			close(p.stoppedChan)
 		}
 	}
 }
+
+// =================================================================================
 
 func (p *Processador) StartProcesso(ctx context.Context, processoID string) error {
 	p.mutex.RLock()
@@ -178,6 +207,10 @@ func (p *Processador) RemoveProcesso(ctx context.Context, processoID string) err
 }
 
 func (p *Processador) RemoveAllProcessos(ctx context.Context) error {
+	if err := p.StopAllProcessos(ctx); err != nil {
+		return err
+	}
+
 	for _, prc := range p.processos {
 		if err := p.RemoveProcesso(ctx, prc.ProcessoID); err != nil {
 			return err
@@ -199,6 +232,8 @@ func (p *Processador) ShowAllProcessos(ctx context.Context) (map[string]bool, er
 	return prc, nil
 }
 
+// =================================================================================
+
 func (p *Processador) AtualizarMatchList(ctx context.Context) error {
 	veiculos, err := p.veiculoCore.QueryAll(ctx)
 	if err != nil {
@@ -215,8 +250,8 @@ func (p *Processador) AtualizarMatchList(ctx context.Context) error {
 	return nil
 }
 
-// ===============
-// TODO mover os arquivos? - como funciona? -         Update no gerencia depois chama essa funcao...
+// =================================================================================
+// TODO Update no gerencia depois chama essa funcao...
 func (p *Processador) AtualizarHousekeeper(ctx context.Context, horasRetencao int) {
 	p.horasRetencao = horasRetencao
 }
@@ -229,8 +264,12 @@ func (p *Processador) StopHousekeeper() {
 	p.housekeeperStatus = false
 }
 
-func (p *Processador) begintHousekeeper(expireTime int, errChan chan error) {
-	d := time.Now().Add(time.Duration(-expireTime) * time.Hour)
+func (p *Processador) StatusHousekeeper() bool {
+	return p.housekeeperStatus
+}
+
+func (p *Processador) begintHousekeeper() {
+	d := time.Now().Add(time.Duration(-p.horasRetencao) * time.Hour)
 
 	err := filepath.Walk(p.armazenamento, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -245,12 +284,14 @@ func (p *Processador) begintHousekeeper(expireTime int, errChan chan error) {
 	})
 
 	if err != nil {
-		errChan <- err
+		p.errChan <- err
 	}
 }
 
+// =================================================================================
+
 func (p *Processador) createRegistro(reg registro.Registro, errChan chan error) {
-	_, err := p.registroCore.Create(context.Background(), reg) // TODO alterar no banco de dados - quando criar não gerar
+	_, err := p.registroCore.Create(context.Background(), reg)
 	if err != nil {
 		errChan <- err
 	}
