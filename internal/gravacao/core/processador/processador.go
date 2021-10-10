@@ -27,15 +27,15 @@ type Processador struct {
 	registroCore       registro.Core
 	veiculoCore        veiculo.Core
 	servidorGravacaoID string
-	armazenamento      string
 	errChan            chan error
 	matchChan          chan string
 	stopChan           chan struct{}
 	stoppedChan        chan struct{}
 
-	mutex     *sync.RWMutex
-	processos map[string]*Processo
-	matchlist map[string]bool
+	mutex         *sync.RWMutex
+	processos     map[string]*Processo
+	matchlist     map[string]bool
+	armazenamento string
 
 	housekeeperStatus bool
 	horasRetencao     int
@@ -81,6 +81,7 @@ func NewProcessador(
 	}
 }
 
+// TODO como vai funcionar o Back-off? https://github.com/jpillora/backoff/blob/master/backoff.go
 // =================================================================================
 
 func (p *Processador) Gerenciar() {
@@ -89,13 +90,7 @@ func (p *Processador) Gerenciar() {
 	for {
 		select {
 		case reg := <-p.regChan:
-			go p.createRegistro(reg, p.errChan)
-
-			p.mutex.RLock()
-			if _, ok := p.matchlist[reg.Placa]; ok { // concurrent map access
-				p.matchChan <- reg.RegistroID
-			}
-			p.mutex.RUnlock()
+			go p.createAndCheckRegistro(reg) // TODO aqui esta meio estranho...
 
 		case err := <-p.internalErrChan:
 			p.errChan <- err // TODO ve o tipo de problema e tem como recuperar - manda ou para notificação ou para SuperrChan
@@ -105,12 +100,6 @@ func (p *Processador) Gerenciar() {
 				go p.begintHousekeeper()
 			}
 
-		case <-p.stopChan:
-			if err := p.StopAllProcessos(context.Background()); err != nil {
-				p.errChan <- err
-			}
-
-			close(p.stoppedChan)
 		}
 	}
 }
@@ -170,7 +159,7 @@ func (p *Processador) StartAllProcessos(ctx context.Context) error {
 	return nil
 }
 
-func (p *Processador) StopProcesso(ctx context.Context, processoID string) error {
+func (p *Processador) StopProcesso(processoID string) error {
 	prclist, ok := p.processos[processoID]
 	if !ok {
 		return ErrProcessoNotFound
@@ -184,9 +173,9 @@ func (p *Processador) StopProcesso(ctx context.Context, processoID string) error
 	return nil
 }
 
-func (p *Processador) StopAllProcessos(ctx context.Context) error {
+func (p *Processador) StopAllProcessos() error {
 	for _, prc := range p.processos {
-		if err := p.StopProcesso(ctx, prc.ProcessoID); !errors.Is(err, ErrAlreadyStopped) {
+		if err := p.StopProcesso(prc.ProcessoID); !errors.Is(err, ErrAlreadyStopped) {
 			return err
 		}
 	}
@@ -194,8 +183,8 @@ func (p *Processador) StopAllProcessos(ctx context.Context) error {
 	return nil
 }
 
-func (p *Processador) RemoveProcesso(ctx context.Context, processoID string) error {
-	if err := p.StopProcesso(ctx, processoID); err != nil {
+func (p *Processador) RemoveProcesso(processoID string) error {
+	if err := p.StopProcesso(processoID); err != nil {
 		if !errors.Is(err, ErrAlreadyStopped) {
 			return err
 		}
@@ -206,13 +195,13 @@ func (p *Processador) RemoveProcesso(ctx context.Context, processoID string) err
 	return nil
 }
 
-func (p *Processador) RemoveAllProcessos(ctx context.Context) error {
-	if err := p.StopAllProcessos(ctx); err != nil {
+func (p *Processador) RemoveAllProcessos() error {
+	if err := p.StopAllProcessos(); err != nil {
 		return err
 	}
 
 	for _, prc := range p.processos {
-		if err := p.RemoveProcesso(ctx, prc.ProcessoID); err != nil {
+		if err := p.RemoveProcesso(prc.ProcessoID); err != nil {
 			return err
 		}
 	}
@@ -220,7 +209,7 @@ func (p *Processador) RemoveAllProcessos(ctx context.Context) error {
 	return nil
 }
 
-func (p *Processador) ShowAllProcessos(ctx context.Context) (map[string]bool, error) {
+func (p *Processador) ShowAllProcessos() (map[string]bool, error) {
 	prc := make(map[string]bool)
 
 	p.mutex.RLock()
@@ -252,7 +241,8 @@ func (p *Processador) AtualizarMatchList(ctx context.Context) error {
 
 // =================================================================================
 // TODO Update no gerencia depois chama essa funcao...
-func (p *Processador) AtualizarHousekeeper(ctx context.Context, horasRetencao int) {
+
+func (p *Processador) AtualizarHousekeeper(horasRetencao int) {
 	p.horasRetencao = horasRetencao
 }
 
@@ -268,6 +258,7 @@ func (p *Processador) StatusHousekeeper() bool {
 	return p.housekeeperStatus
 }
 
+// TODO beginHousekeeper deve receber contexto para parar em caso de alguma coisa
 func (p *Processador) begintHousekeeper() {
 	d := time.Now().Add(time.Duration(-p.horasRetencao) * time.Hour)
 
@@ -290,9 +281,36 @@ func (p *Processador) begintHousekeeper() {
 
 // =================================================================================
 
-func (p *Processador) createRegistro(reg registro.Registro, errChan chan error) {
+func (p *Processador) GetArmazenamentoInfo() (string, int) {
+	return p.armazenamento, p.horasRetencao
+}
+
+// =================================================================================
+
+func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 	_, err := p.registroCore.Create(context.Background(), reg)
 	if err != nil {
-		errChan <- err
+		p.internalErrChan <- err
+		return
 	}
+
+	p.mutex.RLock()
+	_, ok := p.matchlist[reg.Placa]
+	p.mutex.RUnlock()
+	if ok {
+		p.matchChan <- reg.RegistroID
+	}
+}
+
+// =================================================================================
+
+func (p *Processador) StopGerencia() {
+	err := p.RemoveAllProcessos()
+	if err != nil {
+
+	}
+
+	Parar o housekeeper
+
+
 }
