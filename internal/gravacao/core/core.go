@@ -11,7 +11,7 @@ import (
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/config"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/service"
+	grpc_gravacao "github.com/filipeandrade6/vigia-go/internal/gravacao/grpc"
 
 	"github.com/spf13/viper"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -48,7 +48,10 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 	// TODO Initialize Authentication Support
 
 	// =========================================================================
-	// Start Service
+	// Start Gravacao Service
+
+	// =========================================================================
+	// Start gRPC Service
 
 	log.Infow("startup", "status", "initializing API support")
 
@@ -57,7 +60,7 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 
 	serverErrors := make(chan error, 1)
 
-	svc := service.NewGravacaoService(log)
+	svc := grpc_gravacao.NewGravacaoService(log)
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterGravacaoServer(grpcServer, svc)
