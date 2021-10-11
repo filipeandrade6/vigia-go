@@ -1,4 +1,4 @@
-package service
+package processador
 
 import (
 	"fmt"
@@ -15,8 +15,8 @@ type Processo struct {
 	Canal         int
 	Usuario       string
 	Senha         string
-	Armazenamento string
 	Processador   int
+	Armazenamento string
 	regChan       chan registro.Registro
 	errChan       chan error
 	stopChan      chan struct{}
@@ -30,8 +30,8 @@ func NewProcesso(
 	canal int,
 	usuario string,
 	senha string,
-	armazenamento string,
 	processador int,
+	armazenamento string,
 	regChan chan registro.Registro,
 	errChan chan error,
 ) *Processo {
@@ -42,8 +42,8 @@ func NewProcesso(
 		Canal:         canal,
 		Usuario:       usuario,
 		Senha:         senha,
-		Armazenamento: armazenamento,
 		Processador:   processador,
+		Armazenamento: armazenamento,
 		regChan:       regChan,
 		errChan:       errChan,
 		stopChan:      make(chan struct{}),

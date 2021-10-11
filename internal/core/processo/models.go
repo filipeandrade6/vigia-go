@@ -7,15 +7,12 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/core/processo/db"
 )
 
-// TODO colcoar campos agregados e data de criacao e edicao
-
 type Processo struct {
 	ProcessoID         string
 	ServidorGravacaoID string
 	CameraID           string
 	Processador        int
 	Adaptador          int
-	// Execucao           bool
 }
 
 type NewProcesso struct {
@@ -23,7 +20,6 @@ type NewProcesso struct {
 	CameraID           string `validate:"required"`
 	Processador        int    `validate:"required"`
 	Adaptador          int    `validate:"required"`
-	// Execucao           bool
 }
 
 type UpdateProcesso struct {
@@ -31,7 +27,6 @@ type UpdateProcesso struct {
 	CameraID           *string `validate:"omitempty"`
 	Processador        *int    `validate:"omitempty"`
 	Adaptador          *int    `validate:"omitempty"`
-	// Execucao           *bool   `validate:"omitempty"`
 }
 
 // =============================================================================
@@ -58,7 +53,6 @@ func (p Processo) ToProto() *pb.Processo {
 		CameraId:           p.CameraID,
 		Processador:        int32(p.Processador),
 		Adaptador:          int32(p.Adaptador),
-		// Execucao:           p.Execucao,
 	}
 }
 
@@ -69,7 +63,6 @@ func FromProto(p *pb.Processo) Processo {
 		CameraID:           p.GetCameraId(),
 		Processador:        int(p.GetProcessador()),
 		Adaptador:          int(p.GetAdaptador()),
-		// Execucao:           p.GetExecucao(),
 	}
 }
 

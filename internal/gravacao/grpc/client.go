@@ -12,8 +12,7 @@ type GerenciaClient struct {
 	c pb.GerenciaClient
 }
 
-func NewClientGerencia(endereco_ip string, porta int) *GerenciaClient {
-
+func NewClientGerencia(endereco_ip string, porta int) (*GerenciaClient, error) {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithBlock())
@@ -22,14 +21,12 @@ func NewClientGerencia(endereco_ip string, porta int) *GerenciaClient {
 
 	conn, err := grpc.Dial(dialAddr, opts...)
 	if err != nil {
-		fmt.Println("Erro aqui no client") // TODO mudar isso aqui
-		panic(err)
+		return nil, err
 	}
 	//defer conn.Close() // TODO esse aqui vai dar BO
 
+	conn.Close()
 	return &GerenciaClient{
 		c: pb.NewGerenciaClient(conn),
-	}
+	}, nil
 }
-
-// TODO preciso registrar o HealthServer no GRPC

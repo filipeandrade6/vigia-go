@@ -13,7 +13,6 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/config"
 	grpc_gravacao "github.com/filipeandrade6/vigia-go/internal/gravacao/grpc"
 
-	"github.com/spf13/viper"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -48,9 +47,6 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 	// TODO Initialize Authentication Support
 
 	// =========================================================================
-	// Start Gravacao Service
-
-	// =========================================================================
 	// Start gRPC Service
 
 	log.Infow("startup", "status", "initializing API support")
@@ -71,9 +67,25 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 			log.Errorw("startup", "status", "could not open socket", cfg.Gravacao.Conn, cfg.Gravacao.Port, "ERROR", err)
 		}
 
-		log.Infow("startup", "status", "gRPC server started", viper.GetString("VIGIA_GRA_SERVER_HOST"))
+		log.Infow("startup", "status", "gRPC server started") // TODO adicionar host
 		serverErrors <- grpcServer.Serve(lis)
 	}()
+
+	// // =========================================================================
+	// // Start Processador
+
+	// // TODO para iniciar o processador precisa do Core que precisam de banco de dados
+	// // TODO o qual não é obtido sem antes o registro de um gerencia.
+
+	// // =========================================================================
+	// // Start Gravacao Service
+
+	// log.Infow("startup", "status", "initializing service")
+
+	// svc2 := service.NewGravacaoService(
+	// 	cfg.Gravacao.Armazenamento,
+	// 	cfg.Gravacao.Housekeeper,
+	// 	grpcServer)
 
 	// =========================================================================
 	// Shutdown

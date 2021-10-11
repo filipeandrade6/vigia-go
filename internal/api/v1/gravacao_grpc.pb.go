@@ -20,12 +20,15 @@ const _ = grpc.SupportPackageIsVersion7
 type GravacaoClient interface {
 	Registrar(ctx context.Context, in *RegistrarReq, opts ...grpc.CallOption) (*RegistrarRes, error)
 	RemoverRegistro(ctx context.Context, in *RemoverRegistroReq, opts ...grpc.CallOption) (*RemoverRegistroRes, error)
-	AtualizarListaVeiculos(ctx context.Context, in *AtualizarListaVeiculosReq, opts ...grpc.CallOption) (*AtualizarListaVeiculosResp, error)
-	CreateProcessoG(ctx context.Context, in *CreateProcessoGReq, opts ...grpc.CallOption) (*CreateProcessoGRes, error)
-	ReadProcessoG(ctx context.Context, in *ReadProcessoGReq, opts ...grpc.CallOption) (*ReadProcessoGRes, error)
-	ReadProcessoGs(ctx context.Context, in *ReadProcessoGsReq, opts ...grpc.CallOption) (*ReadProcessoGsRes, error)
-	UpdateProcessoG(ctx context.Context, in *UpdateProcessoGReq, opts ...grpc.CallOption) (*UpdateProcessoGRes, error)
-	DeleteProcessoG(ctx context.Context, in *DeleteProcessoGReq, opts ...grpc.CallOption) (*DeleteProcessoGRes, error)
+	StartProcessos(ctx context.Context, in *StartProcessosReq, opts ...grpc.CallOption) (*StartProcessosRes, error)
+	StopProcessos(ctx context.Context, in *StopProcessosReq, opts ...grpc.CallOption) (*StopProcessosRes, error)
+	ListProcessos(ctx context.Context, in *ListProcessosReq, opts ...grpc.CallOption) (*ListProcessosRes, error)
+	AtualizarMatchlist(ctx context.Context, in *AtualizarMatchlistReq, opts ...grpc.CallOption) (*AtualizarMatchlistRes, error)
+	AtualizarHousekeeper(ctx context.Context, in *AtualizarHousekeeperReq, opts ...grpc.CallOption) (*AtualizarHousekeeperRes, error)
+	StartHousekeeper(ctx context.Context, in *StartHousekeeperReq, opts ...grpc.CallOption) (*StartHousekeeperRes, error)
+	StopHousekeeper(ctx context.Context, in *StopHousekeeperReq, opts ...grpc.CallOption) (*StopHousekeeperRes, error)
+	StatusHousekeeper(ctx context.Context, in *StatusHousekeeperReq, opts ...grpc.CallOption) (*StatusHousekeeperRes, error)
+	GetServidorInfo(ctx context.Context, in *GetServidorInfoReq, opts ...grpc.CallOption) (*GetServidorInfoRes, error)
 }
 
 type gravacaoClient struct {
@@ -54,54 +57,81 @@ func (c *gravacaoClient) RemoverRegistro(ctx context.Context, in *RemoverRegistr
 	return out, nil
 }
 
-func (c *gravacaoClient) AtualizarListaVeiculos(ctx context.Context, in *AtualizarListaVeiculosReq, opts ...grpc.CallOption) (*AtualizarListaVeiculosResp, error) {
-	out := new(AtualizarListaVeiculosResp)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/AtualizarListaVeiculos", in, out, opts...)
+func (c *gravacaoClient) StartProcessos(ctx context.Context, in *StartProcessosReq, opts ...grpc.CallOption) (*StartProcessosRes, error) {
+	out := new(StartProcessosRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/StartProcessos", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *gravacaoClient) CreateProcessoG(ctx context.Context, in *CreateProcessoGReq, opts ...grpc.CallOption) (*CreateProcessoGRes, error) {
-	out := new(CreateProcessoGRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/CreateProcessoG", in, out, opts...)
+func (c *gravacaoClient) StopProcessos(ctx context.Context, in *StopProcessosReq, opts ...grpc.CallOption) (*StopProcessosRes, error) {
+	out := new(StopProcessosRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/StopProcessos", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *gravacaoClient) ReadProcessoG(ctx context.Context, in *ReadProcessoGReq, opts ...grpc.CallOption) (*ReadProcessoGRes, error) {
-	out := new(ReadProcessoGRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/ReadProcessoG", in, out, opts...)
+func (c *gravacaoClient) ListProcessos(ctx context.Context, in *ListProcessosReq, opts ...grpc.CallOption) (*ListProcessosRes, error) {
+	out := new(ListProcessosRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/ListProcessos", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *gravacaoClient) ReadProcessoGs(ctx context.Context, in *ReadProcessoGsReq, opts ...grpc.CallOption) (*ReadProcessoGsRes, error) {
-	out := new(ReadProcessoGsRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/ReadProcessoGs", in, out, opts...)
+func (c *gravacaoClient) AtualizarMatchlist(ctx context.Context, in *AtualizarMatchlistReq, opts ...grpc.CallOption) (*AtualizarMatchlistRes, error) {
+	out := new(AtualizarMatchlistRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/AtualizarMatchlist", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *gravacaoClient) UpdateProcessoG(ctx context.Context, in *UpdateProcessoGReq, opts ...grpc.CallOption) (*UpdateProcessoGRes, error) {
-	out := new(UpdateProcessoGRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/UpdateProcessoG", in, out, opts...)
+func (c *gravacaoClient) AtualizarHousekeeper(ctx context.Context, in *AtualizarHousekeeperReq, opts ...grpc.CallOption) (*AtualizarHousekeeperRes, error) {
+	out := new(AtualizarHousekeeperRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/AtualizarHousekeeper", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *gravacaoClient) DeleteProcessoG(ctx context.Context, in *DeleteProcessoGReq, opts ...grpc.CallOption) (*DeleteProcessoGRes, error) {
-	out := new(DeleteProcessoGRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/DeleteProcessoG", in, out, opts...)
+func (c *gravacaoClient) StartHousekeeper(ctx context.Context, in *StartHousekeeperReq, opts ...grpc.CallOption) (*StartHousekeeperRes, error) {
+	out := new(StartHousekeeperRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/StartHousekeeper", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gravacaoClient) StopHousekeeper(ctx context.Context, in *StopHousekeeperReq, opts ...grpc.CallOption) (*StopHousekeeperRes, error) {
+	out := new(StopHousekeeperRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/StopHousekeeper", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gravacaoClient) StatusHousekeeper(ctx context.Context, in *StatusHousekeeperReq, opts ...grpc.CallOption) (*StatusHousekeeperRes, error) {
+	out := new(StatusHousekeeperRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/StatusHousekeeper", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gravacaoClient) GetServidorInfo(ctx context.Context, in *GetServidorInfoReq, opts ...grpc.CallOption) (*GetServidorInfoRes, error) {
+	out := new(GetServidorInfoRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/GetServidorInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -114,12 +144,15 @@ func (c *gravacaoClient) DeleteProcessoG(ctx context.Context, in *DeleteProcesso
 type GravacaoServer interface {
 	Registrar(context.Context, *RegistrarReq) (*RegistrarRes, error)
 	RemoverRegistro(context.Context, *RemoverRegistroReq) (*RemoverRegistroRes, error)
-	AtualizarListaVeiculos(context.Context, *AtualizarListaVeiculosReq) (*AtualizarListaVeiculosResp, error)
-	CreateProcessoG(context.Context, *CreateProcessoGReq) (*CreateProcessoGRes, error)
-	ReadProcessoG(context.Context, *ReadProcessoGReq) (*ReadProcessoGRes, error)
-	ReadProcessoGs(context.Context, *ReadProcessoGsReq) (*ReadProcessoGsRes, error)
-	UpdateProcessoG(context.Context, *UpdateProcessoGReq) (*UpdateProcessoGRes, error)
-	DeleteProcessoG(context.Context, *DeleteProcessoGReq) (*DeleteProcessoGRes, error)
+	StartProcessos(context.Context, *StartProcessosReq) (*StartProcessosRes, error)
+	StopProcessos(context.Context, *StopProcessosReq) (*StopProcessosRes, error)
+	ListProcessos(context.Context, *ListProcessosReq) (*ListProcessosRes, error)
+	AtualizarMatchlist(context.Context, *AtualizarMatchlistReq) (*AtualizarMatchlistRes, error)
+	AtualizarHousekeeper(context.Context, *AtualizarHousekeeperReq) (*AtualizarHousekeeperRes, error)
+	StartHousekeeper(context.Context, *StartHousekeeperReq) (*StartHousekeeperRes, error)
+	StopHousekeeper(context.Context, *StopHousekeeperReq) (*StopHousekeeperRes, error)
+	StatusHousekeeper(context.Context, *StatusHousekeeperReq) (*StatusHousekeeperRes, error)
+	GetServidorInfo(context.Context, *GetServidorInfoReq) (*GetServidorInfoRes, error)
 	mustEmbedUnimplementedGravacaoServer()
 }
 
@@ -133,23 +166,32 @@ func (UnimplementedGravacaoServer) Registrar(context.Context, *RegistrarReq) (*R
 func (UnimplementedGravacaoServer) RemoverRegistro(context.Context, *RemoverRegistroReq) (*RemoverRegistroRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoverRegistro not implemented")
 }
-func (UnimplementedGravacaoServer) AtualizarListaVeiculos(context.Context, *AtualizarListaVeiculosReq) (*AtualizarListaVeiculosResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AtualizarListaVeiculos not implemented")
+func (UnimplementedGravacaoServer) StartProcessos(context.Context, *StartProcessosReq) (*StartProcessosRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartProcessos not implemented")
 }
-func (UnimplementedGravacaoServer) CreateProcessoG(context.Context, *CreateProcessoGReq) (*CreateProcessoGRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateProcessoG not implemented")
+func (UnimplementedGravacaoServer) StopProcessos(context.Context, *StopProcessosReq) (*StopProcessosRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopProcessos not implemented")
 }
-func (UnimplementedGravacaoServer) ReadProcessoG(context.Context, *ReadProcessoGReq) (*ReadProcessoGRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReadProcessoG not implemented")
+func (UnimplementedGravacaoServer) ListProcessos(context.Context, *ListProcessosReq) (*ListProcessosRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListProcessos not implemented")
 }
-func (UnimplementedGravacaoServer) ReadProcessoGs(context.Context, *ReadProcessoGsReq) (*ReadProcessoGsRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReadProcessoGs not implemented")
+func (UnimplementedGravacaoServer) AtualizarMatchlist(context.Context, *AtualizarMatchlistReq) (*AtualizarMatchlistRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AtualizarMatchlist not implemented")
 }
-func (UnimplementedGravacaoServer) UpdateProcessoG(context.Context, *UpdateProcessoGReq) (*UpdateProcessoGRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateProcessoG not implemented")
+func (UnimplementedGravacaoServer) AtualizarHousekeeper(context.Context, *AtualizarHousekeeperReq) (*AtualizarHousekeeperRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AtualizarHousekeeper not implemented")
 }
-func (UnimplementedGravacaoServer) DeleteProcessoG(context.Context, *DeleteProcessoGReq) (*DeleteProcessoGRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteProcessoG not implemented")
+func (UnimplementedGravacaoServer) StartHousekeeper(context.Context, *StartHousekeeperReq) (*StartHousekeeperRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartHousekeeper not implemented")
+}
+func (UnimplementedGravacaoServer) StopHousekeeper(context.Context, *StopHousekeeperReq) (*StopHousekeeperRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopHousekeeper not implemented")
+}
+func (UnimplementedGravacaoServer) StatusHousekeeper(context.Context, *StatusHousekeeperReq) (*StatusHousekeeperRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StatusHousekeeper not implemented")
+}
+func (UnimplementedGravacaoServer) GetServidorInfo(context.Context, *GetServidorInfoReq) (*GetServidorInfoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServidorInfo not implemented")
 }
 func (UnimplementedGravacaoServer) mustEmbedUnimplementedGravacaoServer() {}
 
@@ -200,110 +242,164 @@ func _Gravacao_RemoverRegistro_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_AtualizarListaVeiculos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AtualizarListaVeiculosReq)
+func _Gravacao_StartProcessos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartProcessosReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).AtualizarListaVeiculos(ctx, in)
+		return srv.(GravacaoServer).StartProcessos(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/AtualizarListaVeiculos",
+		FullMethod: "/gravacao.Gravacao/StartProcessos",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).AtualizarListaVeiculos(ctx, req.(*AtualizarListaVeiculosReq))
+		return srv.(GravacaoServer).StartProcessos(ctx, req.(*StartProcessosReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_CreateProcessoG_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateProcessoGReq)
+func _Gravacao_StopProcessos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopProcessosReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).CreateProcessoG(ctx, in)
+		return srv.(GravacaoServer).StopProcessos(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/CreateProcessoG",
+		FullMethod: "/gravacao.Gravacao/StopProcessos",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).CreateProcessoG(ctx, req.(*CreateProcessoGReq))
+		return srv.(GravacaoServer).StopProcessos(ctx, req.(*StopProcessosReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_ReadProcessoG_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReadProcessoGReq)
+func _Gravacao_ListProcessos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListProcessosReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).ReadProcessoG(ctx, in)
+		return srv.(GravacaoServer).ListProcessos(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/ReadProcessoG",
+		FullMethod: "/gravacao.Gravacao/ListProcessos",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).ReadProcessoG(ctx, req.(*ReadProcessoGReq))
+		return srv.(GravacaoServer).ListProcessos(ctx, req.(*ListProcessosReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_ReadProcessoGs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReadProcessoGsReq)
+func _Gravacao_AtualizarMatchlist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AtualizarMatchlistReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).ReadProcessoGs(ctx, in)
+		return srv.(GravacaoServer).AtualizarMatchlist(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/ReadProcessoGs",
+		FullMethod: "/gravacao.Gravacao/AtualizarMatchlist",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).ReadProcessoGs(ctx, req.(*ReadProcessoGsReq))
+		return srv.(GravacaoServer).AtualizarMatchlist(ctx, req.(*AtualizarMatchlistReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_UpdateProcessoG_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateProcessoGReq)
+func _Gravacao_AtualizarHousekeeper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AtualizarHousekeeperReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).UpdateProcessoG(ctx, in)
+		return srv.(GravacaoServer).AtualizarHousekeeper(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/UpdateProcessoG",
+		FullMethod: "/gravacao.Gravacao/AtualizarHousekeeper",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).UpdateProcessoG(ctx, req.(*UpdateProcessoGReq))
+		return srv.(GravacaoServer).AtualizarHousekeeper(ctx, req.(*AtualizarHousekeeperReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_DeleteProcessoG_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteProcessoGReq)
+func _Gravacao_StartHousekeeper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartHousekeeperReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).DeleteProcessoG(ctx, in)
+		return srv.(GravacaoServer).StartHousekeeper(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/DeleteProcessoG",
+		FullMethod: "/gravacao.Gravacao/StartHousekeeper",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).DeleteProcessoG(ctx, req.(*DeleteProcessoGReq))
+		return srv.(GravacaoServer).StartHousekeeper(ctx, req.(*StartHousekeeperReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gravacao_StopHousekeeper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopHousekeeperReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).StopHousekeeper(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/StopHousekeeper",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).StopHousekeeper(ctx, req.(*StopHousekeeperReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gravacao_StatusHousekeeper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StatusHousekeeperReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).StatusHousekeeper(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/StatusHousekeeper",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).StatusHousekeeper(ctx, req.(*StatusHousekeeperReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Gravacao_GetServidorInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetServidorInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GravacaoServer).GetServidorInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gravacao.Gravacao/GetServidorInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GravacaoServer).GetServidorInfo(ctx, req.(*GetServidorInfoReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -324,28 +420,40 @@ var Gravacao_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Gravacao_RemoverRegistro_Handler,
 		},
 		{
-			MethodName: "AtualizarListaVeiculos",
-			Handler:    _Gravacao_AtualizarListaVeiculos_Handler,
+			MethodName: "StartProcessos",
+			Handler:    _Gravacao_StartProcessos_Handler,
 		},
 		{
-			MethodName: "CreateProcessoG",
-			Handler:    _Gravacao_CreateProcessoG_Handler,
+			MethodName: "StopProcessos",
+			Handler:    _Gravacao_StopProcessos_Handler,
 		},
 		{
-			MethodName: "ReadProcessoG",
-			Handler:    _Gravacao_ReadProcessoG_Handler,
+			MethodName: "ListProcessos",
+			Handler:    _Gravacao_ListProcessos_Handler,
 		},
 		{
-			MethodName: "ReadProcessoGs",
-			Handler:    _Gravacao_ReadProcessoGs_Handler,
+			MethodName: "AtualizarMatchlist",
+			Handler:    _Gravacao_AtualizarMatchlist_Handler,
 		},
 		{
-			MethodName: "UpdateProcessoG",
-			Handler:    _Gravacao_UpdateProcessoG_Handler,
+			MethodName: "AtualizarHousekeeper",
+			Handler:    _Gravacao_AtualizarHousekeeper_Handler,
 		},
 		{
-			MethodName: "DeleteProcessoG",
-			Handler:    _Gravacao_DeleteProcessoG_Handler,
+			MethodName: "StartHousekeeper",
+			Handler:    _Gravacao_StartHousekeeper_Handler,
+		},
+		{
+			MethodName: "StopHousekeeper",
+			Handler:    _Gravacao_StopHousekeeper_Handler,
+		},
+		{
+			MethodName: "StatusHousekeeper",
+			Handler:    _Gravacao_StatusHousekeeper_Handler,
+		},
+		{
+			MethodName: "GetServidorInfo",
+			Handler:    _Gravacao_GetServidorInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

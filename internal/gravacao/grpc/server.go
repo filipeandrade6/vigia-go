@@ -2,10 +2,14 @@ package grpc
 
 import (
 	"context"
+	"fmt"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/filipeandrade6/vigia-go/internal/core/camera"
+	"github.com/filipeandrade6/vigia-go/internal/core/processo"
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
 	"github.com/filipeandrade6/vigia-go/internal/core/veiculo"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/service/processador"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 
 	"go.uber.org/zap"
@@ -13,37 +17,50 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type Processo struct {
-}
-
 type GravacaoService struct {
 	pb.UnimplementedGravacaoServer
 
 	log *zap.SugaredLogger
 
-	gerencia       *GerenciaClient
-	processos      map[string]Processo
-	processoErrors chan error
+	servidorGravacaoID string
+	armazenamento      string
+	horasRetencao      int
 
+	gerencia *GerenciaClient
+
+	cameraCore   camera.Core
+	processoCore processo.Core
 	registroCore registro.Core
 	veiculoCore  veiculo.Core
+
+	processador *processador.Processador
+	errChan     chan error
+	matchChan   chan string
 }
 
-func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
-	processoErrors := make(chan error)
-	processos := make(map[string]Processo)
-
+func NewGravacaoService(log *zap.SugaredLogger, armazenamento string, horasRetencao int) *GravacaoService {
 	return &GravacaoService{
-		log:            log,
-		processos:      processos,
-		processoErrors: processoErrors,
+		log:           log,
+		armazenamento: armazenamento,
+		horasRetencao: horasRetencao,
+		errChan:       make(chan error),
+		matchChan:     make(chan string),
 	}
 }
 
+// TODO colocar de modo atomico - db e registro
 func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (*pb.RegistrarRes, error) {
 	if g.gerencia != nil {
 		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, "ja possui servidor de gerencia registrado")
 	}
+
+	gerenciaClient, err := NewClientGerencia(req.GetEnderecoIp(), int(req.GetPorta()))
+	if err != nil {
+		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect to gRPC server: %s", err))
+	}
+	g.gerencia = gerenciaClient
+
+	g.servidorGravacaoID = req.GetServidorGravacaoId()
 
 	db, err := database.Open(database.Config{
 		User:         req.GetDbUser(),
@@ -55,13 +72,37 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 		SSLMode:      req.GetDbSslmode(),
 	})
 	if err != nil {
-		return &pb.RegistrarRes{}, status.Error(codes.Internal, err.Error())
+		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect open database: %s", err))
 	}
 
+	g.cameraCore = camera.NewCore(g.log, db)
+	g.processoCore = processo.NewCore(g.log, db)
 	g.registroCore = registro.NewCore(g.log, db)
 	g.veiculoCore = veiculo.NewCore(g.log, db)
 
-	g.gerencia = NewClientGerencia(req.GetEnderecoIp(), int(req.GetPorta()))
+	g.processador = processador.New(
+		g.registroCore,
+		g.servidorGravacaoID,
+		g.armazenamento,
+		g.horasRetencao,
+		g.errChan,
+		g.matchChan,
+	)
+
+	g.processador.Start()
+
+	go func() {
+		for {
+			select {
+			case err := <-g.errChan:
+				fmt.Println(err)
+
+			case m := <-g.matchChan:
+				fmt.Println(m)
+
+			}
+		}
+	}()
 
 	return &pb.RegistrarRes{}, nil
 }
@@ -77,22 +118,42 @@ func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRe
 	return &pb.RemoverRegistroRes{}, nil
 }
 
-func (g *GravacaoService) CreateProcesso(ctx context.Context, req *pb.CreateProcessoReq) (*pb.CreateProcessoRes, error) {
-	return &pb.CreateProcessoRes{}, nil
+func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProcessosReq) (*pb.StartProcessosRes, error) {
+	prcs := req.GetProcessos()
+
+	for _, prc := range prcs {
+		p, err := g.processoCore.QueryByID(ctx, prc)
+		if err != nil {
+			return &pb.StartProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("query database: %w", err))
+		}
+	}
+
+	return &pb.StartProcessosRes{}, nil
 }
 
-func (g *GravacaoService) ReadProcesso(ctx context.Context, req *pb.ReadProcessoReq) (*pb.ReadProcessoRes, error) {
-	return &pb.ReadProcessoRes{}, nil
+func (g *GravacaoService) StopProcessos(ctx context.Context, req *pb.StopProcessosReq) (*pb.StopProcessosRes, error) {
+	return &pb.StopProcessosRes{}, nil
 }
 
-func (g *GravacaoService) ReadProcessos(ctx context.Context, req *pb.ReadProcessosReq) (*pb.ReadProcessosRes, error) {
-	return &pb.ReadProcessosRes{}, nil
+func (g *GravacaoService) ListProcessos(ctx context.Context, req *pb.ListProcessosReq) (*pb.ListProcessosRes, error) {
+	return &pb.ListProcessosRes{}, nil
 }
 
-func (g *GravacaoService) UpdateProcesso(ctx context.Context, req *pb.UpdateProcessoReq) (*pb.UpdateProcessoRes, error) {
-	return &pb.UpdateProcessoRes{}, nil
+func (g *GravacaoService) AtualizarMatchlist(ctx context.Context, req *pb.AtualizarMatchlistReq) (*pb.AtualizarMatchlistRes, error) {
+	return &pb.AtualizarMatchlistRes{}, nil
 }
-
-func (g *GravacaoService) DeleteProcesso(ctx context.Context, req *pb.DeleteProcessoReq) (*pb.DeleteProcessoRes, error) {
-	return &pb.DeleteProcessoRes{}, nil
+func (g *GravacaoService) AtualizarHousekeeper(ctx context.Context, req *pb.AtualizarHousekeeperReq) (*pb.AtualizarHousekeeperRes, error) {
+	return &pb.AtualizarHousekeeperRes{}, nil
+}
+func (g *GravacaoService) StartHousekeeper(ctx context.Context, req *pb.StartHousekeeperReq) (*pb.StartHousekeeperRes, error) {
+	return &pb.StartHousekeeperRes{}, nil
+}
+func (g *GravacaoService) StopHousekeeper(ctx context.Context, req *pb.StopHousekeeperReq) (*pb.StopHousekeeperRes, error) {
+	return &pb.StopHousekeeperRes{}, nil
+}
+func (g *GravacaoService) StatusHousekeeper(ctx context.Context, req *pb.StatusHousekeeperReq) (*pb.StatusHousekeeperRes, error) {
+	return &pb.StatusHousekeeperRes{}, nil
+}
+func (g *GravacaoService) GetServidorInfo(ctx context.Context, req *pb.GetServidorInfoReq) (*pb.GetServidorInfoRes, error) {
+	return &pb.GetServidorInfoRes{}, nil
 }

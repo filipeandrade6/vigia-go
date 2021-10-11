@@ -1,4 +1,4 @@
-package service
+package processador
 
 import (
 	"context"
@@ -22,8 +22,6 @@ type Processador struct {
 	servidorGravacaoID string
 	errChan            chan error
 	matchChan          chan string
-	stopChan           chan struct{}
-	stoppedChan        chan struct{}
 
 	mutex         *sync.RWMutex
 	processos     map[string]*Processo
@@ -37,22 +35,20 @@ type Processador struct {
 	regChan         chan registro.Registro
 }
 
-func NewProcessador(
+func New(
+	registroCore registro.Core,
 	servidorGravacaoID string,
 	armazenamento string,
 	horasRetencao int,
 	errChan chan error,
 	matchChan chan string,
-	stopChan chan struct{}, // TODO utilizar?
-	stoppedChan chan struct{},
 ) *Processador {
 	return &Processador{
+		registroCore:       registroCore,
 		servidorGravacaoID: servidorGravacaoID,
 		armazenamento:      armazenamento,
 		errChan:            errChan,
 		matchChan:          matchChan,
-		stopChan:           stopChan,
-		stoppedChan:        stoppedChan,
 
 		mutex:     &sync.RWMutex{},
 		processos: make(map[string]*Processo),
@@ -69,7 +65,7 @@ func NewProcessador(
 // TODO como vai funcionar o Back-off? https://github.com/jpillora/backoff/blob/master/backoff.go
 // =================================================================================
 
-func (p *Processador) Gerenciar() {
+func (p *Processador) Start() {
 	ticker := time.NewTicker(time.Hour)
 
 	for {
@@ -88,13 +84,30 @@ func (p *Processador) Gerenciar() {
 	}
 }
 
-func (p *Processador) StartProcessos(pReq []Processo) error {
+// TODO melhorar....
+func (p *Processador) Stop() error {
+	var prc []string
+	for k := range p.processos {
+		prc = append(prc, k)
+	}
+
+	err := p.StopProcessos(prc)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// =================================================================================
+
+func (p *Processador) StartProcessos(pReq []Processo) {
 	for _, prc := range pReq {
 		p.mutex.RLock()
 		_, ok := p.processos[prc.ProcessoID]
 		p.mutex.RUnlock()
 		if ok {
-			return fmt.Errorf("processo processoID[%s]: %s", prc.ProcessoID, ErrAlreadyExecuting)
+			continue // TODO verificar depois
 		}
 
 		np := NewProcesso(
@@ -104,6 +117,7 @@ func (p *Processador) StartProcessos(pReq []Processo) error {
 			prc.Canal,
 			prc.Usuario,
 			prc.Senha,
+			prc.Processador,
 
 			p.armazenamento,
 			p.regChan,
@@ -116,8 +130,6 @@ func (p *Processador) StartProcessos(pReq []Processo) error {
 		p.processos[prc.ProcessoID] = np
 		p.mutex.Unlock()
 	}
-
-	return nil
 }
 
 func (p *Processador) StopProcessos(processos []string) error {
@@ -136,7 +148,7 @@ func (p *Processador) StopProcessos(processos []string) error {
 }
 
 func (p *Processador) ListProcessos() []string {
-	prc := make([]string, len(p.processos))
+	var prc []string
 	for k := range p.processos {
 		prc = append(prc, k)
 	}
@@ -198,6 +210,7 @@ func (p *Processador) begintHousekeeper() {
 
 // =================================================================================
 
+// TODO colocar mais inforamções
 func (p *Processador) GetServidorInfo() (string, int) {
 	return p.armazenamento, p.horasRetencao
 }
@@ -207,6 +220,7 @@ func (p *Processador) GetServidorInfo() (string, int) {
 func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 	_, err := p.registroCore.Create(context.Background(), reg)
 	if err != nil {
+		fmt.Println(err, reg.ProcessoID)
 		p.internalErrChan <- err
 		return
 	}
@@ -218,13 +232,3 @@ func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 		p.matchChan <- reg.RegistroID
 	}
 }
-
-// =================================================================================
-
-// func (p *Processador) StopGerencia() {
-// 	err := p.RemoveAllProcessos()
-// 	if err != nil {
-
-// 	}
-
-// }

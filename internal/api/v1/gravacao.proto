@@ -8,28 +8,31 @@ service Gravacao {
     rpc Registrar (RegistrarReq) returns (RegistrarRes) {}
     rpc RemoverRegistro (RemoverRegistroReq) returns (RemoverRegistroRes) {}
 
-    rpc AtualizarListaVeiculos (AtualizarListaVeiculosReq) returns (AtualizarListaVeiculosResp) {}
+    rpc StartProcessos (StartProcessosReq) returns (StartProcessosRes) {}
+    rpc StopProcessos (StopProcessosReq) returns (StopProcessosRes) {}
+    rpc ListProcessos (ListProcessosReq) returns (ListProcessosRes) {}
 
-    // rpc statusArmazenamento (StatusArmazenamentoParams) returns (StatusArmazenamento) {}
-    // rpc configurarHousekeeping (HousekeepingConfig) returns (StatusHousekeeping) {}
+    rpc AtualizarMatchlist (AtualizarMatchlistReq) returns (AtualizarMatchlistRes) {}
 
-    rpc CreateProcessoG (CreateProcessoGReq) returns (CreateProcessoGRes) {}
-    rpc ReadProcessoG (ReadProcessoGReq) returns (ReadProcessoGRes) {}
-    rpc ReadProcessoGs (ReadProcessoGsReq) returns (ReadProcessoGsRes) {}
-    rpc UpdateProcessoG (UpdateProcessoGReq) returns (UpdateProcessoGRes) {}
-    rpc DeleteProcessoG (DeleteProcessoGReq) returns (DeleteProcessoGRes) {}
+    rpc AtualizarHousekeeper (AtualizarHousekeeperReq) returns (AtualizarHousekeeperRes) {}
+    rpc StartHousekeeper (StartHousekeeperReq) returns (StartHousekeeperRes) {}
+    rpc StopHousekeeper (StopHousekeeperReq) returns (StopHousekeeperRes) {}
+    rpc StatusHousekeeper (StatusHousekeeperReq) returns (StatusHousekeeperRes) {}
+
+    rpc GetServidorInfo (GetServidorInfoReq) returns (GetServidorInfoRes) {}
 }
 
 message RegistrarReq {
-    string endereco_ip = 1;
-    int32 porta = 2;
-    string db_host = 3;
-    string db_user = 4;
-    string db_password = 5;
-    string db_name = 6;
-    int32 db_maxidleconns = 7;
-    int32 db_maxopenconns = 8;
-    string db_sslmode = 9;
+    string servidor_gravacao_id = 1;
+    string endereco_ip = 2;
+    int32 porta = 3;
+    string db_host = 4;
+    string db_user = 5;
+    string db_password = 6;
+    string db_name = 7;
+    int32 db_maxidleconns = 8;
+    int32 db_maxopenconns = 9;
+    string db_sslmode = 10;
 }
 
 message RegistrarRes {}
@@ -42,75 +45,57 @@ message RemoverRegistroRes {}
 
 // ===================
 
-message ProcessoG {
-    string ProcessoG_id = 1;
-    string servidor_gravacao_id = 2;
-    string camera_id = 3;
-    int32 processador = 4;
-    int32 adaptador = 5;
-    bool execucao = 6;
+message StartProcessosReq {
+    repeated string processos = 1;
 }
 
-message CreateProcessoGReq {
-    ProcessoG ProcessoG = 1;
+message StartProcessosRes {}
+
+message StopProcessosReq {
+    repeated string processos = 1;
 }
 
-message CreateProcessoGRes {
-    string ProcessoG_id = 1;
+message StopProcessosRes {}
+
+message ListProcessosReq {}
+
+message ListProcessosRes {
+    repeated string processos = 1;
 }
-
-message ReadProcessoGReq {
-    string ProcessoG_id =1;
-}
-
-message ReadProcessoGRes {
-    ProcessoG ProcessoG = 1;
-}
-
-message ReadProcessoGsReq {}
-
-message ReadProcessoGsRes {
-    repeated ProcessoG ProcessoGs = 1;
-}
-
-message UpdateProcessoGReq {
-    ProcessoG ProcessoG = 1;
-}
-
-message UpdateProcessoGRes {}
-
-message DeleteProcessoGReq {
-    string ProcessoG_id = 1;
-}
-
-message DeleteProcessoGRes {}
 
 // ===================
 
+message AtualizarMatchlistReq {}
 
-message AtualizarListaVeiculosReq {
-    message Veiculo {
-        string placa = 1;
-        string cor = 2;
-        string marca = 3;
-        string modelo = 4;
-        string tipo = 5;
-    }
-    repeated Veiculo veiculo = 1;
+message AtualizarMatchlistRes {}
+
+// ===================
+
+message AtualizarHousekeeperReq {
+    int32 horas_retencao = 1;
 }
 
-message AtualizarListaVeiculosResp {}
+message AtualizarHousekeeperRes {}
 
-    // message StatusArmazenamento {
-    //     message Armazenamento {
-    //         string caminho = 1;
-    //         int32 disponivel = 2;
-    //         int32 alocado = 3;
-    //         int32 utilizado = 4;
-    //     }
-    //     repeated Armazenamento armazenamento = 1;
-    // }
+message StartHousekeeperReq {}
 
-    // message StatusArmazenamentoParams {}
+message StartHousekeeperRes {}
 
-    // message StatusArmazenamento {}
+message StopHousekeeperReq {}
+
+message StopHousekeeperRes {}
+
+message StatusHousekeeperReq{}
+
+message StatusHousekeeperRes{
+    bool status = 1;
+}
+
+// ===================
+
+message GetServidorInfoReq{}
+
+message GetServidorInfoRes{
+    string armazenamento = 1;
+    int32 horas_retencao = 2;
+}
