@@ -142,6 +142,10 @@ func (p *Processador) StopProcessos(processos []string) error {
 		}
 
 		p.processos[prc].Stop()
+
+		p.mutex.Lock()
+		delete(p.processos, prc)
+		p.mutex.Unlock()
 	}
 
 	return nil
@@ -210,7 +214,7 @@ func (p *Processador) begintHousekeeper() {
 
 // =================================================================================
 
-// TODO colocar mais inforamções
+// TODO colocar mais inforamções -  mudar para processador info - servidor info deve ficar no server
 func (p *Processador) GetServidorInfo() (string, int) {
 	return p.armazenamento, p.horasRetencao
 }

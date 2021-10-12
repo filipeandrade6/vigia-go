@@ -41,7 +41,6 @@ func (c Core) Create(ctx context.Context, np NewProcesso) (Processo, error) {
 		CameraID:           np.CameraID,
 		Processador:        np.Processador,
 		Adaptador:          np.Adaptador,
-		// Execucao:           np.Execucao,
 	}
 
 	if err := c.store.Create(ctx, dbPrc); err != nil {
@@ -80,9 +79,6 @@ func (c Core) Update(ctx context.Context, processoID string, up UpdateProcesso) 
 	if up.Adaptador != nil {
 		dbPrc.Adaptador = *up.Adaptador
 	}
-	// if up.Execucao != nil {
-	// 	dbPrc.Execucao = *up.Execucao
-	// }
 
 	if err := c.store.Update(ctx, dbPrc); err != nil {
 		return fmt.Errorf("update: %w", err)

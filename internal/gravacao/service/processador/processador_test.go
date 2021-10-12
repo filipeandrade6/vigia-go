@@ -29,8 +29,8 @@ func TestProcessador(t *testing.T) {
 	{
 		errChan := make(chan error)
 		matchChan := make(chan string)
-		stopChan := make(chan struct{})
-		stoppedChan := make(chan struct{})
+		// stopChan := make(chan struct{})
+		// stoppedChan := make(chan struct{})
 
 		ticker := time.NewTicker(3 * time.Second)
 
@@ -41,8 +41,8 @@ func TestProcessador(t *testing.T) {
 			1,
 			errChan,
 			matchChan,
-			stopChan,
-			stoppedChan,
+			// stopChan,
+			// stoppedChan,
 		)
 
 		veiculos, err := veiculoCore.QueryAll(ctx)

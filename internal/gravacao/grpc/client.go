@@ -1,7 +1,9 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 
@@ -14,18 +16,20 @@ type GerenciaClient struct {
 
 func NewClientGerencia(endereco_ip string, porta int) (*GerenciaClient, error) {
 	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithInsecure())
+	opts = append(opts, grpc.WithInsecure()) // TODO trocar para SSL/TLS
 	opts = append(opts, grpc.WithBlock())
 
 	dialAddr := fmt.Sprintf("%s:%d", endereco_ip, porta)
 
-	conn, err := grpc.Dial(dialAddr, opts...)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, dialAddr, opts...)
 	if err != nil {
 		return nil, err
 	}
-	//defer conn.Close() // TODO esse aqui vai dar BO
+	// conn, err := grpc.Dial(dialAddr, opts...)
 
-	conn.Close()
 	return &GerenciaClient{
 		c: pb.NewGerenciaClient(conn),
 	}, nil

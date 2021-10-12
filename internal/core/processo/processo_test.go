@@ -24,7 +24,6 @@ func TestProcesso(t *testing.T) {
 		CameraID:           "d03307d4-2b28-4c23-a004-3da25e5b8ce3", // seeded
 		Processador:        2,
 		Adaptador:          2,
-		// Execucao:           false,
 	}
 
 	t.Log("\tGiven the need to work with Processo records.")
@@ -51,7 +50,6 @@ func TestProcesso(t *testing.T) {
 			CameraID:           tests.StringPointer("d03307d4-2b28-4c23-a004-3da25e5b8aa3"),
 			Processador:        tests.IntPointer(5),
 			Adaptador:          tests.IntPointer(5),
-			// Execucao:           tests.BoolPointer(true),
 		}
 
 		if err = core.Update(ctx, prc.ProcessoID, upd); err != nil {

@@ -80,31 +80,24 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 	g.registroCore = registro.NewCore(g.log, db)
 	g.veiculoCore = veiculo.NewCore(g.log, db)
 
-	g.processador = processador.New(
-		g.registroCore,
-		g.servidorGravacaoID,
-		g.armazenamento,
-		g.horasRetencao,
-		g.errChan,
-		g.matchChan,
-	)
+	g.processador = processador.New(g.registroCore, g.servidorGravacaoID, g.armazenamento, g.horasRetencao, g.errChan, g.matchChan)
 
-	go func() {
-		for {
-			select {
-			case err := <-g.errChan:
-				fmt.Println(err)
-
-			case m := <-g.matchChan:
-				fmt.Println(m)
-
-			}
-		}
-	}()
-
-	g.processador.Start()
+	go g.start()
+	go g.processador.Start()
 
 	return &pb.RegistrarRes{}, nil
+}
+
+func (g *GravacaoService) start() {
+	for {
+		select {
+		case err := <-g.errChan:
+			fmt.Println(err)
+
+		case m := <-g.matchChan:
+			fmt.Println(m)
+		}
+	}
 }
 
 func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRegistroReq) (*pb.RemoverRegistroRes, error) {
@@ -113,7 +106,7 @@ func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRe
 	}
 	g.gerencia = nil
 
-	// TODO interromper os core?
+	// TODO interromper os cores, processador, e db?
 
 	return &pb.RemoverRegistroRes{}, nil
 }
@@ -121,22 +114,47 @@ func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRe
 func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProcessosReq) (*pb.StartProcessosRes, error) {
 	prcs := req.GetProcessos()
 
+	var processos []processador.Processo
 	for _, prc := range prcs {
 		p, err := g.processoCore.QueryByID(ctx, prc)
 		if err != nil {
-			return &pb.StartProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("query database: %w", err))
+			return &pb.StartProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("query database: %s", err))
 		}
+
+		c, err := g.cameraCore.QueryByID(ctx, p.CameraID)
+		if err != nil {
+			return &pb.StartProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("query database: %s", err))
+		}
+
+		processos = append(processos, processador.Processo{
+			ProcessoID:  prc,
+			EnderecoIP:  c.EnderecoIP,
+			Porta:       c.Porta,
+			Canal:       c.Canal,
+			Usuario:     c.Usuario,
+			Senha:       c.Senha,
+			Processador: p.Processador,
+		})
 	}
+
+	g.processador.StartProcessos(processos)
 
 	return &pb.StartProcessosRes{}, nil
 }
 
 func (g *GravacaoService) StopProcessos(ctx context.Context, req *pb.StopProcessosReq) (*pb.StopProcessosRes, error) {
+	err := g.processador.StopProcessos(req.GetProcessos())
+	if err != nil {
+		return &pb.StopProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("stopping processo: %s", err)) // TODO start nao retorna mas stop retorna
+	}
+
 	return &pb.StopProcessosRes{}, nil
 }
 
 func (g *GravacaoService) ListProcessos(ctx context.Context, req *pb.ListProcessosReq) (*pb.ListProcessosRes, error) {
-	return &pb.ListProcessosRes{}, nil
+	processos := g.processador.ListProcessos()
+
+	return &pb.ListProcessosRes{Processos: processos}, nil
 }
 
 func (g *GravacaoService) AtualizarMatchlist(ctx context.Context, req *pb.AtualizarMatchlistReq) (*pb.AtualizarMatchlistRes, error) {

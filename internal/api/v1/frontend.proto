@@ -232,7 +232,6 @@ message Processo {
     string camera_id = 3;
     int32 processador = 4;
     int32 adaptador = 5;
-    bool execucao = 6;
 }
 
 message CreateProcessoReq{

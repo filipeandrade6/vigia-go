@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 )
@@ -15,7 +17,7 @@ type Gravacao struct {
 	Conn          string `mapstructure:"conn"`
 	Port          int    `mapstructure:"port"`
 	Armazenamento string `mapstructure:"armazenamento"`
-	Housekeeper   string `mapstructure:"housekeeper"`
+	Housekeeper   int    `mapstructure:"housekeeper"`
 }
 
 type Configuration struct {
@@ -25,12 +27,17 @@ type Configuration struct {
 }
 
 func ParseConfig(build string) (Configuration, error) {
+	userDir, err := os.UserHomeDir()
+	if err != nil {
+		return Configuration{}, fmt.Errorf("getting user directory: %w", err)
+	}
+
 	viper.SetDefault("auth.directory", "deployments/keys")
 	viper.SetDefault("auth.activekid", "bcc18baa-7830-4cfc-8f96-8a26ede5d81f")
 	viper.SetDefault("gravacao.conn", "tcp")
 	viper.SetDefault("gravacao.port", "12346")
-	viper.SetDefault("gravacao.armazenamento", "/home/filipe/vigia")
-	viper.SetDefault("gravacao.housekeeper", "0 0 * * 0")
+	viper.SetDefault("gravacao.armazenamento", filepath.Join(userDir, "vigia"))
+	viper.SetDefault("gravacao.housekeeper", "168")
 
 	viper.BindEnv("auth.directory", "VIGIA_AUTH_DIR")
 	viper.BindEnv("auth.activekid", "VIGIA_AUTH_ACTIVEKID")

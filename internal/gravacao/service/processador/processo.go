@@ -52,18 +52,7 @@ func NewProcesso(
 }
 
 func (p *Processo) Start() {
-	go p.processar()
-}
-
-func (p *Processo) Stop() {
-	close(p.stopChan)
-	<-p.stoppedChan
-}
-
-func (p *Processo) processar() {
-	stopProcChan := make(chan struct{})
-	stoppedProcChan := make(chan struct{})
-
+	// go p.processar()
 	if p.Processador == 0 {
 		go dahua(
 			p.ProcessoID,
@@ -75,16 +64,39 @@ func (p *Processo) processar() {
 			p.Armazenamento,
 			p.regChan,
 			p.errChan,
-			stopProcChan,
-			stoppedProcChan,
+			p.stopChan,
+			p.stoppedChan,
 		)
 	}
-
-	<-p.stopChan
-	close(stopProcChan)
-	<-stoppedProcChan
-	close(p.stoppedChan)
 }
+
+func (p *Processo) Stop() {
+	close(p.stopChan)
+	<-p.stoppedChan
+}
+
+// func (p *Processo) processar() {
+// 	if p.Processador == 0 {
+// 		go dahua(
+// 			p.ProcessoID,
+// 			p.EnderecoIP,
+// 			p.Porta,
+// 			p.Canal,
+// 			p.Usuario,
+// 			p.Senha,
+// 			p.Armazenamento,
+// 			p.regChan,
+// 			p.errChan,
+// 			p.stopChan,
+// 			p.stoppedChan,
+// 		)
+// 	}
+
+// 	<-p.stopChan
+// 	close(stopProcChan)
+// 	<-stoppedProcChan
+// 	close(p.stoppedChan)
+// }
 
 func dahua(
 	processoID string,
@@ -96,15 +108,20 @@ func dahua(
 	armazenamento string,
 	regChan chan registro.Registro,
 	errChan chan error,
-	stopProcChan chan struct{},
-	stoppedProcChan chan struct{},
+	stopChan chan struct{},
+	stoppedChan chan struct{},
 ) {
-	defer close(stoppedProcChan)
+	defer close(stoppedChan)
 
 	var i int
 	for {
 		select {
+		case <-stopChan:
+			fmt.Println("cancel called")
+			return
+
 		default:
+			fmt.Print(i, "..")
 			time.Sleep(time.Duration(time.Millisecond * 200))
 			r := registro.Registro{
 				RegistroID:    validate.GenerateID(),
@@ -120,8 +137,6 @@ func dahua(
 			r.Armazenamento = fmt.Sprintf("%s/%d_%s", armazenamento, r.CriadoEm.Unix(), r.RegistroID)
 			regChan <- r
 			i++
-		case <-stopProcChan:
-			return
 		}
 	}
 }
