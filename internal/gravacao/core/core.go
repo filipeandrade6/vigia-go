@@ -71,22 +71,6 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 		serverErrors <- grpcServer.Serve(lis)
 	}()
 
-	// // =========================================================================
-	// // Start Processador
-
-	// // TODO para iniciar o processador precisa do Core que precisam de banco de dados
-	// // TODO o qual não é obtido sem antes o registro de um gerencia.
-
-	// // =========================================================================
-	// // Start Gravacao Service
-
-	// log.Infow("startup", "status", "initializing service")
-
-	// svc2 := service.NewGravacaoService(
-	// 	cfg.Gravacao.Armazenamento,
-	// 	cfg.Gravacao.Housekeeper,
-	// 	grpcServer)
-
 	// =========================================================================
 	// Shutdown
 

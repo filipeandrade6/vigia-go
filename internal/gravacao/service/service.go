@@ -33,18 +33,6 @@ func NewGravacaoService(gravacaoServer *grpc.Server) *GravacaoService {
 	}
 }
 
-// func Registrar(dbCfg database.Config) error {
-
-// 	db, err := database.Open(dbCfg)
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	g.registroCore = registro.NewCore(g.log, db)
-// 	g.veiculoCore = veiculos.NewCore(g.log, db)
-
-// }
-
 func (g *GravacaoService) Start() {
 	// =========================================================================
 	// gRPC Server
@@ -54,12 +42,15 @@ func (g *GravacaoService) Start() {
 	go func() {
 		lis, err := net.Listen(cfg.Gravacao.Conn, fmt.Sprintf(":%d", cfg.Gravacao.Port))
 		if err != nil {
-			log.Errorw("startup", "status", "could not open socket", cfg.Gravacao.Conn, cfg.Gravacao.Port, "ERROR", err)
+			g.log.Errorw("startup", "status", "could not open socket", cfg.Gravacao.Conn, cfg.Gravacao.Port, "ERROR", err)
 		}
 
-		log.Infow("startup", "status", "gRPC server started") // TODO adicionar host
-		serverErrors <- grpcServer.Serve(lis)
+		g.log.Infow("startup", "status", "gRPC server started") // TODO adicionar host
+		g.sysErrors <- grpcServer.Serve(lis)
 	}()
+
+	// =========================================================================
+	// gRPC Server
 
 }
 

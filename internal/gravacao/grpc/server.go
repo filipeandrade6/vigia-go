@@ -54,14 +54,6 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, "ja possui servidor de gerencia registrado")
 	}
 
-	gerenciaClient, err := NewClientGerencia(req.GetEnderecoIp(), int(req.GetPorta()))
-	if err != nil {
-		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect to gRPC server: %s", err))
-	}
-	g.gerencia = gerenciaClient
-
-	g.servidorGravacaoID = req.GetServidorGravacaoId()
-
 	db, err := database.Open(database.Config{
 		User:         req.GetDbUser(),
 		Password:     req.GetDbPassword(),
@@ -74,6 +66,14 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 	if err != nil {
 		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect open database: %s", err))
 	}
+
+	gerenciaClient, err := NewClientGerencia(req.GetEnderecoIp(), int(req.GetPorta()))
+	if err != nil {
+		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect to gRPC server: %s", err))
+	}
+	g.gerencia = gerenciaClient
+
+	g.servidorGravacaoID = req.GetServidorGravacaoId()
 
 	g.cameraCore = camera.NewCore(g.log, db)
 	g.processoCore = processo.NewCore(g.log, db)
@@ -89,8 +89,6 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 		g.matchChan,
 	)
 
-	g.processador.Start()
-
 	go func() {
 		for {
 			select {
@@ -103,6 +101,8 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 			}
 		}
 	}()
+
+	g.processador.Start()
 
 	return &pb.RegistrarRes{}, nil
 }
