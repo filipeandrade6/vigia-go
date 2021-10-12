@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/dahua/v1/traffic"
 	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 )
 
@@ -62,6 +63,20 @@ func (p *Processo) Start() {
 			p.Usuario,
 			p.Senha,
 			p.Armazenamento,
+			p.regChan,
+			p.errChan,
+			p.stopChan,
+			p.stoppedChan,
+		)
+	} else {
+		traffic.Start(
+			p.ProcessoID,
+			p.Armazenamento,
+			p.EnderecoIP,
+			int32(p.Porta),
+			int32(p.Canal),
+			p.Usuario,
+			p.Senha,
 			p.regChan,
 			p.errChan,
 			p.stopChan,
