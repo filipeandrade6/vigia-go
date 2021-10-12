@@ -75,29 +75,6 @@ func (p *Processo) Stop() {
 	<-p.stoppedChan
 }
 
-// func (p *Processo) processar() {
-// 	if p.Processador == 0 {
-// 		go dahua(
-// 			p.ProcessoID,
-// 			p.EnderecoIP,
-// 			p.Porta,
-// 			p.Canal,
-// 			p.Usuario,
-// 			p.Senha,
-// 			p.Armazenamento,
-// 			p.regChan,
-// 			p.errChan,
-// 			p.stopChan,
-// 			p.stoppedChan,
-// 		)
-// 	}
-
-// 	<-p.stopChan
-// 	close(stopProcChan)
-// 	<-stoppedProcChan
-// 	close(p.stoppedChan)
-// }
-
 func dahua(
 	processoID string,
 	enderecoIP string,

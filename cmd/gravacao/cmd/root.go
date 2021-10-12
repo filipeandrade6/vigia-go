@@ -25,7 +25,7 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		log, err := logger.New("GRAVACAO")
+		log, err := logger.New("GRAVACAO", cfg.Gravacao.Armazenamento)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
