@@ -6,6 +6,8 @@ COLOCAR DUAS PORTAS NO SERVIDOR DE GERENCIA
 
 IMPLEMENTAR TESTES PARA GRAVACAO > PROCESSADOR
 
+ver duplicata de armazenamento em registro, processo, servidor, etc... INDEX?
+
 #### ONDE PAREI
 
 JUNTAR PROCESSO E PROCESSADOR NO MESMO ARQUIVO....
@@ -25,6 +27,47 @@ NÃO COMITAR O .ENV FILE PARA O VCS(GIT) AS CONFIG DEVE SER FORNECIDAS NA APLICA
 ADICIONAR AUTHORIZATION POR NIVEL DE SERVIÇO ASSIM COMO O TECH SCHOOL
 
 COLOCAR require de na funcação do usuario ou criar if proibindo nulo	fmt.Println(fullMethodName)
+
+#### COR DO CARRO
+
+EM_CAR_COLOR_WHITE        EM_CAR_COLOR_TYPE = iota // 白色
+EM_CAR_COLOR_BLACK                                 // 黑色
+EM_CAR_COLOR_RED                                   // 红色
+EM_CAR_COLOR_YELLOW                                // 黄色
+EM_CAR_COLOR_GRAY                                  // 灰色
+EM_CAR_COLOR_BLUE                                  // 蓝色
+EM_CAR_COLOR_GREEN                                 // 绿色
+EM_CAR_COLOR_PINK                                  // 粉色
+EM_CAR_COLOR_PURPLE                                // 紫色
+EM_CAR_COLOR_DARK_PURPLE                           // 暗紫色
+EM_CAR_COLOR_BROWN                                 // 棕色
+EM_CAR_COLOR_MAROON                                // 粟色
+EM_CAR_COLOR_SILVER_GRAY                           // 银灰色
+EM_CAR_COLOR_DARK_GRAY                             // 暗灰色
+EM_CAR_COLOR_WHITE_SMOKE                           // 白烟色
+EM_CAR_COLOR_DEEP_ORANGE                           // 深橙色
+EM_CAR_COLOR_LIGHT_ROSE                            // 浅玫瑰色
+EM_CAR_COLOR_TOMATO_RED                            // 番茄红色
+EM_CAR_COLOR_OLIVE                                 // 橄榄色
+EM_CAR_COLOR_GOLDEN                                // 金色
+EM_CAR_COLOR_DARK_OLIVE                            // 暗橄榄色
+EM_CAR_COLOR_YELLOW_GREEN                          // 黄绿色
+EM_CAR_COLOR_GREEN_YELLOW                          // 绿黄色
+EM_CAR_COLOR_FOREST_GREEN                          // 森林绿
+EM_CAR_COLOR_OCEAN_BLUE                            // 海洋绿
+EM_CAR_COLOR_DEEP_SKYBLUE                          // 深天蓝
+EM_CAR_COLOR_CYAN                                  // 青色
+EM_CAR_COLOR_DEEP_BLUE                             // 深蓝色
+EM_CAR_COLOR_DEEP_RED                              // 深红色
+EM_CAR_COLOR_DEEP_GREEN                            // 深绿色
+EM_CAR_COLOR_DEEP_YELLOW                           // 深黄色
+EM_CAR_COLOR_DEEP_PINK                             // 深粉色
+EM_CAR_COLOR_DEEP_PURPLE                           // 深紫色
+EM_CAR_COLOR_DEEP_BROWN                            // 深棕色
+EM_CAR_COLOR_DEEP_CYAN                             // 深青色
+EM_CAR_COLOR_ORANGE                                // 橙色
+EM_CAR_COLOR_DEEP_GOLDEN                           // 深金色
+EM_CAR_COLOR_OTHER        = 255                    // 未识别、其他
 
 #### TODO
 

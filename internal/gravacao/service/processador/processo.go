@@ -54,7 +54,7 @@ func NewProcesso(
 func (p *Processo) Start() {
 	// go p.processar()
 	if p.Processador == 0 {
-		go dahua(
+		go processoTeste(
 			p.ProcessoID,
 			p.EnderecoIP,
 			p.Porta,
@@ -75,7 +75,7 @@ func (p *Processo) Stop() {
 	<-p.stoppedChan
 }
 
-func dahua(
+func processoTeste(
 	processoID string,
 	enderecoIP string,
 	porta int,
