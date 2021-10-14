@@ -48,7 +48,6 @@ func NewGravacaoService(log *zap.SugaredLogger, armazenamento string, horasReten
 	}
 }
 
-// TODO colocar de modo atomico - db e registro
 func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (*pb.RegistrarRes, error) {
 	if g.gerencia != nil {
 		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, "ja possui servidor de gerencia registrado")
@@ -160,18 +159,23 @@ func (g *GravacaoService) ListProcessos(ctx context.Context, req *pb.ListProcess
 func (g *GravacaoService) AtualizarMatchlist(ctx context.Context, req *pb.AtualizarMatchlistReq) (*pb.AtualizarMatchlistRes, error) {
 	return &pb.AtualizarMatchlistRes{}, nil
 }
+
 func (g *GravacaoService) AtualizarHousekeeper(ctx context.Context, req *pb.AtualizarHousekeeperReq) (*pb.AtualizarHousekeeperRes, error) {
 	return &pb.AtualizarHousekeeperRes{}, nil
 }
+
 func (g *GravacaoService) StartHousekeeper(ctx context.Context, req *pb.StartHousekeeperReq) (*pb.StartHousekeeperRes, error) {
 	return &pb.StartHousekeeperRes{}, nil
 }
+
 func (g *GravacaoService) StopHousekeeper(ctx context.Context, req *pb.StopHousekeeperReq) (*pb.StopHousekeeperRes, error) {
 	return &pb.StopHousekeeperRes{}, nil
 }
+
 func (g *GravacaoService) StatusHousekeeper(ctx context.Context, req *pb.StatusHousekeeperReq) (*pb.StatusHousekeeperRes, error) {
 	return &pb.StatusHousekeeperRes{}, nil
 }
+
 func (g *GravacaoService) GetServidorInfo(ctx context.Context, req *pb.GetServidorInfoReq) (*pb.GetServidorInfoRes, error) {
 	return &pb.GetServidorInfoRes{}, nil
 }

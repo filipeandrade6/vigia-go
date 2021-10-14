@@ -26,7 +26,7 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 	log.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
 
 	// =========================================================================
-	// Load Configuration
+	// Show Configuration
 
 	log.Infow("startup", "config", fmt.Sprintf("%+v", cfg)) // TODO esconder senhas
 

@@ -19,7 +19,7 @@ type Processo struct {
 	Processador   int
 	Armazenamento string
 	regChan       chan registro.Registro
-	errChan       chan error
+	errChan       chan traffic.ProcessoError
 	stopChan      chan struct{}
 	stoppedChan   chan struct{}
 }
@@ -34,7 +34,7 @@ func NewProcesso(
 	processador int,
 	armazenamento string,
 	regChan chan registro.Registro,
-	errChan chan error,
+	errChan chan traffic.ProcessoError,
 ) *Processo {
 	return &Processo{
 		ProcessoID:    processoID,
@@ -47,13 +47,13 @@ func NewProcesso(
 		Armazenamento: armazenamento,
 		regChan:       regChan,
 		errChan:       errChan,
-		stopChan:      make(chan struct{}),
-		stoppedChan:   make(chan struct{}),
 	}
 }
 
 func (p *Processo) Start() {
-	// go p.processar()
+	p.stopChan = make(chan struct{})
+	p.stoppedChan = make(chan struct{})
+
 	if p.Processador == 0 {
 		go processoTeste(
 			p.ProcessoID,
@@ -65,11 +65,13 @@ func (p *Processo) Start() {
 			p.Armazenamento,
 			p.regChan,
 			p.errChan,
+			// p.stopChan,
+			// p.stoppedChan,
 			p.stopChan,
 			p.stoppedChan,
 		)
 	} else {
-		traffic.Start(
+		go traffic.Start(
 			p.ProcessoID,
 			p.Armazenamento,
 			p.EnderecoIP,
@@ -99,7 +101,7 @@ func processoTeste(
 	senha string,
 	armazenamento string,
 	regChan chan registro.Registro,
-	errChan chan error,
+	errChan chan traffic.ProcessoError,
 	stopChan chan struct{},
 	stoppedChan chan struct{},
 ) {

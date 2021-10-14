@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/config"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/core"
@@ -13,19 +14,17 @@ import (
 
 var cfg config.Configuration
 
-// TODO adicionar help
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gravacao",
-	Short: "A brief description of your application",
+	Short: "Servico de gravacao",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := os.MkdirAll(cfg.Gravacao.Armazenamento, os.ModePerm)
+		err := os.MkdirAll(filepath.Join(cfg.Gravacao.Armazenamento, "registros"), os.ModePerm)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		log, err := logger.New("GRAVACAO", cfg.Gravacao.Armazenamento)
+		log, err := logger.New("GRAVACAO")
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

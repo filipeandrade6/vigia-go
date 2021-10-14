@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/dahua/v1/traffic"
 )
 
 var (
@@ -23,15 +24,16 @@ type Processador struct {
 	errChan            chan error
 	matchChan          chan string
 
-	mutex         *sync.RWMutex
+	mu            *sync.RWMutex
 	processos     map[string]*Processo
+	retry         map[string]*Processo // ! implementar
 	matchlist     map[string]bool
 	armazenamento string
 
 	housekeeperStatus bool
 	horasRetencao     int
 
-	internalErrChan chan error
+	internalErrChan chan traffic.ProcessoError
 	regChan         chan registro.Registro
 }
 
@@ -50,15 +52,16 @@ func New(
 		errChan:            errChan,
 		matchChan:          matchChan,
 
-		mutex:     &sync.RWMutex{},
+		mu:        &sync.RWMutex{},
 		processos: make(map[string]*Processo),
+		retry:     make(map[string]*Processo), // ! implementar
 		matchlist: make(map[string]bool),
 
 		housekeeperStatus: true,
 		horasRetencao:     horasRetencao,
 
 		regChan:         make(chan registro.Registro),
-		internalErrChan: make(chan error),
+		internalErrChan: make(chan traffic.ProcessoError),
 	}
 }
 
@@ -66,7 +69,8 @@ func New(
 // =================================================================================
 
 func (p *Processador) Start() {
-	ticker := time.NewTicker(time.Hour)
+	tickerHK := time.NewTicker(time.Hour)
+	tickerRetry := time.NewTicker(10 * time.Second)
 
 	for {
 		select {
@@ -74,11 +78,35 @@ func (p *Processador) Start() {
 			go p.createAndCheckRegistro(reg)
 
 		case err := <-p.internalErrChan:
-			p.errChan <- err // TODO ve o tipo de problema e tem como recuperar - manda ou para notificação ou para SuperrChan
+			switch {
+			case errors.As(err, &traffic.ErrLogin):
+				fmt.Println("erro de login")
+				fmt.Println(err.ProcessoID)
+				p.retry[err.ProcessoID] = p.processos[err.ProcessoID]
+				delete(p.processos, err.ProcessoID)
 
-		case <-ticker.C:
+			case errors.As(err, &traffic.ErrSaveImage):
+				fmt.Println("erro de salvar imagem")
+
+			case errors.As(err, &traffic.ErrAnalyzer):
+				fmt.Println("erro de anaylyzer")
+				delete(p.processos, err.ProcessoID)
+			}
+			p.errChan <- err
+
+		case <-tickerHK.C:
 			if p.housekeeperStatus {
 				go p.begintHousekeeper()
+			}
+
+		case <-tickerRetry.C:
+			fmt.Printf("\n retry: %v\n", p.retry)
+			for processoID, processo := range p.retry {
+				p.mu.Lock()
+				p.processos[processoID] = processo // TODO arrumar aqui, fica ping pong de retry - não da pra remover (tem que acertar o timing)
+				p.mu.Unlock()                      // ! arrumar isso aqui
+
+				processo.Start()
 			}
 		}
 	}
@@ -103,9 +131,9 @@ func (p *Processador) Stop() error {
 
 func (p *Processador) StartProcessos(pReq []Processo) {
 	for _, prc := range pReq {
-		p.mutex.RLock()
+		p.mu.RLock()
 		_, ok := p.processos[prc.ProcessoID]
-		p.mutex.RUnlock()
+		p.mu.RUnlock()
 		if ok {
 			continue // TODO verificar depois
 		}
@@ -121,31 +149,31 @@ func (p *Processador) StartProcessos(pReq []Processo) {
 
 			p.armazenamento,
 			p.regChan,
-			p.errChan,
+			p.internalErrChan,
 		)
 
-		np.Start()
-
-		p.mutex.Lock()
+		p.mu.Lock()
 		p.processos[prc.ProcessoID] = np
-		p.mutex.Unlock()
+		p.mu.Unlock()
+
+		np.Start()
 	}
 }
 
 func (p *Processador) StopProcessos(processos []string) error {
 	for _, prc := range processos {
-		p.mutex.RLock()
+		p.mu.RLock()
 		_, ok := p.processos[prc]
-		p.mutex.RUnlock()
+		p.mu.RUnlock()
 		if !ok {
 			return fmt.Errorf("processo processoID[%s]: %w", prc, ErrProcessoNotFound)
 		}
 
 		p.processos[prc].Stop()
 
-		p.mutex.Lock()
+		p.mu.Lock()
 		delete(p.processos, prc)
-		p.mutex.Unlock()
+		p.mu.Unlock()
 	}
 
 	return nil
@@ -163,12 +191,12 @@ func (p *Processador) ListProcessos() []string {
 // =================================================================================
 
 func (p *Processador) AtualizarMatchList(placas []string) error {
-	p.mutex.Lock()
+	p.mu.Lock()
 	p.matchlist = make(map[string]bool)
 	for _, placa := range placas {
 		p.matchlist[placa] = true
 	}
-	p.mutex.Unlock()
+	p.mu.Unlock()
 
 	return nil
 }
@@ -225,13 +253,13 @@ func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 	_, err := p.registroCore.Create(context.Background(), reg)
 	if err != nil {
 		fmt.Println(err, reg.ProcessoID)
-		p.internalErrChan <- err
+		p.errChan <- err // internal ou errChan?
 		return
 	}
 
-	p.mutex.RLock()
+	p.mu.RLock()
 	_, ok := p.matchlist[reg.Placa]
-	p.mutex.RUnlock()
+	p.mu.RUnlock()
 	if ok {
 		p.matchChan <- reg.RegistroID
 	}

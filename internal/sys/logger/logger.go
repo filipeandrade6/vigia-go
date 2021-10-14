@@ -3,6 +3,7 @@ package logger
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"go.uber.org/zap"
@@ -11,9 +12,14 @@ import (
 
 // New contructs a Sugared Logger that writes to stdout and
 // provides human readable timestamps.
-func New(service string, path string) (*zap.SugaredLogger, error) {
+func New(service string) (*zap.SugaredLogger, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
 	config := zap.NewProductionConfig()
-	config.OutputPaths = []string{"stdout", filepath.Join(path, fmt.Sprintf("%s.log", service))} // TODO melhorar isso aqui
+	config.OutputPaths = []string{"stdout", filepath.Join(homeDir, fmt.Sprintf("%s.log", service))}
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	config.DisableStacktrace = true
 	config.InitialFields = map[string]interface{}{
