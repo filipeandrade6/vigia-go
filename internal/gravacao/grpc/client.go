@@ -34,3 +34,31 @@ func NewClientGerencia(endereco_ip string, porta int) (*GerenciaClient, error) {
 		c: pb.NewGerenciaClient(conn),
 	}, nil
 }
+
+func (g *GerenciaClient) Match(veiculo_id, registro_id string) {
+	ctx := context.Background()
+
+	r := &pb.MatchReq{
+		VeiculoId:  veiculo_id,
+		RegistroId: registro_id,
+	}
+
+	if _, err := g.c.Match(ctx, r); err != nil {
+		// TODO adicionar no error? - colocar buffer? caso o gerencia esteja offline
+	}
+
+}
+
+func (g *GerenciaClient) ProcessoError(servidorGravacaoID, processoID string, errType int) {
+	ctx := context.Background()
+
+	r := &pb.ProcessoErrorReq{
+		ServidorGravacaoId: servidorGravacaoID,
+		ProcessoId: processoID,
+		Erro: ,
+	}
+
+	if _, err := g.c.ProcessoError(ctx, r); err != nil {
+		// TODO adicionar error? - colocar buffer? caso o gerencia esteja offline
+	}
+}

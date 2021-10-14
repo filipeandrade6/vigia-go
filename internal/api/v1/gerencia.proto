@@ -4,16 +4,29 @@ option go_package = "./internal/api/v1";
 
 package gerencia;
 
-import "google/protobuf/timestamp.proto";
-
 service Gerencia {
     rpc Match(MatchReq) returns (MatchRes) {}
+    rpc ProcessoError(ProcessoErrorReq) returns (ProcessoErrorRes) {}
 }
 
 message MatchReq {
     string veiculo_id = 1;
     string registro_id = 2;
-    google.protobuf.Timestamp agora = 3;
 }
 
 message MatchRes {}
+
+message ProcessoErrorReq {
+    string servidor_gravacao_id = 1;
+    string processo_id = 2;
+    enum Error {
+        OFFLINE = 0;
+        UNAUTHENTICATED = 1;
+        ANALYZER = 2;
+        IMAGE = 3;
+        DESCONHECIDO = 4;
+    }
+    Error erro = 3;
+}
+
+message ProcessoErrorRes {}

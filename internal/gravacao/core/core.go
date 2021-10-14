@@ -18,7 +18,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// build is the git versin of this program. It is set using build flags in the makefile.
 var build = "develop"
 
 func Run(log *zap.SugaredLogger, cfg config.Configuration) error {

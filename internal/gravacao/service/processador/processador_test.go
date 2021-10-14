@@ -8,7 +8,7 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
 	"github.com/filipeandrade6/vigia-go/internal/core/veiculo"
 	"github.com/filipeandrade6/vigia-go/internal/database/tests"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/service/processador" // TODO trocar aqui
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/service/processador"
 )
 
 // TODO teste de adicionar placa

@@ -33,7 +33,7 @@ type Processador struct {
 	housekeeperStatus bool
 	horasRetencao     int
 
-	internalErrChan chan traffic.ProcessoError
+	internalErrChan chan traffic.ProcessoError // melhorar esse erro
 	regChan         chan registro.Registro
 }
 
@@ -70,7 +70,7 @@ func New(
 
 func (p *Processador) Start() {
 	tickerHK := time.NewTicker(time.Hour)
-	tickerRetry := time.NewTicker(10 * time.Second)
+	tickerRetry := time.NewTicker(15 * time.Second)
 
 	for {
 		select {
@@ -80,17 +80,15 @@ func (p *Processador) Start() {
 		case err := <-p.internalErrChan:
 			switch {
 			case errors.As(err, &traffic.ErrLogin):
-				fmt.Println("erro de login")
-				fmt.Println(err.ProcessoID)
 				p.retry[err.ProcessoID] = p.processos[err.ProcessoID]
 				delete(p.processos, err.ProcessoID)
 
 			case errors.As(err, &traffic.ErrSaveImage):
-				fmt.Println("erro de salvar imagem")
+				// TODO notificar
 
 			case errors.As(err, &traffic.ErrAnalyzer):
-				fmt.Println("erro de anaylyzer")
 				delete(p.processos, err.ProcessoID)
+				// TODO notificar
 			}
 			p.errChan <- err
 
@@ -103,8 +101,8 @@ func (p *Processador) Start() {
 			fmt.Printf("\n retry: %v\n", p.retry)
 			for processoID, processo := range p.retry {
 				p.mu.Lock()
-				p.processos[processoID] = processo // TODO arrumar aqui, fica ping pong de retry - não da pra remover (tem que acertar o timing)
-				p.mu.Unlock()                      // ! arrumar isso aqui
+				p.processos[processoID] = processo
+				p.mu.Unlock()
 
 				processo.Start()
 			}
@@ -112,7 +110,7 @@ func (p *Processador) Start() {
 	}
 }
 
-// TODO melhorar....
+// TODO remover do retry também...
 func (p *Processador) Stop() error {
 	var prc []string
 	for k := range p.processos {
@@ -135,7 +133,7 @@ func (p *Processador) StartProcessos(pReq []Processo) {
 		_, ok := p.processos[prc.ProcessoID]
 		p.mu.RUnlock()
 		if ok {
-			continue // TODO verificar depois
+			continue
 		}
 
 		np := NewProcesso(

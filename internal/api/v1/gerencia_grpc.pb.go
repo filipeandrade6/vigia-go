@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
 	Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error)
+	ProcessoError(ctx context.Context, in *ProcessoErrorReq, opts ...grpc.CallOption) (*ProcessoErrorRes, error)
 }
 
 type gerenciaClient struct {
@@ -38,11 +39,21 @@ func (c *gerenciaClient) Match(ctx context.Context, in *MatchReq, opts ...grpc.C
 	return out, nil
 }
 
+func (c *gerenciaClient) ProcessoError(ctx context.Context, in *ProcessoErrorReq, opts ...grpc.CallOption) (*ProcessoErrorRes, error) {
+	out := new(ProcessoErrorRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ProcessoError", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GerenciaServer is the server API for Gerencia service.
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
 	Match(context.Context, *MatchReq) (*MatchRes, error)
+	ProcessoError(context.Context, *ProcessoErrorReq) (*ProcessoErrorRes, error)
 	mustEmbedUnimplementedGerenciaServer()
 }
 
@@ -52,6 +63,9 @@ type UnimplementedGerenciaServer struct {
 
 func (UnimplementedGerenciaServer) Match(context.Context, *MatchReq) (*MatchRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Match not implemented")
+}
+func (UnimplementedGerenciaServer) ProcessoError(context.Context, *ProcessoErrorReq) (*ProcessoErrorRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessoError not implemented")
 }
 func (UnimplementedGerenciaServer) mustEmbedUnimplementedGerenciaServer() {}
 
@@ -84,6 +98,24 @@ func _Gerencia_Match_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Gerencia_ProcessoError_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProcessoErrorReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).ProcessoError(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/ProcessoError",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).ProcessoError(ctx, req.(*ProcessoErrorReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Gerencia_ServiceDesc is the grpc.ServiceDesc for Gerencia service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -94,6 +126,10 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Match",
 			Handler:    _Gerencia_Match_Handler,
+		},
+		{
+			MethodName: "ProcessoError",
+			Handler:    _Gerencia_ProcessoError_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
