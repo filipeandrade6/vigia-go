@@ -63,6 +63,7 @@ func New(
 }
 
 // =================================================================================
+// Processador
 
 func (p *Processador) Start() {
 	err := os.MkdirAll(p.armazenamento, os.ModePerm)
@@ -125,6 +126,7 @@ func (p *Processador) Stop() error {
 }
 
 // =================================================================================
+// Processo
 
 func (p *Processador) StartProcessos(pReq []Processo) {
 	for _, prc := range pReq {
@@ -186,6 +188,7 @@ func (p *Processador) ListProcessos() []string {
 }
 
 // =================================================================================
+// Matchlist
 
 func (p *Processador) AtualizarMatchList(placas []string) error {
 	p.mu.Lock()
@@ -199,6 +202,7 @@ func (p *Processador) AtualizarMatchList(placas []string) error {
 }
 
 // =================================================================================
+// Armazenamento
 
 func (p *Processador) UpdateArmazenamento(armazenamento string, horasRetencao int) error {
 	prcsBkp := make(map[string]*Processo)
@@ -246,28 +250,29 @@ func (p *Processador) UpdateArmazenamento(armazenamento string, horasRetencao in
 	return nil
 }
 
-// TODO beginHousekeeper deve receber contexto para parar em caso de alguma coisa...?
+// =================================================================================
+
 func (p *Processador) begintHousekeeper() {
 	d := time.Now().Add(time.Duration(-p.horasRetencao) * time.Hour)
 
 	err := filepath.Walk(p.armazenamento, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err // TODO testar com diretorio errado...
+		if path == p.armazenamento {
+			return nil
 		}
 
 		if info.ModTime().Before(d) {
-			os.Remove(path)
+			err := os.Remove(path)
+			if err != nil {
+				return err
+			}
 		}
 
 		return nil
 	})
-
 	if err != nil {
-		p.errChan <- err
+		p.errChan <- fmt.Errorf("housekeeper stopped: %w", err)
 	}
 }
-
-// =================================================================================
 
 func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 	_, err := p.registroCore.Create(context.Background(), reg)

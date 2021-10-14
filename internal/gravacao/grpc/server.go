@@ -99,6 +99,8 @@ func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRe
 	}
 	g.gerencia = nil
 
+	g.processador.Stop()
+
 	// TODO interromper os cores, processador, e db?
 
 	return &pb.RemoverRegistroRes{}, nil
