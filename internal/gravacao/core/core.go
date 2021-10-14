@@ -55,7 +55,7 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 
 	serverErrors := make(chan error, 1)
 
-	svc := grpc_gravacao.NewGravacaoService(log, cfg.Gravacao.Armazenamento, cfg.Gravacao.Housekeeper)
+	svc := grpc_gravacao.NewGravacaoService(log)
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterGravacaoServer(grpcServer, svc)

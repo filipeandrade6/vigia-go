@@ -24,11 +24,7 @@ type GravacaoClient interface {
 	StopProcessos(ctx context.Context, in *StopProcessosReq, opts ...grpc.CallOption) (*StopProcessosRes, error)
 	ListProcessos(ctx context.Context, in *ListProcessosReq, opts ...grpc.CallOption) (*ListProcessosRes, error)
 	AtualizarMatchlist(ctx context.Context, in *AtualizarMatchlistReq, opts ...grpc.CallOption) (*AtualizarMatchlistRes, error)
-	AtualizarHousekeeper(ctx context.Context, in *AtualizarHousekeeperReq, opts ...grpc.CallOption) (*AtualizarHousekeeperRes, error)
-	StartHousekeeper(ctx context.Context, in *StartHousekeeperReq, opts ...grpc.CallOption) (*StartHousekeeperRes, error)
-	StopHousekeeper(ctx context.Context, in *StopHousekeeperReq, opts ...grpc.CallOption) (*StopHousekeeperRes, error)
-	StatusHousekeeper(ctx context.Context, in *StatusHousekeeperReq, opts ...grpc.CallOption) (*StatusHousekeeperRes, error)
-	GetServidorInfo(ctx context.Context, in *GetServidorInfoReq, opts ...grpc.CallOption) (*GetServidorInfoRes, error)
+	UpdateArmazenamento(ctx context.Context, in *UpdateArmazenamentoReq, opts ...grpc.CallOption) (*UpdateArmazenamentoRes, error)
 }
 
 type gravacaoClient struct {
@@ -93,45 +89,9 @@ func (c *gravacaoClient) AtualizarMatchlist(ctx context.Context, in *AtualizarMa
 	return out, nil
 }
 
-func (c *gravacaoClient) AtualizarHousekeeper(ctx context.Context, in *AtualizarHousekeeperReq, opts ...grpc.CallOption) (*AtualizarHousekeeperRes, error) {
-	out := new(AtualizarHousekeeperRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/AtualizarHousekeeper", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gravacaoClient) StartHousekeeper(ctx context.Context, in *StartHousekeeperReq, opts ...grpc.CallOption) (*StartHousekeeperRes, error) {
-	out := new(StartHousekeeperRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/StartHousekeeper", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gravacaoClient) StopHousekeeper(ctx context.Context, in *StopHousekeeperReq, opts ...grpc.CallOption) (*StopHousekeeperRes, error) {
-	out := new(StopHousekeeperRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/StopHousekeeper", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gravacaoClient) StatusHousekeeper(ctx context.Context, in *StatusHousekeeperReq, opts ...grpc.CallOption) (*StatusHousekeeperRes, error) {
-	out := new(StatusHousekeeperRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/StatusHousekeeper", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gravacaoClient) GetServidorInfo(ctx context.Context, in *GetServidorInfoReq, opts ...grpc.CallOption) (*GetServidorInfoRes, error) {
-	out := new(GetServidorInfoRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/GetServidorInfo", in, out, opts...)
+func (c *gravacaoClient) UpdateArmazenamento(ctx context.Context, in *UpdateArmazenamentoReq, opts ...grpc.CallOption) (*UpdateArmazenamentoRes, error) {
+	out := new(UpdateArmazenamentoRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/UpdateArmazenamento", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -148,11 +108,7 @@ type GravacaoServer interface {
 	StopProcessos(context.Context, *StopProcessosReq) (*StopProcessosRes, error)
 	ListProcessos(context.Context, *ListProcessosReq) (*ListProcessosRes, error)
 	AtualizarMatchlist(context.Context, *AtualizarMatchlistReq) (*AtualizarMatchlistRes, error)
-	AtualizarHousekeeper(context.Context, *AtualizarHousekeeperReq) (*AtualizarHousekeeperRes, error)
-	StartHousekeeper(context.Context, *StartHousekeeperReq) (*StartHousekeeperRes, error)
-	StopHousekeeper(context.Context, *StopHousekeeperReq) (*StopHousekeeperRes, error)
-	StatusHousekeeper(context.Context, *StatusHousekeeperReq) (*StatusHousekeeperRes, error)
-	GetServidorInfo(context.Context, *GetServidorInfoReq) (*GetServidorInfoRes, error)
+	UpdateArmazenamento(context.Context, *UpdateArmazenamentoReq) (*UpdateArmazenamentoRes, error)
 	mustEmbedUnimplementedGravacaoServer()
 }
 
@@ -178,20 +134,8 @@ func (UnimplementedGravacaoServer) ListProcessos(context.Context, *ListProcessos
 func (UnimplementedGravacaoServer) AtualizarMatchlist(context.Context, *AtualizarMatchlistReq) (*AtualizarMatchlistRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AtualizarMatchlist not implemented")
 }
-func (UnimplementedGravacaoServer) AtualizarHousekeeper(context.Context, *AtualizarHousekeeperReq) (*AtualizarHousekeeperRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AtualizarHousekeeper not implemented")
-}
-func (UnimplementedGravacaoServer) StartHousekeeper(context.Context, *StartHousekeeperReq) (*StartHousekeeperRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StartHousekeeper not implemented")
-}
-func (UnimplementedGravacaoServer) StopHousekeeper(context.Context, *StopHousekeeperReq) (*StopHousekeeperRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StopHousekeeper not implemented")
-}
-func (UnimplementedGravacaoServer) StatusHousekeeper(context.Context, *StatusHousekeeperReq) (*StatusHousekeeperRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StatusHousekeeper not implemented")
-}
-func (UnimplementedGravacaoServer) GetServidorInfo(context.Context, *GetServidorInfoReq) (*GetServidorInfoRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetServidorInfo not implemented")
+func (UnimplementedGravacaoServer) UpdateArmazenamento(context.Context, *UpdateArmazenamentoReq) (*UpdateArmazenamentoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateArmazenamento not implemented")
 }
 func (UnimplementedGravacaoServer) mustEmbedUnimplementedGravacaoServer() {}
 
@@ -314,92 +258,20 @@ func _Gravacao_AtualizarMatchlist_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_AtualizarHousekeeper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AtualizarHousekeeperReq)
+func _Gravacao_UpdateArmazenamento_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateArmazenamentoReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).AtualizarHousekeeper(ctx, in)
+		return srv.(GravacaoServer).UpdateArmazenamento(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/AtualizarHousekeeper",
+		FullMethod: "/gravacao.Gravacao/UpdateArmazenamento",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).AtualizarHousekeeper(ctx, req.(*AtualizarHousekeeperReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gravacao_StartHousekeeper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StartHousekeeperReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GravacaoServer).StartHousekeeper(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/StartHousekeeper",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).StartHousekeeper(ctx, req.(*StartHousekeeperReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gravacao_StopHousekeeper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StopHousekeeperReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GravacaoServer).StopHousekeeper(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/StopHousekeeper",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).StopHousekeeper(ctx, req.(*StopHousekeeperReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gravacao_StatusHousekeeper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StatusHousekeeperReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GravacaoServer).StatusHousekeeper(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/StatusHousekeeper",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).StatusHousekeeper(ctx, req.(*StatusHousekeeperReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Gravacao_GetServidorInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetServidorInfoReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GravacaoServer).GetServidorInfo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/GetServidorInfo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).GetServidorInfo(ctx, req.(*GetServidorInfoReq))
+		return srv.(GravacaoServer).UpdateArmazenamento(ctx, req.(*UpdateArmazenamentoReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -436,24 +308,8 @@ var Gravacao_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Gravacao_AtualizarMatchlist_Handler,
 		},
 		{
-			MethodName: "AtualizarHousekeeper",
-			Handler:    _Gravacao_AtualizarHousekeeper_Handler,
-		},
-		{
-			MethodName: "StartHousekeeper",
-			Handler:    _Gravacao_StartHousekeeper_Handler,
-		},
-		{
-			MethodName: "StopHousekeeper",
-			Handler:    _Gravacao_StopHousekeeper_Handler,
-		},
-		{
-			MethodName: "StatusHousekeeper",
-			Handler:    _Gravacao_StatusHousekeeper_Handler,
-		},
-		{
-			MethodName: "GetServidorInfo",
-			Handler:    _Gravacao_GetServidorInfo_Handler,
+			MethodName: "UpdateArmazenamento",
+			Handler:    _Gravacao_UpdateArmazenamento_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

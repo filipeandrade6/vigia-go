@@ -14,25 +14,22 @@ service Gravacao {
 
     rpc AtualizarMatchlist (AtualizarMatchlistReq) returns (AtualizarMatchlistRes) {}
 
-    rpc AtualizarHousekeeper (AtualizarHousekeeperReq) returns (AtualizarHousekeeperRes) {}
-    rpc StartHousekeeper (StartHousekeeperReq) returns (StartHousekeeperRes) {}
-    rpc StopHousekeeper (StopHousekeeperReq) returns (StopHousekeeperRes) {}
-    rpc StatusHousekeeper (StatusHousekeeperReq) returns (StatusHousekeeperRes) {}
-
-    rpc GetServidorInfo (GetServidorInfoReq) returns (GetServidorInfoRes) {}
+    rpc UpdateArmazenamento (UpdateArmazenamentoReq) returns (UpdateArmazenamentoRes) {}
 }
 
 message RegistrarReq {
     string servidor_gravacao_id = 1;
-    string endereco_ip = 2;
-    int32 porta = 3;
-    string db_host = 4;
-    string db_user = 5;
-    string db_password = 6;
-    string db_name = 7;
-    int32 db_maxidleconns = 8;
-    int32 db_maxopenconns = 9;
-    string db_sslmode = 10;
+    string armazenamento = 2;
+    int32 horas_retencao = 3;
+    string endereco_ip = 4;
+    int32 porta = 5;
+    string db_host = 6;
+    string db_user = 7;
+    string db_password = 8;
+    string db_name = 9;
+    int32 db_maxidleconns = 10;
+    int32 db_maxopenconns = 11;
+    string db_sslmode = 12;
 }
 
 message RegistrarRes {}
@@ -60,7 +57,8 @@ message StopProcessosRes {}
 message ListProcessosReq {}
 
 message ListProcessosRes {
-    repeated string processos = 1;
+    repeated string processos_em_execucao = 1;
+    repeated string processos_em_tentativa = 2;
 }
 
 // ===================
@@ -71,31 +69,9 @@ message AtualizarMatchlistRes {}
 
 // ===================
 
-message AtualizarHousekeeperReq {
-    int32 horas_retencao = 1;
-}
-
-message AtualizarHousekeeperRes {}
-
-message StartHousekeeperReq {}
-
-message StartHousekeeperRes {}
-
-message StopHousekeeperReq {}
-
-message StopHousekeeperRes {}
-
-message StatusHousekeeperReq{}
-
-message StatusHousekeeperRes{
-    bool status = 1;
-}
-
-// ===================
-
-message GetServidorInfoReq{}
-
-message GetServidorInfoRes{
+message UpdateArmazenamentoReq {
     string armazenamento = 1;
     int32 horas_retencao = 2;
 }
+
+message UpdateArmazenamentoRes {}

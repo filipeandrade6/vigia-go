@@ -2,6 +2,8 @@ package processador
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
@@ -116,7 +118,7 @@ func processoTeste(
 
 		default:
 			fmt.Print(i, "..")
-			time.Sleep(time.Duration(time.Millisecond * 200))
+			time.Sleep(time.Duration(time.Millisecond * 500))
 			r := registro.Registro{
 				RegistroID:    validate.GenerateID(),
 				ProcessoID:    processoID,
@@ -130,6 +132,11 @@ func processoTeste(
 			}
 			r.Armazenamento = fmt.Sprintf("%s/%d_%s", armazenamento, r.CriadoEm.Unix(), r.RegistroID)
 			regChan <- r
+
+			err := os.WriteFile(filepath.Join(armazenamento, fmt.Sprintf("%d.txt", i)), []byte("hello\ngo\n"), 0644)
+			if err != nil {
+				errChan <- traffic.ProcessoError{ProcessoID: processoID, Err: err}
+			}
 			i++
 		}
 	}

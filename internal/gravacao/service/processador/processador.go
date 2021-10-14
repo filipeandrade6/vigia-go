@@ -15,60 +15,62 @@ import (
 
 var (
 	ErrProcessoNotFound = errors.New("processo not found")
-	ErrAlreadyExecuting = errors.New("processo already executing")
 )
 
 type Processador struct {
-	registroCore       registro.Core
 	servidorGravacaoID string
-	errChan            chan error
-	matchChan          chan string
+	armazenamento      string
+	horasRetencao      int
 
-	mu            *sync.RWMutex
-	processos     map[string]*Processo
-	retry         map[string]*Processo // ! implementar
-	matchlist     map[string]bool
-	armazenamento string
+	registroCore registro.Core
+	errChan      chan error
+	matchChan    chan string
 
-	housekeeperStatus bool
-	horasRetencao     int
+	mu        *sync.RWMutex
+	processos map[string]*Processo
+	retry     map[string]*Processo // ! implementar
+	matchlist map[string]bool
 
 	internalErrChan chan traffic.ProcessoError // melhorar esse erro
 	regChan         chan registro.Registro
 }
 
 func New(
-	registroCore registro.Core,
 	servidorGravacaoID string,
 	armazenamento string,
 	horasRetencao int,
+	registroCore registro.Core,
 	errChan chan error,
 	matchChan chan string,
 ) *Processador {
 	return &Processador{
-		registroCore:       registroCore,
 		servidorGravacaoID: servidorGravacaoID,
 		armazenamento:      armazenamento,
-		errChan:            errChan,
-		matchChan:          matchChan,
+		horasRetencao:      horasRetencao,
+
+		registroCore: registroCore,
+		errChan:      errChan,
+		matchChan:    matchChan,
 
 		mu:        &sync.RWMutex{},
 		processos: make(map[string]*Processo),
-		retry:     make(map[string]*Processo), // ! implementar
+		retry:     make(map[string]*Processo),
 		matchlist: make(map[string]bool),
 
-		housekeeperStatus: true,
-		horasRetencao:     horasRetencao,
-
-		regChan:         make(chan registro.Registro),
 		internalErrChan: make(chan traffic.ProcessoError),
+		regChan:         make(chan registro.Registro),
 	}
 }
 
-// TODO como vai funcionar o Back-off? https://github.com/jpillora/backoff/blob/master/backoff.go
 // =================================================================================
 
 func (p *Processador) Start() {
+	err := os.MkdirAll(p.armazenamento, os.ModePerm)
+	if err != nil {
+		p.errChan <- err
+		return // TODO arrumar isso aqui
+	}
+
 	tickerHK := time.NewTicker(time.Hour)
 	tickerRetry := time.NewTicker(15 * time.Second)
 
@@ -93,12 +95,9 @@ func (p *Processador) Start() {
 			p.errChan <- err
 
 		case <-tickerHK.C:
-			if p.housekeeperStatus {
-				go p.begintHousekeeper()
-			}
+			go p.begintHousekeeper()
 
 		case <-tickerRetry.C:
-			fmt.Printf("\n retry: %v\n", p.retry)
 			for processoID, processo := range p.retry {
 				p.mu.Lock()
 				p.processos[processoID] = processo
@@ -201,23 +200,53 @@ func (p *Processador) AtualizarMatchList(placas []string) error {
 
 // =================================================================================
 
-func (p *Processador) AtualizarHousekeeper(horasRetencao int) {
+func (p *Processador) UpdateArmazenamento(armazenamento string, horasRetencao int) error {
+	prcsBkp := make(map[string]*Processo)
+	p.mu.RLock()
+	for k, v := range p.processos {
+		prcsBkp[k] = v
+	}
+
+	var prcs []string
+	for k := range prcsBkp {
+		prcs = append(prcs, k)
+	}
+	p.mu.RUnlock()
+
+	err := p.StopProcessos(prcs)
+	if err != nil {
+		return err // TODO Tratar
+	}
+
+	p.mu.Lock()
+	p.armazenamento = armazenamento
 	p.horasRetencao = horasRetencao
+	p.mu.Unlock()
+
+	err = os.MkdirAll(p.armazenamento, os.ModePerm)
+	if err != nil {
+		return err // TODO arrumar isso aqui
+	}
+
+	var nPrcs []Processo
+	for _, p := range prcsBkp {
+		nPrcs = append(nPrcs, Processo{
+			ProcessoID:  p.ProcessoID,
+			EnderecoIP:  p.EnderecoIP,
+			Porta:       p.Porta,
+			Canal:       p.Canal,
+			Usuario:     p.Usuario,
+			Senha:       p.Senha,
+			Processador: p.Processador,
+		})
+	}
+
+	p.StartProcessos(nPrcs)
+
+	return nil
 }
 
-func (p *Processador) StartHousekeeper() {
-	p.housekeeperStatus = true
-}
-
-func (p *Processador) StopHousekeeper() {
-	p.housekeeperStatus = false
-}
-
-func (p *Processador) StatusHousekeeper() bool {
-	return p.housekeeperStatus
-}
-
-// TODO beginHousekeeper deve receber contexto para parar em caso de alguma coisa
+// TODO beginHousekeeper deve receber contexto para parar em caso de alguma coisa...?
 func (p *Processador) begintHousekeeper() {
 	d := time.Now().Add(time.Duration(-p.horasRetencao) * time.Hour)
 
@@ -236,13 +265,6 @@ func (p *Processador) begintHousekeeper() {
 	if err != nil {
 		p.errChan <- err
 	}
-}
-
-// =================================================================================
-
-// TODO colocar mais inforamções -  mudar para processador info - servidor info deve ficar no server
-func (p *Processador) GetServidorInfo() (string, int) {
-	return p.armazenamento, p.horasRetencao
 }
 
 // =================================================================================
