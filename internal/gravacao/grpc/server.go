@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"os"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
@@ -47,6 +48,11 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, "ja possui servidor de gerencia registrado")
 	}
 
+	err := os.MkdirAll(req.GetArmazenamento(), os.ModePerm)
+	if err != nil {
+		return &pb.RegistrarRes{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
 	db, err := database.Open(database.Config{
 		User:         req.GetDbUser(),
 		Password:     req.GetDbPassword(),
@@ -60,7 +66,7 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect open database: %s", err))
 	}
 
-	// quando a altenticação falha com senha diferente ele não alerta
+	// TODO o DB quando a altenticação falha com senha diferente ele não alerta
 
 	gerenciaClient, err := NewClientGerencia(req.GetEnderecoIp(), int(req.GetPorta()))
 	if err != nil {
@@ -147,9 +153,9 @@ func (g *GravacaoService) StopProcessos(ctx context.Context, req *pb.StopProcess
 }
 
 func (g *GravacaoService) ListProcessos(ctx context.Context, req *pb.ListProcessosReq) (*pb.ListProcessosRes, error) {
-	processos := g.processador.ListProcessos()
+	processos, retry := g.processador.ListProcessos()
 
-	return &pb.ListProcessosRes{ProcessosEmExecucao: processos, ProcessosEmTentativa: processos}, nil // TODO ! arrumar
+	return &pb.ListProcessosRes{ProcessosEmExecucao: processos, ProcessosEmTentativa: retry}, nil // TODO ! arrumar
 }
 
 func (g *GravacaoService) AtualizarMatchlist(ctx context.Context, req *pb.AtualizarMatchlistReq) (*pb.AtualizarMatchlistRes, error) {

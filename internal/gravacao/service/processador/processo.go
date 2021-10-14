@@ -67,8 +67,6 @@ func (p *Processo) Start() {
 			p.Armazenamento,
 			p.regChan,
 			p.errChan,
-			// p.stopChan,
-			// p.stoppedChan,
 			p.stopChan,
 			p.stoppedChan,
 		)
@@ -133,7 +131,7 @@ func processoTeste(
 			r.Armazenamento = fmt.Sprintf("%s/%d_%s", armazenamento, r.CriadoEm.Unix(), r.RegistroID)
 			regChan <- r
 
-			err := os.WriteFile(filepath.Join(armazenamento, fmt.Sprintf("%d.txt", i)), []byte("hello\ngo\n"), 0644)
+			err := os.WriteFile(filepath.Join(armazenamento, fmt.Sprintf("%d-%s.txt", i, r.RegistroID)), []byte("hello\ngo\n"), 0644)
 			if err != nil {
 				errChan <- traffic.ProcessoError{ProcessoID: processoID, Err: err}
 			}

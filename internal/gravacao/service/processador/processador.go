@@ -28,11 +28,11 @@ type Processador struct {
 
 	mu        *sync.RWMutex
 	processos map[string]*Processo
-	retry     map[string]*Processo // ! implementar
+	retry     map[string]*Processo
 	matchlist map[string]bool
 
-	internalErrChan chan traffic.ProcessoError // melhorar esse erro
-	regChan         chan registro.Registro
+	interErrChan chan traffic.ProcessoError // TODO
+	regChan      chan registro.Registro
 }
 
 func New(
@@ -57,8 +57,8 @@ func New(
 		retry:     make(map[string]*Processo),
 		matchlist: make(map[string]bool),
 
-		internalErrChan: make(chan traffic.ProcessoError),
-		regChan:         make(chan registro.Registro),
+		interErrChan: make(chan traffic.ProcessoError),
+		regChan:      make(chan registro.Registro),
 	}
 }
 
@@ -66,21 +66,16 @@ func New(
 // Processador
 
 func (p *Processador) Start() {
-	err := os.MkdirAll(p.armazenamento, os.ModePerm)
-	if err != nil {
-		p.errChan <- err
-		return // TODO arrumar isso aqui
-	}
-
 	tickerHK := time.NewTicker(time.Hour)
-	tickerRetry := time.NewTicker(15 * time.Second)
+	tickerRetry := time.NewTicker(30 * time.Second)
 
 	for {
 		select {
 		case reg := <-p.regChan:
 			go p.createAndCheckRegistro(reg)
 
-		case err := <-p.internalErrChan:
+		// TODO erros da dahua estão duplicando a cada chamada
+		case err := <-p.interErrChan:
 			switch {
 			case errors.As(err, &traffic.ErrLogin):
 				p.retry[err.ProcessoID] = p.processos[err.ProcessoID]
@@ -110,12 +105,16 @@ func (p *Processador) Start() {
 	}
 }
 
-// TODO remover do retry também...
 func (p *Processador) Stop() error {
 	var prc []string
+	p.mu.RLock()
 	for k := range p.processos {
 		prc = append(prc, k)
 	}
+	for k := range p.retry {
+		prc = append(prc, k)
+	}
+	p.mu.RUnlock()
 
 	err := p.StopProcessos(prc)
 	if err != nil {
@@ -132,8 +131,9 @@ func (p *Processador) StartProcessos(pReq []Processo) {
 	for _, prc := range pReq {
 		p.mu.RLock()
 		_, ok := p.processos[prc.ProcessoID]
+		_, ok2 := p.retry[prc.ProcessoID]
 		p.mu.RUnlock()
-		if ok {
+		if ok || ok2 {
 			continue
 		}
 
@@ -148,12 +148,14 @@ func (p *Processador) StartProcessos(pReq []Processo) {
 
 			p.armazenamento,
 			p.regChan,
-			p.internalErrChan,
+			p.interErrChan,
 		)
 
 		p.mu.Lock()
 		p.processos[prc.ProcessoID] = np
 		p.mu.Unlock()
+
+		// TODO fazer teste de login antes de iniciar
 
 		np.Start()
 	}
@@ -163,33 +165,49 @@ func (p *Processador) StopProcessos(processos []string) error {
 	for _, prc := range processos {
 		p.mu.RLock()
 		_, ok := p.processos[prc]
+		_, ok2 := p.retry[prc]
 		p.mu.RUnlock()
-		if !ok {
-			return fmt.Errorf("processo processoID[%s]: %w", prc, ErrProcessoNotFound)
+
+		if ok {
+			p.processos[prc].Stop()
+
+			p.mu.Lock()
+			delete(p.processos, prc)
+			p.mu.Unlock()
+			continue
 		}
 
-		p.processos[prc].Stop()
+		if ok2 {
+			p.mu.Lock()
+			delete(p.retry, prc)
+			p.mu.Unlock()
+			continue
+		}
 
-		p.mu.Lock()
-		delete(p.processos, prc)
-		p.mu.Unlock()
+		return fmt.Errorf("processo processoID[%s]: %w", prc, ErrProcessoNotFound)
 	}
 
 	return nil
 }
 
-func (p *Processador) ListProcessos() []string {
+func (p *Processador) ListProcessos() ([]string, []string) {
 	var prc []string
 	for k := range p.processos {
 		prc = append(prc, k)
 	}
 
-	return prc
+	var retryPrc []string
+	for k := range p.retry {
+		retryPrc = append(retryPrc, k)
+	}
+
+	return prc, retryPrc
 }
 
 // =================================================================================
 // Matchlist
 
+// TODO
 func (p *Processador) AtualizarMatchList(placas []string) error {
 	p.mu.Lock()
 	p.matchlist = make(map[string]bool)
@@ -278,7 +296,7 @@ func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 	_, err := p.registroCore.Create(context.Background(), reg)
 	if err != nil {
 		fmt.Println(err, reg.ProcessoID)
-		p.errChan <- err // internal ou errChan?
+		p.errChan <- err // TODO adicionar error personalizado
 		return
 	}
 

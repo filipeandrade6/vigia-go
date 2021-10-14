@@ -61,9 +61,11 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 	pb.RegisterGravacaoServer(grpcServer, svc)
 
 	go func() {
-		lis, err := net.Listen(cfg.Gravacao.Conn, fmt.Sprintf(":%d", cfg.Gravacao.Port))
+		// lis, err := net.Listen(cfg.Gravacao.Conn, fmt.Sprintf(":%d", cfg.Gravacao.Port))
+		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Gravacao.Port))
 		if err != nil {
-			log.Errorw("startup", "status", "could not open socket", cfg.Gravacao.Conn, cfg.Gravacao.Port, "ERROR", err)
+			// log.Errorw("startup", "status", "could not open socket", cfg.Gravacao.Conn, cfg.Gravacao.Port, "ERROR", err)
+			log.Errorw("startup", "status", "could not open socket", "tcp", cfg.Gravacao.Port, "ERROR", err)
 		}
 
 		log.Infow("startup", "status", "gRPC server started") // TODO adicionar host
