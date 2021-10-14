@@ -31,7 +31,7 @@ type Processador struct {
 	retry     map[string]*Processo
 	matchlist map[string]bool
 
-	interErrChan chan traffic.ProcessoError // TODO
+	interErrChan chan traffic.ProcessoError
 	regChan      chan registro.Registro
 }
 
@@ -207,16 +207,13 @@ func (p *Processador) ListProcessos() ([]string, []string) {
 // =================================================================================
 // Matchlist
 
-// TODO
-func (p *Processador) AtualizarMatchList(placas []string) error {
+func (p *Processador) UpdateMatchlist(placas []string) {
 	p.mu.Lock()
 	p.matchlist = make(map[string]bool)
 	for _, placa := range placas {
 		p.matchlist[placa] = true
 	}
 	p.mu.Unlock()
-
-	return nil
 }
 
 // =================================================================================

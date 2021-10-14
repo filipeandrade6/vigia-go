@@ -48,6 +48,8 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, "ja possui servidor de gerencia registrado")
 	}
 
+	g.log.Infow("start", "teste", "teste")
+
 	err := os.MkdirAll(req.GetArmazenamento(), os.ModePerm)
 	if err != nil {
 		return &pb.RegistrarRes{}, status.Error(codes.InvalidArgument, err.Error())
@@ -146,7 +148,7 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 func (g *GravacaoService) StopProcessos(ctx context.Context, req *pb.StopProcessosReq) (*pb.StopProcessosRes, error) {
 	err := g.processador.StopProcessos(req.GetProcessos())
 	if err != nil {
-		return &pb.StopProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("stopping processo: %s", err)) // TODO start nao retorna mas stop retorna
+		return &pb.StopProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("stopping processo: %s", err))
 	}
 
 	return &pb.StopProcessosRes{}, nil
@@ -155,11 +157,24 @@ func (g *GravacaoService) StopProcessos(ctx context.Context, req *pb.StopProcess
 func (g *GravacaoService) ListProcessos(ctx context.Context, req *pb.ListProcessosReq) (*pb.ListProcessosRes, error) {
 	processos, retry := g.processador.ListProcessos()
 
-	return &pb.ListProcessosRes{ProcessosEmExecucao: processos, ProcessosEmTentativa: retry}, nil // TODO ! arrumar
+	return &pb.ListProcessosRes{ProcessosEmExecucao: processos, ProcessosEmTentativa: retry}, nil
 }
 
-func (g *GravacaoService) AtualizarMatchlist(ctx context.Context, req *pb.AtualizarMatchlistReq) (*pb.AtualizarMatchlistRes, error) {
-	return &pb.AtualizarMatchlistRes{}, nil
+func (g *GravacaoService) UpdateMatchlist(ctx context.Context, req *pb.UpdateMatchlistReq) (*pb.UpdateMatchlistRes, error) {
+
+	veiculos, err := g.veiculoCore.QueryAll(ctx)
+	if err != nil {
+		return &pb.UpdateMatchlistRes{}, status.Error(codes.Internal, fmt.Sprintf("query database: %s", err))
+	}
+
+	var matchlist []string
+	for _, v := range veiculos {
+		matchlist = append(matchlist, v.Placa)
+	}
+
+	g.processador.UpdateMatchlist(matchlist)
+
+	return &pb.UpdateMatchlistRes{}, nil
 }
 
 func (g *GravacaoService) UpdateArmazenamento(ctx context.Context, req *pb.UpdateArmazenamentoReq) (*pb.UpdateArmazenamentoRes, error) {
