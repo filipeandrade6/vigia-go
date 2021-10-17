@@ -47,18 +47,17 @@ func (g *GerenciaClient) Check(servidorID string) error {
 	return nil
 }
 
-func (g *GerenciaClient) Match(veiculo_id, registro_id string) {
-	ctx := context.Background()
+func (g *GerenciaClient) Match(registroID string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
 
-	r := &pb.MatchReq{
-		VeiculoId:  veiculo_id,
-		RegistroId: registro_id,
-	}
+	r := &pb.MatchReq{RegistroId: registroID}
 
 	if _, err := g.c.Match(ctx, r); err != nil {
-		// TODO adicionar no error? - colocar buffer? caso o gerencia esteja offline
+		return err
 	}
 
+	return nil
 }
 
 // func (g *GerenciaClient) ProcessoError(servidorGravacaoID, processoID string, errType int) {

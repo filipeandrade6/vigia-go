@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
 	"github.com/filipeandrade6/vigia-go/internal/core/camera"
@@ -33,17 +34,20 @@ type GravacaoService struct {
 	processador *processador.Processador
 	errChan     chan error
 	matchChan   chan string
+
+	matchBuffChan chan string
 }
 
 func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
 	return &GravacaoService{
-		log:       log,
-		errChan:   make(chan error),
-		matchChan: make(chan string),
+		log:           log,
+		errChan:       make(chan error),
+		matchChan:     make(chan string),
+		matchBuffChan: make(chan string, 100),
 	}
 }
 
-// TODO colocar info log para tudo...?
+// TODO pensar no caso do gerencia ficar offline
 
 func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (*pb.RegistrarRes, error) {
 	if g.gerencia != nil {
@@ -106,15 +110,38 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 }
 
 func (g *GravacaoService) start() {
+	t := time.NewTicker(10 * time.Second)
 	for {
 		select {
 		case err := <-g.errChan:
-			g.log.Errorw("error", "ERROR", err)
-			// TODO notificar
+			g.log.Errorw("ERROR", err)
+			// TODO adicionar buffer de erros
 
 		case m := <-g.matchChan:
-			g.log.Infow("match", "MATCH", m)
-			// TODO notificar
+			g.log.Infow("MATCH", "registro", m)
+			if err := g.gerencia.Match(m); err != nil {
+				e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
+				g.log.Errorw("call match", "ERROR", e)
+				g.matchBuffChan <- m
+			}
+
+		case <-t.C:
+			select {
+			case m := <-g.matchBuffChan:
+				if g.gerencia == nil {
+					g.log.Errorw("call match", "ERROR", "gerencia gRPC server not registered")
+					g.matchBuffChan <- m
+					break
+				}
+
+				if err := g.gerencia.Match(m); err != nil {
+					g.log.Errorw("call match", "ERROR", fmt.Sprintf("could not connect to gerencia gRPC server: %s", err))
+					g.matchBuffChan <- m
+					break
+				}
+
+			default:
+			}
 		}
 	}
 }
@@ -135,7 +162,7 @@ func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRe
 
 	// TODO interromper os cores, processador, e db?
 
-	g.log.Infow("remover registro", "removed", "ok")
+	g.log.Infow("remover registro")
 	return &pb.RemoverRegistroRes{}, nil
 }
 
