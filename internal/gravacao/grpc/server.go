@@ -43,6 +43,8 @@ func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
 	}
 }
 
+// TODO fazer verificação de registro nos outros chamados, pois da panic...
+
 func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (*pb.RegistrarRes, error) {
 	if g.gerencia != nil {
 		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, "ja possui servidor de gerencia registrado")
@@ -71,6 +73,7 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect to gRPC server: %s", err))
 	}
 	g.gerencia = gerenciaClient
+	// TODO faz um teste de conexão - um check no service pra ver se é gerencia....
 
 	g.cameraCore = camera.NewCore(g.log, db)
 	g.processoCore = processo.NewCore(g.log, db)

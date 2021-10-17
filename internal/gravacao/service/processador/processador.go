@@ -31,7 +31,7 @@ type Processador struct {
 	retry     map[string]*Processo
 	matchlist map[string]bool
 
-	interErrChan chan traffic.ProcessoError
+	interErrChan chan *traffic.ProcessoError
 	regChan      chan registro.Registro
 }
 
@@ -57,7 +57,7 @@ func New(
 		retry:     make(map[string]*Processo),
 		matchlist: make(map[string]bool),
 
-		interErrChan: make(chan traffic.ProcessoError),
+		interErrChan: make(chan *traffic.ProcessoError),
 		regChan:      make(chan registro.Registro),
 	}
 }
@@ -77,13 +77,14 @@ func (p *Processador) Start() {
 		// TODO tenho wrappar o err para passar para o log - não mandar erro seco do traffic
 		// TODO e quando ela estiver funcionando e ficar offline?
 		// TODO erros da dahua estão duplicando a cada chamada
+		// TODO ver qual o tipo de erro que da quando a camera estiver conectada e ficar offline...
 		case err := <-p.interErrChan:
 			switch {
-			case errors.As(err, &traffic.ErrUnreachable):
+			case errors.As(err.Err, &traffic.ErrUnreachable):
 				p.retry[err.ProcessoID] = p.processos[err.ProcessoID]
 				delete(p.processos, err.ProcessoID)
 
-			case errors.As(err, &traffic.ErrSaveImage):
+			case errors.As(err.Err, &traffic.ErrSaveImage):
 				// só notifica
 
 			default:
@@ -293,7 +294,10 @@ func (p *Processador) begintHousekeeper() {
 func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 	_, err := p.registroCore.Create(context.Background(), reg)
 	if err != nil {
-		fmt.Println(err, reg.ProcessoID)
+		err := p.StopProcessos([]string{reg.ProcessoID})
+		if err != nil {
+			p.errChan <- fmt.Errorf("stopping processo: %s", err)
+		}
 		p.errChan <- fmt.Errorf("could not create registro: %w", err)
 		return
 	}
