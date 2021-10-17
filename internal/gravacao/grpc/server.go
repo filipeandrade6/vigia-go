@@ -100,6 +100,8 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 
 	g.processador = processador.New(req.GetServidorGravacaoId(), req.GetArmazenamento(), int(req.GetHorasRetencao()), g.registroCore, g.errChan, g.matchChan)
 
+	// TODO adicionar update veiculos aqui
+
 	go g.start()
 	go g.processador.Start()
 
