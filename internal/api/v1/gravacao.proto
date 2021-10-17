@@ -12,7 +12,7 @@ service Gravacao {
     rpc StopProcessos (StopProcessosReq) returns (StopProcessosRes) {}
     rpc ListProcessos (ListProcessosReq) returns (ListProcessosRes) {}
 
-    rpc UpdateMatchlist (UpdateMatchlistReq) returns (UpdateMatchlistRes) {}
+    rpc UpdateVeiculos (UpdateVeiculosReq) returns (UpdateVeiculosRes) {}
 
     rpc UpdateArmazenamento (UpdateArmazenamentoReq) returns (UpdateArmazenamentoRes) {}
 }
@@ -63,9 +63,9 @@ message ListProcessosRes {
 
 // ===================
 
-message UpdateMatchlistReq {}
+message UpdateVeiculosReq {}
 
-message UpdateMatchlistRes {}
+message UpdateVeiculosRes {}
 
 // ===================
 

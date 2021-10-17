@@ -23,7 +23,7 @@ type GravacaoClient interface {
 	StartProcessos(ctx context.Context, in *StartProcessosReq, opts ...grpc.CallOption) (*StartProcessosRes, error)
 	StopProcessos(ctx context.Context, in *StopProcessosReq, opts ...grpc.CallOption) (*StopProcessosRes, error)
 	ListProcessos(ctx context.Context, in *ListProcessosReq, opts ...grpc.CallOption) (*ListProcessosRes, error)
-	UpdateMatchlist(ctx context.Context, in *UpdateMatchlistReq, opts ...grpc.CallOption) (*UpdateMatchlistRes, error)
+	UpdateVeiculos(ctx context.Context, in *UpdateVeiculosReq, opts ...grpc.CallOption) (*UpdateVeiculosRes, error)
 	UpdateArmazenamento(ctx context.Context, in *UpdateArmazenamentoReq, opts ...grpc.CallOption) (*UpdateArmazenamentoRes, error)
 }
 
@@ -80,9 +80,9 @@ func (c *gravacaoClient) ListProcessos(ctx context.Context, in *ListProcessosReq
 	return out, nil
 }
 
-func (c *gravacaoClient) UpdateMatchlist(ctx context.Context, in *UpdateMatchlistReq, opts ...grpc.CallOption) (*UpdateMatchlistRes, error) {
-	out := new(UpdateMatchlistRes)
-	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/UpdateMatchlist", in, out, opts...)
+func (c *gravacaoClient) UpdateVeiculos(ctx context.Context, in *UpdateVeiculosReq, opts ...grpc.CallOption) (*UpdateVeiculosRes, error) {
+	out := new(UpdateVeiculosRes)
+	err := c.cc.Invoke(ctx, "/gravacao.Gravacao/UpdateVeiculos", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ type GravacaoServer interface {
 	StartProcessos(context.Context, *StartProcessosReq) (*StartProcessosRes, error)
 	StopProcessos(context.Context, *StopProcessosReq) (*StopProcessosRes, error)
 	ListProcessos(context.Context, *ListProcessosReq) (*ListProcessosRes, error)
-	UpdateMatchlist(context.Context, *UpdateMatchlistReq) (*UpdateMatchlistRes, error)
+	UpdateVeiculos(context.Context, *UpdateVeiculosReq) (*UpdateVeiculosRes, error)
 	UpdateArmazenamento(context.Context, *UpdateArmazenamentoReq) (*UpdateArmazenamentoRes, error)
 	mustEmbedUnimplementedGravacaoServer()
 }
@@ -131,8 +131,8 @@ func (UnimplementedGravacaoServer) StopProcessos(context.Context, *StopProcessos
 func (UnimplementedGravacaoServer) ListProcessos(context.Context, *ListProcessosReq) (*ListProcessosRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProcessos not implemented")
 }
-func (UnimplementedGravacaoServer) UpdateMatchlist(context.Context, *UpdateMatchlistReq) (*UpdateMatchlistRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateMatchlist not implemented")
+func (UnimplementedGravacaoServer) UpdateVeiculos(context.Context, *UpdateVeiculosReq) (*UpdateVeiculosRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateVeiculos not implemented")
 }
 func (UnimplementedGravacaoServer) UpdateArmazenamento(context.Context, *UpdateArmazenamentoReq) (*UpdateArmazenamentoRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateArmazenamento not implemented")
@@ -240,20 +240,20 @@ func _Gravacao_ListProcessos_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gravacao_UpdateMatchlist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateMatchlistReq)
+func _Gravacao_UpdateVeiculos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateVeiculosReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GravacaoServer).UpdateMatchlist(ctx, in)
+		return srv.(GravacaoServer).UpdateVeiculos(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gravacao.Gravacao/UpdateMatchlist",
+		FullMethod: "/gravacao.Gravacao/UpdateVeiculos",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GravacaoServer).UpdateMatchlist(ctx, req.(*UpdateMatchlistReq))
+		return srv.(GravacaoServer).UpdateVeiculos(ctx, req.(*UpdateVeiculosReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -304,8 +304,8 @@ var Gravacao_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Gravacao_ListProcessos_Handler,
 		},
 		{
-			MethodName: "UpdateMatchlist",
-			Handler:    _Gravacao_UpdateMatchlist_Handler,
+			MethodName: "UpdateVeiculos",
+			Handler:    _Gravacao_UpdateVeiculos_Handler,
 		},
 		{
 			MethodName: "UpdateArmazenamento",

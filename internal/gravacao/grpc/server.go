@@ -43,6 +43,8 @@ func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
 	}
 }
 
+// TODO colocar info log para tudo...?
+
 func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (*pb.RegistrarRes, error) {
 	if g.gerencia != nil {
 		e := "already registered gerencia service"
@@ -119,14 +121,21 @@ func (g *GravacaoService) start() {
 
 func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRegistroReq) (*pb.RemoverRegistroRes, error) {
 	if g.gerencia == nil {
-		return &pb.RemoverRegistroRes{}, status.Error(codes.NotFound, "nao possui servidor de gerencia registrado")
+		e := "there is not gerencia service registered"
+		g.log.Errorw("remover registro", "ERROR", e)
+		return &pb.RemoverRegistroRes{}, status.Error(codes.NotFound, e)
 	}
 	g.gerencia = nil
 
-	g.processador.Stop()
+	if err := g.processador.Stop(); err != nil {
+		e := fmt.Sprintf("could not stop processador: %s", err)
+		g.log.Errorw("remover registro", "ERROR", e)
+		return &pb.RemoverRegistroRes{}, status.Error(codes.Internal, e)
+	}
 
 	// TODO interromper os cores, processador, e db?
 
+	g.log.Infow("remover registro", "removed", "ok")
 	return &pb.RemoverRegistroRes{}, nil
 }
 
@@ -137,12 +146,16 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 	for _, prc := range prcs {
 		p, err := g.processoCore.QueryByID(ctx, prc)
 		if err != nil {
-			return &pb.StartProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("query database: %s", err))
+			e := fmt.Sprintf("query processos database: %s", err)
+			g.log.Errorw("start processos", "ERROR", e)
+			return &pb.StartProcessosRes{}, status.Error(codes.Internal, e)
 		}
 
 		c, err := g.cameraCore.QueryByID(ctx, p.CameraID)
 		if err != nil {
-			return &pb.StartProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("query database: %s", err))
+			e := fmt.Sprintf("query cameras database: %s", err)
+			g.log.Errorw("start processos", "ERROR", e)
+			return &pb.StartProcessosRes{}, status.Error(codes.Internal, e)
 		}
 
 		processos = append(processos, processador.Processo{
@@ -158,29 +171,37 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 
 	g.processador.StartProcessos(processos)
 
+	g.log.Infow("start processos", "started", prcs)
 	return &pb.StartProcessosRes{}, nil
 }
 
 func (g *GravacaoService) StopProcessos(ctx context.Context, req *pb.StopProcessosReq) (*pb.StopProcessosRes, error) {
-	err := g.processador.StopProcessos(req.GetProcessos())
+	prcs := req.GetProcessos()
+
+	err := g.processador.StopProcessos(prcs)
 	if err != nil {
-		return &pb.StopProcessosRes{}, status.Error(codes.Internal, fmt.Sprintf("stopping processo: %s", err))
+		e := fmt.Sprintf("stopping processo: %s", err)
+		g.log.Errorw("stop processos", "ERROR", e)
+		return &pb.StopProcessosRes{}, status.Error(codes.Internal, e)
 	}
 
+	g.log.Infow("stop processos", "stopped", prcs)
 	return &pb.StopProcessosRes{}, nil
 }
 
 func (g *GravacaoService) ListProcessos(ctx context.Context, req *pb.ListProcessosReq) (*pb.ListProcessosRes, error) {
-	processos, retry := g.processador.ListProcessos()
+	processos, retrying := g.processador.ListProcessos()
 
-	return &pb.ListProcessosRes{ProcessosEmExecucao: processos, ProcessosEmTentativa: retry}, nil
+	g.log.Infow("list processos", "running", processos, "retrying", retrying)
+	return &pb.ListProcessosRes{ProcessosEmExecucao: processos, ProcessosEmTentativa: retrying}, nil
 }
 
-func (g *GravacaoService) UpdateMatchlist(ctx context.Context, req *pb.UpdateMatchlistReq) (*pb.UpdateMatchlistRes, error) {
-
+func (g *GravacaoService) UpdateVeiculos(ctx context.Context, req *pb.UpdateVeiculosReq) (*pb.UpdateVeiculosRes, error) {
 	veiculos, err := g.veiculoCore.QueryAll(ctx)
 	if err != nil {
-		return &pb.UpdateMatchlistRes{}, status.Error(codes.Internal, fmt.Sprintf("query database: %s", err))
+		e := fmt.Sprintf("query veiculos database: %s", err)
+		g.log.Errorw("update veiculos", "ERROR", e)
+		return &pb.UpdateVeiculosRes{}, status.Error(codes.Internal, e)
 	}
 
 	var matchlist []string
@@ -190,14 +211,21 @@ func (g *GravacaoService) UpdateMatchlist(ctx context.Context, req *pb.UpdateMat
 
 	g.processador.UpdateMatchlist(matchlist)
 
-	return &pb.UpdateMatchlistRes{}, nil
+	g.log.Infow("update veiculos", "updated", matchlist)
+	return &pb.UpdateVeiculosRes{}, nil
 }
 
 func (g *GravacaoService) UpdateArmazenamento(ctx context.Context, req *pb.UpdateArmazenamentoReq) (*pb.UpdateArmazenamentoRes, error) {
-	err := g.processador.UpdateArmazenamento(req.GetArmazenamento(), int(req.GetHorasRetencao()))
+	armazenamento := req.GetArmazenamento()
+	horasRetencao := int(req.GetHorasRetencao())
+
+	err := g.processador.UpdateArmazenamento(armazenamento, horasRetencao)
 	if err != nil {
-		return &pb.UpdateArmazenamentoRes{}, status.Error(codes.Internal, err.Error())
+		e := fmt.Sprintf("could not update armazenamento: %s", err)
+		g.log.Errorw("update armazenamento", "ERROR", e)
+		return &pb.UpdateArmazenamentoRes{}, status.Error(codes.Internal, e)
 	}
 
+	g.log.Infow("update armazenamento", "armazenamento", armazenamento, "horas retencao", horasRetencao)
 	return &pb.UpdateArmazenamentoRes{}, nil
 }
