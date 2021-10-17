@@ -74,9 +74,6 @@ func (p *Processador) Start() {
 		case reg := <-p.regChan:
 			go p.createAndCheckRegistro(reg)
 
-		// TODO tenho wrappar o err para passar para o log - não mandar erro seco do traffic
-		// TODO e quando ela estiver funcionando e ficar offline?
-		// TODO erros da dahua estão duplicando a cada chamada
 		// TODO ver qual o tipo de erro que da quando a camera estiver conectada e ficar offline...
 		case err := <-p.interErrChan:
 			switch {

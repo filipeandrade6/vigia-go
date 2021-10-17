@@ -38,8 +38,8 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 	// =========================================================================
 	// App Starting
 
-	expvar.NewString("build").Set(build)            // TODO expvar
-	log.Infow("starting service", "version", build) // TODO utilizar essa build
+	expvar.NewString("build").Set(build)   // TODO expvar
+	log.Infow("startup", "version", build) // TODO utilizar essa build
 	defer log.Infow("shutdown complete")
 
 	// =========================================================================

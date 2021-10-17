@@ -43,16 +43,18 @@ func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
 	}
 }
 
-// TODO fazer verificação de registro nos outros chamados, pois da panic...
-
 func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (*pb.RegistrarRes, error) {
 	if g.gerencia != nil {
-		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, "ja possui servidor de gerencia registrado")
+		e := "already registered gerencia service"
+		g.log.Errorw("registrar", "ERROR", e)
+		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, e)
 	}
 
 	err := os.MkdirAll(req.GetArmazenamento(), os.ModePerm)
 	if err != nil {
-		return &pb.RegistrarRes{}, status.Error(codes.InvalidArgument, err.Error())
+		e := fmt.Sprintf("could not create directory: %s", err)
+		g.log.Errorw("registrar", "ERROR", e)
+		return &pb.RegistrarRes{}, status.Error(codes.InvalidArgument, e)
 	}
 
 	db, err := database.Connect(database.Config{
@@ -65,15 +67,25 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 		DisableTLS:   req.GetDbDisableTls(),
 	})
 	if err != nil {
-		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect open database: %s", err))
+		e := fmt.Sprintf("could not connect to database: %s", err)
+		g.log.Errorw("registrar", "ERROR", e)
+		return &pb.RegistrarRes{}, status.Error(codes.Internal, e)
 	}
 
 	gerenciaClient, err := NewClientGerencia(req.GetEnderecoIp(), int(req.GetPorta()))
 	if err != nil {
-		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect to gRPC server: %s", err))
+		e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
+		g.log.Errorw("registrar", "ERROR", e)
+		return &pb.RegistrarRes{}, status.Error(codes.Internal, e)
 	}
+	// if err := gerenciaClient.Check(req.ServidorGravacaoId); err != nil {
+	// 	e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
+	// 	g.log.Errorw("registrar", "ERROR", e)
+	// 	return &pb.RegistrarRes{}, status.Error(codes.Internal, e)
+	// }
+	// ! habilitar acima
+
 	g.gerencia = gerenciaClient
-	// TODO faz um teste de conexão - um check no service pra ver se é gerencia....
 
 	g.cameraCore = camera.NewCore(g.log, db)
 	g.processoCore = processo.NewCore(g.log, db)
@@ -85,6 +97,9 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 	go g.start()
 	go g.processador.Start()
 
+	req.DbPassword = ""
+	g.log.Infow("registrar", "registered", req)
+
 	return &pb.RegistrarRes{}, nil
 }
 
@@ -92,10 +107,12 @@ func (g *GravacaoService) start() {
 	for {
 		select {
 		case err := <-g.errChan:
-			fmt.Println(err)
+			g.log.Errorw("error", "ERROR", err)
+			// TODO notificar
 
 		case m := <-g.matchChan:
-			fmt.Println(m)
+			g.log.Infow("match", "MATCH", m)
+			// TODO notificar
 		}
 	}
 }

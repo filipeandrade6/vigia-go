@@ -5,9 +5,16 @@ option go_package = "./internal/api/v1";
 package gerencia;
 
 service Gerencia {
+    rpc Check(CheckReq) returns (CheckRes) {}
     rpc Match(MatchReq) returns (MatchRes) {}
     rpc ProcessoError(ProcessoErrorReq) returns (ProcessoErrorRes) {}
 }
+
+message CheckReq {
+    string servidor_gravacao_id = 1;
+}
+
+message CheckRes {}
 
 message MatchReq {
     string veiculo_id = 1;

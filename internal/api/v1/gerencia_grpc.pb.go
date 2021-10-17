@@ -18,6 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GerenciaClient interface {
+	Check(ctx context.Context, in *CheckReq, opts ...grpc.CallOption) (*CheckRes, error)
 	Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error)
 	ProcessoError(ctx context.Context, in *ProcessoErrorReq, opts ...grpc.CallOption) (*ProcessoErrorRes, error)
 }
@@ -28,6 +29,15 @@ type gerenciaClient struct {
 
 func NewGerenciaClient(cc grpc.ClientConnInterface) GerenciaClient {
 	return &gerenciaClient{cc}
+}
+
+func (c *gerenciaClient) Check(ctx context.Context, in *CheckReq, opts ...grpc.CallOption) (*CheckRes, error) {
+	out := new(CheckRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/Check", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *gerenciaClient) Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error) {
@@ -52,6 +62,7 @@ func (c *gerenciaClient) ProcessoError(ctx context.Context, in *ProcessoErrorReq
 // All implementations must embed UnimplementedGerenciaServer
 // for forward compatibility
 type GerenciaServer interface {
+	Check(context.Context, *CheckReq) (*CheckRes, error)
 	Match(context.Context, *MatchReq) (*MatchRes, error)
 	ProcessoError(context.Context, *ProcessoErrorReq) (*ProcessoErrorRes, error)
 	mustEmbedUnimplementedGerenciaServer()
@@ -61,6 +72,9 @@ type GerenciaServer interface {
 type UnimplementedGerenciaServer struct {
 }
 
+func (UnimplementedGerenciaServer) Check(context.Context, *CheckReq) (*CheckRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
+}
 func (UnimplementedGerenciaServer) Match(context.Context, *MatchReq) (*MatchRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Match not implemented")
 }
@@ -78,6 +92,24 @@ type UnsafeGerenciaServer interface {
 
 func RegisterGerenciaServer(s grpc.ServiceRegistrar, srv GerenciaServer) {
 	s.RegisterService(&Gerencia_ServiceDesc, srv)
+}
+
+func _Gerencia_Check_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GerenciaServer).Check(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gerencia.Gerencia/Check",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GerenciaServer).Check(ctx, req.(*CheckReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Gerencia_Match_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -123,6 +155,10 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "gerencia.Gerencia",
 	HandlerType: (*GerenciaServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Check",
+			Handler:    _Gerencia_Check_Handler,
+		},
 		{
 			MethodName: "Match",
 			Handler:    _Gerencia_Match_Handler,

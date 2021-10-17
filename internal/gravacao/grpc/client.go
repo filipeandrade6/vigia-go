@@ -35,6 +35,18 @@ func NewClientGerencia(endereco_ip string, porta int) (*GerenciaClient, error) {
 	}, nil
 }
 
+func (g *GerenciaClient) Check(servidorID string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	r := &pb.CheckReq{ServidorGravacaoId: servidorID}
+	if _, err := g.c.Check(ctx, r); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (g *GerenciaClient) Match(veiculo_id, registro_id string) {
 	ctx := context.Background()
 
