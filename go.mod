@@ -17,9 +17,9 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.2
 	github.com/ory/dockertest/v3 v3.8.0
-	github.com/robfig/cron v1.2.0
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
+	github.com/xinsnake/go-http-digest-auth-client v0.6.0
 	go.uber.org/automaxprocs v1.4.0
 	go.uber.org/zap v1.19.0
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97

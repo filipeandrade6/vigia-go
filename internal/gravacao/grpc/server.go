@@ -48,27 +48,23 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, "ja possui servidor de gerencia registrado")
 	}
 
-	g.log.Infow("start", "teste", "teste")
-
 	err := os.MkdirAll(req.GetArmazenamento(), os.ModePerm)
 	if err != nil {
 		return &pb.RegistrarRes{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	db, err := database.Open(database.Config{
+	db, err := database.Connect(database.Config{
 		User:         req.GetDbUser(),
 		Password:     req.GetDbPassword(),
 		Host:         req.GetDbHost(),
 		Name:         req.GetDbName(),
-		MaxIDLEConns: int(req.GetDbMaxidleconns()),
-		MaxOpenConns: int(req.GetDbMaxopenconns()),
-		SSLMode:      req.GetDbSslmode(),
+		MaxIDLEConns: int(req.GetDbMaxIdleConns()),
+		MaxOpenConns: int(req.GetDbMaxOpenConns()),
+		DisableTLS:   req.GetDbDisableTls(),
 	})
 	if err != nil {
 		return &pb.RegistrarRes{}, status.Error(codes.Internal, fmt.Sprintf("could not connect open database: %s", err))
 	}
-
-	// TODO o DB quando a altenticação falha com senha diferente ele não alerta
 
 	gerenciaClient, err := NewClientGerencia(req.GetEnderecoIp(), int(req.GetPorta()))
 	if err != nil {

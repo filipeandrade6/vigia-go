@@ -18,7 +18,8 @@ type Database struct {
 	Name         string `mapstructure:"name"`
 	MaxIDLEConns int    `mapstructure:"maxidleconns"`
 	MaxOpenConns int    `mapstructure:"maxopenconns"`
-	SSLMode      string `mapstructure:"sslmode"`
+	// SSLMode      string `mapstructure:"sslmode"`
+	DisableTLS bool `mapstructure:"disabletls"`
 }
 
 type Service struct {
@@ -42,7 +43,8 @@ func ParseConfig(build string) (Configuration, error) {
 	viper.SetDefault("database.name", "vigia")
 	viper.SetDefault("database.maxidleconns", "0")
 	viper.SetDefault("database.maxopenconns", "0")
-	viper.SetDefault("database.sslmode", "disable")
+	// viper.SetDefault("database.sslmode", "disable")
+	viper.SetDefault("database.disabletls", "true")
 	viper.SetDefault("service.host", "gerencia")
 	viper.SetDefault("service.conn", "tcp")
 	viper.SetDefault("service.port", "12346")
@@ -55,7 +57,8 @@ func ParseConfig(build string) (Configuration, error) {
 	viper.BindEnv("database.name", "VIGIA_DB_NAME")
 	viper.BindEnv("database.maxidleconns", "VIGIA_DB_MAXIDLECONNS")
 	viper.BindEnv("database.maxopenconns", "VIGIA_DB_MAXOPENCONNS")
-	viper.BindEnv("database.sslmode", "VIGIA_DB_SSLMODE")
+	// viper.BindEnv("database.sslmode", "VIGIA_DB_SSLMODE")
+	viper.BindEnv("database.disabletls", "VIGIA_DB_DISABLETLS")
 	viper.BindEnv("service.host", "VIGIA_GER_HOST")
 	viper.BindEnv("service.conn", "VIGIA_GER_SERVER_CONN")
 	viper.BindEnv("service.port", "VIGIA_GER_SERVER_PORT")
@@ -68,8 +71,6 @@ func ParseConfig(build string) (Configuration, error) {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return Configuration{}, fmt.Errorf("unmsarshalling config: %w", err)
 	}
-
-	// fmt.Println(cfg)
 
 	return cfg, nil
 }

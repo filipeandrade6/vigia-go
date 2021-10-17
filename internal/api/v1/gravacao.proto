@@ -27,9 +27,9 @@ message RegistrarReq {
     string db_user = 7;
     string db_password = 8;
     string db_name = 9;
-    int32 db_maxidleconns = 10;
-    int32 db_maxopenconns = 11;
-    string db_sslmode = 12;
+    int32 db_max_idle_conns = 10;
+    int32 db_max_open_conns = 11;
+    bool db_disable_tls = 12;
 }
 
 message RegistrarRes {}

@@ -74,20 +74,23 @@ func (p *Processador) Start() {
 		case reg := <-p.regChan:
 			go p.createAndCheckRegistro(reg)
 
+		// TODO tenho wrappar o err para passar para o log - não mandar erro seco do traffic
+		// TODO e quando ela estiver funcionando e ficar offline?
 		// TODO erros da dahua estão duplicando a cada chamada
 		case err := <-p.interErrChan:
 			switch {
-			case errors.As(err, &traffic.ErrLogin):
+			case errors.As(err, &traffic.ErrUnreachable):
 				p.retry[err.ProcessoID] = p.processos[err.ProcessoID]
 				delete(p.processos, err.ProcessoID)
 
 			case errors.As(err, &traffic.ErrSaveImage):
-				// TODO notificar
+				// só notifica
 
-			case errors.As(err, &traffic.ErrAnalyzer):
+			default:
 				delete(p.processos, err.ProcessoID)
-				// TODO notificar
+
 			}
+
 			p.errChan <- err
 
 		case <-tickerHK.C:
@@ -154,8 +157,6 @@ func (p *Processador) StartProcessos(pReq []Processo) {
 		p.mu.Lock()
 		p.processos[prc.ProcessoID] = np
 		p.mu.Unlock()
-
-		// TODO fazer teste de login antes de iniciar
 
 		np.Start()
 	}
@@ -234,7 +235,7 @@ func (p *Processador) UpdateArmazenamento(armazenamento string, horasRetencao in
 
 	err := p.StopProcessos(prcs)
 	if err != nil {
-		return err // TODO Tratar
+		return err
 	}
 
 	p.mu.Lock()
@@ -244,7 +245,7 @@ func (p *Processador) UpdateArmazenamento(armazenamento string, horasRetencao in
 
 	err = os.MkdirAll(p.armazenamento, os.ModePerm)
 	if err != nil {
-		return err // TODO arrumar isso aqui
+		return err
 	}
 
 	var nPrcs []Processo
@@ -293,7 +294,7 @@ func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 	_, err := p.registroCore.Create(context.Background(), reg)
 	if err != nil {
 		fmt.Println(err, reg.ProcessoID)
-		p.errChan <- err // TODO adicionar error personalizado
+		p.errChan <- fmt.Errorf("could not create registro: %w", err)
 		return
 	}
 

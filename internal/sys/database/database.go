@@ -6,14 +6,12 @@ import (
 	"errors"
 	"net/url"
 	"reflect"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // Calls init function.
 	"go.uber.org/zap"
 )
 
-// Set of error variables for CRUD operations.
 var (
 	ErrNotFound              = errors.New("not found")
 	ErrInvalidID             = errors.New("ID is not in its proper form")
@@ -23,7 +21,6 @@ var (
 	ErrDBNotFound = errors.New("not found")
 )
 
-// Config is the required properties to use the database.
 type Config struct {
 	User         string
 	Password     string
@@ -31,19 +28,18 @@ type Config struct {
 	Name         string
 	MaxIDLEConns int
 	MaxOpenConns int
-	// DisableTLS   bool
-	SSLMode string
+	DisableTLS   bool
+	// SSLMode string
 }
 
-// Open knows how to open a database connection based on the configuration.
-func Open(cfg Config) (*sqlx.DB, error) {
-	// sslMode := "require"
-	// if cfg.DisableTLS {
-	// 	sslMode = "disable"
-	// }
+func Connect(cfg Config) (*sqlx.DB, error) {
+	sslMode := "require"
+	if cfg.DisableTLS {
+		sslMode = "disable"
+	}
 
 	q := make(url.Values)
-	q.Set("sslmode", cfg.SSLMode)
+	q.Set("sslmode", sslMode)
 	q.Set("timezone", "utc")
 
 	u := url.URL{
@@ -54,7 +50,7 @@ func Open(cfg Config) (*sqlx.DB, error) {
 		RawQuery: q.Encode(),
 	}
 
-	db, err := sqlx.Open("postgres", u.String())
+	db, err := sqlx.Connect("postgres", u.String())
 	if err != nil {
 		return nil, err
 	}
@@ -62,35 +58,6 @@ func Open(cfg Config) (*sqlx.DB, error) {
 	db.SetMaxOpenConns(cfg.MaxOpenConns)
 
 	return db, nil
-}
-
-// StatusCheck returns nil if it can successfully talk to the database. It
-// returns a non-nil error otherwise.
-func StatusCheck(ctx context.Context, sqlxDB *sqlx.DB) error {
-
-	// First check we can ping the database.
-	var pingError error
-	for attempts := 1; ; attempts++ {
-		pingError = sqlxDB.Ping()
-		if pingError == nil {
-			break
-		}
-		time.Sleep(time.Duration(attempts) * 100 * time.Millisecond)
-		if ctx.Err() != nil {
-			return ctx.Err()
-		}
-	}
-
-	// Make sure we didn't timeout or be cancelled.
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
-
-	// Run a simple query to determine connectivity. Running this query forces a
-	// round trip through the database.
-	const q = `SELECT true`
-	var tmp bool
-	return sqlxDB.QueryRowContext(ctx, q).Scan(&tmp)
 }
 
 // NamedExecContext is a helper function to execute a CUD operation with
