@@ -19,6 +19,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type OperationError struct {
+	servidorGravacaoID string
+	ProcessoID         string
+	RegistroID         string
+}
+
 type GravacaoService struct {
 	pb.UnimplementedGravacaoServer
 
@@ -100,7 +106,7 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 
 	g.processador = processador.New(req.GetServidorGravacaoId(), req.GetArmazenamento(), int(req.GetHorasRetencao()), g.registroCore, g.errChan, g.matchChan)
 
-	// TODO adicionar update veiculos aqui
+	g.UpdateVeiculos(ctx, &pb.UpdateVeiculosReq{})
 
 	go g.start()
 	go g.processador.Start()
@@ -128,7 +134,7 @@ func (g *GravacaoService) start() {
 			}
 
 		case <-t.C:
-			select {
+			select { // TODO improve
 			case m := <-g.matchBuffChan:
 				if g.gerencia == nil {
 					g.log.Errorw("call match", "ERROR", "gerencia gRPC server not registered")
