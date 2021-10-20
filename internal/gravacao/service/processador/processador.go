@@ -11,6 +11,7 @@ import (
 
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/dahua/v1/traffic"
+	"github.com/filipeandrade6/vigia-go/internal/sys/operrors"
 )
 
 var (
@@ -31,7 +32,8 @@ type Processador struct {
 	retry     map[string]*Processo
 	matchlist map[string]bool
 
-	interErrChan chan *traffic.ProcessoError
+	// interErrChan chan *traffic.ProcessoError
+	interErrChan chan *operrors.OpError
 	regChan      chan registro.Registro
 }
 
@@ -57,7 +59,8 @@ func New(
 		retry:     make(map[string]*Processo),
 		matchlist: make(map[string]bool),
 
-		interErrChan: make(chan *traffic.ProcessoError),
+		// interErrChan: make(chan *traffic.ProcessoError),
+		interErrChan: make(chan *operrors.OpError),
 		regChan:      make(chan registro.Registro),
 	}
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/dahua/v1/traffic"
+	"github.com/filipeandrade6/vigia-go/internal/sys/operrors"
 	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 )
 
@@ -21,9 +22,10 @@ type Processo struct {
 	Processador   int
 	Armazenamento string
 	regChan       chan registro.Registro
-	errChan       chan *traffic.ProcessoError
-	stopChan      chan struct{}
-	stoppedChan   chan struct{}
+	// errChan       chan *traffic.ProcessoError
+	errChan     chan *operrors.OpError
+	stopChan    chan struct{}
+	stoppedChan chan struct{}
 }
 
 func NewProcesso(
@@ -36,7 +38,8 @@ func NewProcesso(
 	processador int,
 	armazenamento string,
 	regChan chan registro.Registro,
-	errChan chan *traffic.ProcessoError,
+	// errChan chan *traffic.ProcessoError,
+	errChan chan *operrors.OpError,
 ) *Processo {
 	return &Processo{
 		ProcessoID:    processoID,
@@ -101,7 +104,8 @@ func processoTeste(
 	senha string,
 	armazenamento string,
 	regChan chan registro.Registro,
-	errChan chan *traffic.ProcessoError,
+	// errChan chan *traffic.ProcessoError,
+	errChan chan *operrors.OpError,
 	stopChan chan struct{},
 	stoppedChan chan struct{},
 ) {
@@ -133,7 +137,8 @@ func processoTeste(
 
 			err := os.WriteFile(filepath.Join(armazenamento, fmt.Sprintf("%d-%s.txt", i, r.RegistroID)), []byte("hello\ngo\n"), 0644)
 			if err != nil {
-				errChan <- &traffic.ProcessoError{ProcessoID: processoID, Err: err}
+				// errChan <- &traffic.ProcessoError{ProcessoID: processoID, Err: err}
+				errChan <- &operrors.OpError{ProcessoID: processoID, Err: err}
 			}
 			i++
 		}
