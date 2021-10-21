@@ -13,6 +13,7 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/core/veiculo"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/service/processador"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
+	"github.com/filipeandrade6/vigia-go/internal/sys/operrors"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -38,17 +39,19 @@ type GravacaoService struct {
 	veiculoCore  veiculo.Core
 
 	processador *processador.Processador
-	errChan     chan error
+	errChan     chan operrors.OpError
 	matchChan   chan string
 
+	errBuffChan   chan operrors.OpError
 	matchBuffChan chan string
 }
 
 func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
 	return &GravacaoService{
 		log:           log,
-		errChan:       make(chan error),
+		errChan:       make(chan operrors.OpError),
 		matchChan:     make(chan string),
+		errBuffChan:   make(chan operrors.OpError, 1000), // TODO otimizar aqui
 		matchBuffChan: make(chan string, 100),
 	}
 }
@@ -121,9 +124,13 @@ func (g *GravacaoService) start() {
 	t := time.NewTicker(10 * time.Second)
 	for {
 		select {
-		case err := <-g.errChan:
-			g.log.Errorw("ERROR", err)
-			// TODO adicionar buffer de erros
+		case e := <-g.errChan:
+			g.log.Errorw("ERROR", e)
+			if err := g.gerencia.ErrorReport(e); err != nil {
+				e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
+				g.log.Errorw("call error report", "ERROR", e)
+				g.errBuffChan <- operrors.OpError{} // TODO =============================================
+			}
 
 		case m := <-g.matchChan:
 			g.log.Infow("MATCH", "registro", m)
@@ -134,20 +141,27 @@ func (g *GravacaoService) start() {
 			}
 
 		case <-t.C:
-			select { // TODO improve
-			case m := <-g.matchBuffChan:
-				if g.gerencia == nil {
-					g.log.Errorw("call match", "ERROR", "gerencia gRPC server not registered")
-					g.matchBuffChan <- m
-					break
+			select {
+			case e := <-g.errBuffChan:
+				if g.gerencia != nil {
+					if err := g.gerencia.ErrorReport(e); err != nil {
+						g.log.Errorw("call error report", "ERROR", fmt.Sprintf("could not call service on gerencia gRPC server: %s", err))
+						g.errBuffChan <- e
+						break
+					}
+
+					m, ok := <-g.matchBuffChan
+					if ok {
+						if err := g.gerencia.Match(m); err != nil {
+							g.log.Errorw("call match", "ERROR", fmt.Sprintf("could not call service on gerencia gRPC server: %s", err))
+							g.errBuffChan <- err // TODO =============================================
+							g.matchBuffChan <- m
+							break
+						}
+					}
 				}
 
-				if err := g.gerencia.Match(m); err != nil {
-					g.log.Errorw("call match", "ERROR", fmt.Sprintf("could not connect to gerencia gRPC server: %s", err))
-					g.matchBuffChan <- m
-					break
-				}
-
+				g.errBuffChan <- e
 			default:
 			}
 		}

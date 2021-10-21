@@ -43,10 +43,11 @@ type OpError struct {
 	ProcessoID string
 	RegistroID string
 	// Err        OpErr
-	Err error
+	Err             error
+	StoppedProcesso bool
 }
 
-func (o *OpError) Unwrap() error { return o.Err }
+func (o *OpError) Unwrap() error { return o.Err } // TODO: verificar isso aqui
 
 func (o *OpError) Error() string {
 	// if o == nil {

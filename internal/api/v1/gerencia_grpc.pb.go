@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type GerenciaClient interface {
 	Check(ctx context.Context, in *CheckReq, opts ...grpc.CallOption) (*CheckRes, error)
 	Match(ctx context.Context, in *MatchReq, opts ...grpc.CallOption) (*MatchRes, error)
-	ProcessoError(ctx context.Context, in *ProcessoErrorReq, opts ...grpc.CallOption) (*ProcessoErrorRes, error)
+	ErrorReport(ctx context.Context, in *ErrorReportReq, opts ...grpc.CallOption) (*ErrorReportRes, error)
 }
 
 type gerenciaClient struct {
@@ -49,9 +49,9 @@ func (c *gerenciaClient) Match(ctx context.Context, in *MatchReq, opts ...grpc.C
 	return out, nil
 }
 
-func (c *gerenciaClient) ProcessoError(ctx context.Context, in *ProcessoErrorReq, opts ...grpc.CallOption) (*ProcessoErrorRes, error) {
-	out := new(ProcessoErrorRes)
-	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ProcessoError", in, out, opts...)
+func (c *gerenciaClient) ErrorReport(ctx context.Context, in *ErrorReportReq, opts ...grpc.CallOption) (*ErrorReportRes, error) {
+	out := new(ErrorReportRes)
+	err := c.cc.Invoke(ctx, "/gerencia.Gerencia/ErrorReport", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *gerenciaClient) ProcessoError(ctx context.Context, in *ProcessoErrorReq
 type GerenciaServer interface {
 	Check(context.Context, *CheckReq) (*CheckRes, error)
 	Match(context.Context, *MatchReq) (*MatchRes, error)
-	ProcessoError(context.Context, *ProcessoErrorReq) (*ProcessoErrorRes, error)
+	ErrorReport(context.Context, *ErrorReportReq) (*ErrorReportRes, error)
 	mustEmbedUnimplementedGerenciaServer()
 }
 
@@ -78,8 +78,8 @@ func (UnimplementedGerenciaServer) Check(context.Context, *CheckReq) (*CheckRes,
 func (UnimplementedGerenciaServer) Match(context.Context, *MatchReq) (*MatchRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Match not implemented")
 }
-func (UnimplementedGerenciaServer) ProcessoError(context.Context, *ProcessoErrorReq) (*ProcessoErrorRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ProcessoError not implemented")
+func (UnimplementedGerenciaServer) ErrorReport(context.Context, *ErrorReportReq) (*ErrorReportRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ErrorReport not implemented")
 }
 func (UnimplementedGerenciaServer) mustEmbedUnimplementedGerenciaServer() {}
 
@@ -130,20 +130,20 @@ func _Gerencia_Match_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Gerencia_ProcessoError_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProcessoErrorReq)
+func _Gerencia_ErrorReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ErrorReportReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GerenciaServer).ProcessoError(ctx, in)
+		return srv.(GerenciaServer).ErrorReport(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gerencia.Gerencia/ProcessoError",
+		FullMethod: "/gerencia.Gerencia/ErrorReport",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GerenciaServer).ProcessoError(ctx, req.(*ProcessoErrorReq))
+		return srv.(GerenciaServer).ErrorReport(ctx, req.(*ErrorReportReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -164,8 +164,8 @@ var Gerencia_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Gerencia_Match_Handler,
 		},
 		{
-			MethodName: "ProcessoError",
-			Handler:    _Gerencia_ProcessoError_Handler,
+			MethodName: "ErrorReport",
+			Handler:    _Gerencia_ErrorReport_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -7,7 +7,7 @@ package gerencia;
 service Gerencia {
     rpc Check(CheckReq) returns (CheckRes) {}
     rpc Match(MatchReq) returns (MatchRes) {}
-    rpc ProcessoError(ProcessoErrorReq) returns (ProcessoErrorRes) {}
+    rpc ErrorReport(ErrorReportReq) returns (ErrorReportRes) {}
 }
 
 message CheckReq {
@@ -23,17 +23,12 @@ message MatchReq {
 
 message MatchRes {}
 
-message ProcessoErrorReq {
+message ErrorReportReq {
     string servidor_gravacao_id = 1;
     string processo_id = 2;
-    enum Error {
-        OFFLINE = 0;
-        UNAUTHENTICATED = 1;
-        ANALYZER = 2;
-        IMAGE = 3;
-        DESCONHECIDO = 4;
-    }
-    Error erro = 3;
+    string registro_id =3;
+    string error = 4;
+    bool stopped_processo = 5;
 }
 
-message ProcessoErrorRes {}
+message ErrorReportRes {}

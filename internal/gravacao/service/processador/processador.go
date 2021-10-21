@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/dahua/v1/traffic"
 	"github.com/filipeandrade6/vigia-go/internal/sys/operrors"
 )
 
@@ -24,7 +23,7 @@ type Processador struct {
 	horasRetencao      int
 
 	registroCore registro.Core
-	errChan      chan error
+	errChan      chan operrors.OpError // TODO usar ponteiros?
 	matchChan    chan string
 
 	mu        *sync.RWMutex
@@ -42,7 +41,7 @@ func New(
 	armazenamento string,
 	horasRetencao int,
 	registroCore registro.Core,
-	errChan chan error,
+	errChan chan operrors.OpError,
 	matchChan chan string,
 ) *Processador {
 	return &Processador{
@@ -79,20 +78,19 @@ func (p *Processador) Start() {
 
 		// TODO ver qual o tipo de erro que da quando a camera estiver conectada e ficar offline...
 		case err := <-p.interErrChan:
+			err.ServidorID = p.servidorGravacaoID
+
 			switch {
-			case errors.As(err.Err, &traffic.ErrUnreachable):
+			case errors.As(err.Err, &operrors.ErrUnreachable):
 				p.retry[err.ProcessoID] = p.processos[err.ProcessoID]
 				delete(p.processos, err.ProcessoID)
 
-			case errors.As(err.Err, &traffic.ErrSaveImage):
-				// só notifica
-
 			default:
+				err.StoppedProcesso = true
 				delete(p.processos, err.ProcessoID)
-
 			}
 
-			p.errChan <- err
+			p.errChan <- *err // TODO usar ponteiros?
 
 		case <-tickerHK.C:
 			go p.begintHousekeeper()
@@ -287,7 +285,7 @@ func (p *Processador) begintHousekeeper() {
 		return nil
 	})
 	if err != nil {
-		p.errChan <- fmt.Errorf("housekeeper stopped: %w", err)
+		p.errChan <- operrors.OpError{ServidorID: p.servidorGravacaoID, Err: fmt.Errorf("housekeeper stopped: %w", err)}
 	}
 }
 
@@ -296,9 +294,9 @@ func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 	if err != nil {
 		err := p.StopProcessos([]string{reg.ProcessoID})
 		if err != nil {
-			p.errChan <- fmt.Errorf("stopping processo: %s", err)
+			p.errChan <- operrors.OpError{ServidorID: p.servidorGravacaoID, Err: fmt.Errorf("stopping processo: %s", err)}
 		}
-		p.errChan <- fmt.Errorf("could not create registro: %w", err)
+		p.errChan <- operrors.OpError{ServidorID: p.servidorGravacaoID, Err: fmt.Errorf("could not create registro: %w", err)}
 		return
 	}
 

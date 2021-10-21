@@ -6,6 +6,7 @@ import (
 	"time"
 
 	pb "github.com/filipeandrade6/vigia-go/internal/api/v1"
+	"github.com/filipeandrade6/vigia-go/internal/sys/operrors"
 
 	"google.golang.org/grpc"
 )
@@ -60,16 +61,21 @@ func (g *GerenciaClient) Match(registroID string) error {
 	return nil
 }
 
-// func (g *GerenciaClient) ProcessoError(servidorGravacaoID, processoID string, errType int) {
-// 	ctx := context.Background()
+func (g *GerenciaClient) ErrorReport(err operrors.OpError) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
 
-// 	r := &pb.ProcessoErrorReq{
-// 		ServidorGravacaoId: servidorGravacaoID,
-// 		ProcessoId: processoID,
-// 		Erro: ,
-// 	}
+	r := &pb.ErrorReportReq{
+		ServidorGravacaoId: err.ServidorID,
+		ProcessoId:         err.ProcessoID,
+		RegistroId:         err.RegistroID,
+		Error:              err.Err.Error(),
+		StoppedProcesso:    err.StoppedProcesso,
+	}
 
-// 	if _, err := g.c.ProcessoError(ctx, r); err != nil {
-// 		// TODO adicionar error? - colocar buffer? caso o gerencia esteja offline
-// 	}
-// }
+	if _, err := g.c.ErrorReport(ctx, r); err != nil {
+		return err
+	}
+
+	return nil
+}
