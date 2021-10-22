@@ -122,6 +122,13 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 
 func (g *GravacaoService) start() {
 	t := time.NewTicker(10 * time.Second)
+
+	go func() {
+		for e := range g.errBuffChan {
+
+		}
+	}()
+
 	for {
 		select {
 		case e := <-g.errChan:
@@ -129,7 +136,7 @@ func (g *GravacaoService) start() {
 			if err := g.gerencia.ErrorReport(e); err != nil {
 				e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
 				g.log.Errorw("call error report", "ERROR", e)
-				g.errBuffChan <- operrors.OpError{} // TODO =============================================
+				g.errBuffChan <- operrors.OpError{}
 			}
 
 		case m := <-g.matchChan:
