@@ -52,7 +52,7 @@ func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
 		errChan:       make(chan operrors.OpError),
 		matchChan:     make(chan string),
 		errBuffChan:   make(chan operrors.OpError, 1000), // TODO otimizar aqui
-		matchBuffChan: make(chan string, 100),
+		matchBuffChan: make(chan string, 100),            // TODO otimizar aqui
 	}
 }
 
@@ -123,20 +123,14 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 func (g *GravacaoService) start() {
 	t := time.NewTicker(10 * time.Second)
 
-	go func() {
-		for e := range g.errBuffChan {
-
-		}
-	}()
-
 	for {
 		select {
 		case e := <-g.errChan:
 			g.log.Errorw("ERROR", e)
 			if err := g.gerencia.ErrorReport(e); err != nil {
-				e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
-				g.log.Errorw("call error report", "ERROR", e)
-				g.errBuffChan <- operrors.OpError{}
+				e2 := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
+				g.log.Errorw("call error report", "ERROR", e2)
+				g.errBuffChan <- e
 			}
 
 		case m := <-g.matchChan:
@@ -144,33 +138,51 @@ func (g *GravacaoService) start() {
 			if err := g.gerencia.Match(m); err != nil {
 				e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
 				g.log.Errorw("call match", "ERROR", e)
+				g.errBuffChan <- operrors.OpError{RegistroID: m, Err: err}
 				g.matchBuffChan <- m
 			}
 
 		case <-t.C:
-			select {
-			case e := <-g.errBuffChan:
-				if g.gerencia != nil {
-					if err := g.gerencia.ErrorReport(e); err != nil {
-						g.log.Errorw("call error report", "ERROR", fmt.Sprintf("could not call service on gerencia gRPC server: %s", err))
-						g.errBuffChan <- e
-						break
-					}
-
-					m, ok := <-g.matchBuffChan
-					if ok {
-						if err := g.gerencia.Match(m); err != nil {
-							g.log.Errorw("call match", "ERROR", fmt.Sprintf("could not call service on gerencia gRPC server: %s", err))
-							g.errBuffChan <- err // TODO =============================================
-							g.matchBuffChan <- m
-							break
-						}
-					}
-				}
-
-				g.errBuffChan <- e
-			default:
+			if g.gerencia == nil {
+				break
 			}
+
+			go g.errBuffFlush()
+			go g.matchBuffFlush()
+
+		}
+	}
+}
+
+func (g *GravacaoService) errBuffFlush() {
+	for {
+		select {
+		case e := <-g.errBuffChan:
+			if err := g.gerencia.ErrorReport(e); err != nil {
+				g.log.Errorw("call error report", "ERROR", fmt.Sprintf("could not call service on gerencia gRPC server: %s", err))
+				g.errBuffChan <- e
+				return
+			}
+
+		default:
+			return
+		}
+	}
+}
+
+func (g *GravacaoService) matchBuffFlush() {
+	for {
+		select {
+		case m := <-g.matchBuffChan:
+			if err := g.gerencia.Match(m); err != nil {
+				g.log.Errorw("call match", "ERROR", fmt.Sprintf("could not call service on gerencia gRPC server: %s", err))
+				g.errBuffChan <- operrors.OpError{RegistroID: m, Err: err}
+				g.matchBuffChan <- m
+				return
+			}
+
+		default:
+			return
 		}
 	}
 }

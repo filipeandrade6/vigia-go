@@ -13,6 +13,10 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/config"
 	grpc_gravacao "github.com/filipeandrade6/vigia-go/internal/gravacao/grpc"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
+
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -57,7 +61,19 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 
 	svc := grpc_gravacao.NewGravacaoService(log)
 
-	grpcServer := grpc.NewServer()
+	opts := []grpc_zap.Option{
+		grpc_zap.WithLevels(grpc_zap.DefaultCodeToLevel), // TODO tem outros opts como WithDurationField, tem como add campos no logger com Extract_unary e Decider que ignora chamadas de healthcheck
+	}
+
+	grpc_zap.ReplaceGrpcLoggerV2(log.Desugar()) // TODO
+
+	grpcServer := grpc.NewServer(
+		grpc_middleware.WithUnaryServerChain(
+			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
+			grpc_zap.UnaryServerInterceptor(log.Desugar(), opts...), // TODO
+		),
+	)
+
 	pb.RegisterGravacaoServer(grpcServer, svc)
 
 	go func() {
