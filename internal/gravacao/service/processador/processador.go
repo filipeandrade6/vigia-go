@@ -13,14 +13,9 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/sys/operrors"
 )
 
-var (
-	ErrProcessoNotFound = errors.New("processo not found")
-)
-
 type Processador struct {
-	servidorGravacaoID string
-	armazenamento      string
-	horasRetencao      int
+	armazenamento string
+	horasRetencao int
 
 	registroCore registro.Core
 	errChan      chan operrors.OpError // TODO usar ponteiros?
@@ -31,13 +26,11 @@ type Processador struct {
 	retry     map[string]*Processo
 	matchlist map[string]bool
 
-	// interErrChan chan *traffic.ProcessoError
 	interErrChan chan *operrors.OpError
 	regChan      chan registro.Registro
 }
 
 func New(
-	servidorGravacaoID string,
 	armazenamento string,
 	horasRetencao int,
 	registroCore registro.Core,
@@ -45,9 +38,8 @@ func New(
 	matchChan chan string,
 ) *Processador {
 	return &Processador{
-		servidorGravacaoID: servidorGravacaoID,
-		armazenamento:      armazenamento,
-		horasRetencao:      horasRetencao,
+		armazenamento: armazenamento,
+		horasRetencao: horasRetencao,
 
 		registroCore: registroCore,
 		errChan:      errChan,
@@ -58,7 +50,6 @@ func New(
 		retry:     make(map[string]*Processo),
 		matchlist: make(map[string]bool),
 
-		// interErrChan: make(chan *traffic.ProcessoError),
 		interErrChan: make(chan *operrors.OpError),
 		regChan:      make(chan registro.Registro),
 	}
@@ -78,15 +69,13 @@ func (p *Processador) Start() {
 
 		// TODO ver qual o tipo de erro que da quando a camera estiver conectada e ficar offline...
 		case err := <-p.interErrChan:
-			err.ServidorID = p.servidorGravacaoID
-
 			switch {
 			case errors.As(err.Err, &operrors.ErrUnreachable):
 				p.retry[err.ProcessoID] = p.processos[err.ProcessoID]
 				delete(p.processos, err.ProcessoID)
 
-			default:
-				err.StoppedProcesso = true
+			default: // TODO ver isso abaixo
+				err.StoppedProcesso = true // ! isso aqui esta em uso?
 				delete(p.processos, err.ProcessoID)
 			}
 
@@ -118,9 +107,8 @@ func (p *Processador) Stop() error {
 	}
 	p.mu.RUnlock()
 
-	err := p.StopProcessos(prc)
-	if err != nil {
-		return err
+	if nonStoppedPrc := p.StopProcessos(prc); nonStoppedPrc != nil {
+		return fmt.Errorf("could not stop processos: %s", nonStoppedPrc)
 	}
 
 	return nil
@@ -161,7 +149,9 @@ func (p *Processador) StartProcessos(pReq []Processo) {
 	}
 }
 
-func (p *Processador) StopProcessos(processos []string) error {
+func (p *Processador) StopProcessos(processos []string) []string {
+	var errPrc []string
+
 	for _, prc := range processos {
 		p.mu.RLock()
 		_, ok := p.processos[prc]
@@ -184,7 +174,11 @@ func (p *Processador) StopProcessos(processos []string) error {
 			continue
 		}
 
-		return fmt.Errorf("processo processoID[%s]: %w", prc, ErrProcessoNotFound)
+		errPrc = append(errPrc, prc)
+	}
+
+	if len(errPrc) > 0 {
+		return errPrc
 	}
 
 	return nil
@@ -232,9 +226,8 @@ func (p *Processador) UpdateArmazenamento(armazenamento string, horasRetencao in
 	}
 	p.mu.RUnlock()
 
-	err := p.StopProcessos(prcs)
-	if err != nil {
-		return err
+	if nonStoppedPrc := p.StopProcessos(prcs); nonStoppedPrc != nil {
+		return fmt.Errorf("could not stop processos: %s", nonStoppedPrc)
 	}
 
 	p.mu.Lock()
@@ -242,8 +235,7 @@ func (p *Processador) UpdateArmazenamento(armazenamento string, horasRetencao in
 	p.horasRetencao = horasRetencao
 	p.mu.Unlock()
 
-	err = os.MkdirAll(p.armazenamento, os.ModePerm)
-	if err != nil {
+	if err := os.MkdirAll(p.armazenamento, os.ModePerm); err != nil {
 		return err
 	}
 
@@ -285,18 +277,17 @@ func (p *Processador) begintHousekeeper() {
 		return nil
 	})
 	if err != nil {
-		p.errChan <- operrors.OpError{ServidorID: p.servidorGravacaoID, Err: fmt.Errorf("housekeeper stopped: %w", err)}
+		p.errChan <- operrors.OpError{Err: fmt.Errorf("housekeeper stopped: %w", err)}
 	}
 }
 
 func (p *Processador) createAndCheckRegistro(reg registro.Registro) {
 	_, err := p.registroCore.Create(context.Background(), reg)
 	if err != nil {
-		err := p.StopProcessos([]string{reg.ProcessoID})
-		if err != nil {
-			p.errChan <- operrors.OpError{ServidorID: p.servidorGravacaoID, Err: fmt.Errorf("stopping processo: %s", err)}
+		if nonStoppedPrc := p.StopProcessos([]string{reg.ProcessoID}); nonStoppedPrc != nil {
+			p.errChan <- operrors.OpError{Err: fmt.Errorf("could not stop processo: %s", nonStoppedPrc)}
 		}
-		p.errChan <- operrors.OpError{ServidorID: p.servidorGravacaoID, Err: fmt.Errorf("could not create registro: %w", err)}
+		p.errChan <- operrors.OpError{Err: fmt.Errorf("could not create registro: %w", err)}
 		return
 	}
 

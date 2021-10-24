@@ -21,12 +21,13 @@ import (
 )
 
 type OperationError struct {
-	servidorGravacaoID string
-	ProcessoID         string
-	RegistroID         string
+	ProcessoID string
+	RegistroID string
 }
 
 type GravacaoService struct {
+	servidorGravacaoID string
+
 	pb.UnimplementedGravacaoServer
 
 	log *zap.SugaredLogger
@@ -61,14 +62,14 @@ func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
 func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (*pb.RegistrarRes, error) {
 	if g.gerencia != nil {
 		e := "already registered gerencia service"
-		g.log.Errorw("registrar", "ERROR", e)
+		g.log.Errorw("Could not register gerencia", "error", e)
 		return &pb.RegistrarRes{}, status.Error(codes.AlreadyExists, e)
 	}
 
 	err := os.MkdirAll(req.GetArmazenamento(), os.ModePerm)
 	if err != nil {
 		e := fmt.Sprintf("could not create directory: %s", err)
-		g.log.Errorw("registrar", "ERROR", e)
+		g.log.Errorw("Could not register gerencia", "error", e)
 		return &pb.RegistrarRes{}, status.Error(codes.InvalidArgument, e)
 	}
 
@@ -83,19 +84,19 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 	})
 	if err != nil {
 		e := fmt.Sprintf("could not connect to database: %s", err)
-		g.log.Errorw("registrar", "ERROR", e)
+		g.log.Errorw("Could not register gerencia", "error", e)
 		return &pb.RegistrarRes{}, status.Error(codes.Internal, e)
 	}
 
 	gerenciaClient, err := NewClientGerencia(req.GetEnderecoIp(), int(req.GetPorta()))
 	if err != nil {
 		e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
-		g.log.Errorw("registrar", "ERROR", e)
+		g.log.Errorw("Could not register gerencia", "error", e)
 		return &pb.RegistrarRes{}, status.Error(codes.Internal, e)
 	}
 	// if err := gerenciaClient.Check(req.ServidorGravacaoId); err != nil {
 	// 	e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
-	// 	g.log.Errorw("registrar", "ERROR", e)
+	// 	g.log.Errorw("Could not register gerencia", "error", e)
 	// 	return &pb.RegistrarRes{}, status.Error(codes.Internal, e)
 	// }
 	// ! habilitar acima
@@ -107,15 +108,17 @@ func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (
 	g.registroCore = registro.NewCore(g.log, db)
 	g.veiculoCore = veiculo.NewCore(g.log, db)
 
-	g.processador = processador.New(req.GetServidorGravacaoId(), req.GetArmazenamento(), int(req.GetHorasRetencao()), g.registroCore, g.errChan, g.matchChan)
+	g.processador = processador.New(req.GetArmazenamento(), int(req.GetHorasRetencao()), g.registroCore, g.errChan, g.matchChan)
 
 	g.UpdateVeiculos(ctx, &pb.UpdateVeiculosReq{})
 
 	go g.start()
 	go g.processador.Start()
 
+	g.servidorGravacaoID = req.GetServidorGravacaoId()
+
 	req.DbPassword = ""
-	g.log.Infow("registrar", "registered", req)
+	g.log.Infow("Gerencia registered", "params", req)
 
 	return &pb.RegistrarRes{}, nil
 }
@@ -126,19 +129,20 @@ func (g *GravacaoService) start() {
 	for {
 		select {
 		case e := <-g.errChan:
-			g.log.Errorw("ERROR", e)
+			e.ServidorGravacaoID = g.servidorGravacaoID
+			g.log.Errorw("Error received", "error", e.Error())
 			if err := g.gerencia.ErrorReport(e); err != nil {
-				e2 := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
-				g.log.Errorw("call error report", "ERROR", e2)
+				e2 := fmt.Sprintf("could not call gerencia gRPC server: %s", err)
+				g.log.Errorw("Could not call ErrorReport", "error", e2) // ! Em loop com Errorreceived acima
 				g.errBuffChan <- e
 			}
 
 		case m := <-g.matchChan:
-			g.log.Infow("MATCH", "registro", m)
+			g.log.Infow("Vehicle found", "registro_id", m)
 			if err := g.gerencia.Match(m); err != nil {
-				e := fmt.Sprintf("could not connect to gerencia gRPC server: %s", err)
-				g.log.Errorw("call match", "ERROR", e)
-				g.errBuffChan <- operrors.OpError{RegistroID: m, Err: err}
+				e := fmt.Sprintf("could not call gerencia gRPC server: %s", err)
+				g.log.Errorw("Could not call Match", "error", e)
+				g.errBuffChan <- operrors.OpError{ServidorGravacaoID: g.servidorGravacaoID, RegistroID: m, Err: err}
 				g.matchBuffChan <- m
 			}
 
@@ -154,12 +158,13 @@ func (g *GravacaoService) start() {
 	}
 }
 
+// TODO testar batch flush de dados
+
 func (g *GravacaoService) errBuffFlush() {
 	for {
 		select {
 		case e := <-g.errBuffChan:
 			if err := g.gerencia.ErrorReport(e); err != nil {
-				g.log.Errorw("call error report", "ERROR", fmt.Sprintf("could not call service on gerencia gRPC server: %s", err))
 				g.errBuffChan <- e
 				return
 			}
@@ -175,8 +180,8 @@ func (g *GravacaoService) matchBuffFlush() {
 		select {
 		case m := <-g.matchBuffChan:
 			if err := g.gerencia.Match(m); err != nil {
-				g.log.Errorw("call match", "ERROR", fmt.Sprintf("could not call service on gerencia gRPC server: %s", err))
-				g.errBuffChan <- operrors.OpError{RegistroID: m, Err: err}
+				e := fmt.Errorf("could not call gerencia gRPC server: %w", err)
+				g.errBuffChan <- operrors.OpError{ServidorGravacaoID: g.servidorGravacaoID, RegistroID: m, Err: e}
 				g.matchBuffChan <- m
 				return
 			}
@@ -189,21 +194,24 @@ func (g *GravacaoService) matchBuffFlush() {
 
 func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRegistroReq) (*pb.RemoverRegistroRes, error) {
 	if g.gerencia == nil {
-		e := "there is not gerencia service registered"
-		g.log.Errorw("remover registro", "ERROR", e)
+		e := "there is not a gerencia service registered"
+		g.log.Errorw("Could not remove registered gerencia", "error", e)
 		return &pb.RemoverRegistroRes{}, status.Error(codes.NotFound, e)
 	}
 	g.gerencia = nil
 
 	if err := g.processador.Stop(); err != nil {
 		e := fmt.Sprintf("could not stop processador: %s", err)
-		g.log.Errorw("remover registro", "ERROR", e)
+		g.log.Errorw("Could not remove registered gerencia", "error", e)
 		return &pb.RemoverRegistroRes{}, status.Error(codes.Internal, e)
 	}
 
 	// TODO interromper os cores, processador, e db?
+	// TODO colocar mutex nessas paradas antes de verificar ID de servidor, se tem gerencia registrado, etc
 
-	g.log.Infow("remover registro")
+	g.servidorGravacaoID = ""
+
+	g.log.Infow("Gerencia service unregistered")
 	return &pb.RemoverRegistroRes{}, nil
 }
 
@@ -215,14 +223,14 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 		p, err := g.processoCore.QueryByID(ctx, prc)
 		if err != nil {
 			e := fmt.Sprintf("query processos database: %s", err)
-			g.log.Errorw("start processos", "ERROR", e)
+			g.log.Errorw("Could not start processos", "error", e)
 			return &pb.StartProcessosRes{}, status.Error(codes.Internal, e)
 		}
 
 		c, err := g.cameraCore.QueryByID(ctx, p.CameraID)
 		if err != nil {
 			e := fmt.Sprintf("query cameras database: %s", err)
-			g.log.Errorw("start processos", "ERROR", e)
+			g.log.Errorw("Could not start processos", "error", e)
 			return &pb.StartProcessosRes{}, status.Error(codes.Internal, e)
 		}
 
@@ -239,28 +247,27 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 
 	g.processador.StartProcessos(processos)
 
-	g.log.Infow("start processos", "started", prcs)
+	g.log.Infow("Started processos", "processos", prcs)
 	return &pb.StartProcessosRes{}, nil
 }
 
 func (g *GravacaoService) StopProcessos(ctx context.Context, req *pb.StopProcessosReq) (*pb.StopProcessosRes, error) {
 	prcs := req.GetProcessos()
 
-	err := g.processador.StopProcessos(prcs)
-	if err != nil {
-		e := fmt.Sprintf("stopping processo: %s", err)
-		g.log.Errorw("stop processos", "ERROR", e)
-		return &pb.StopProcessosRes{}, status.Error(codes.Internal, e)
+	if nonStoppedPrc := g.processador.StopProcessos(prcs); nonStoppedPrc != nil {
+		e := fmt.Sprintf("could not stop processos %s from %s", nonStoppedPrc, prcs)
+		g.log.Errorw("Could not stop all processos", "error", e, "processos", nonStoppedPrc)
+		return &pb.StopProcessosRes{NonStoppedProcessos: nonStoppedPrc}, status.Error(codes.Internal, e)
 	}
 
-	g.log.Infow("stop processos", "stopped", prcs)
+	g.log.Infow("Stopped processos", "processos", prcs)
 	return &pb.StopProcessosRes{}, nil
 }
 
 func (g *GravacaoService) ListProcessos(ctx context.Context, req *pb.ListProcessosReq) (*pb.ListProcessosRes, error) {
 	processos, retrying := g.processador.ListProcessos()
 
-	g.log.Infow("list processos", "running", processos, "retrying", retrying)
+	g.log.Infow("Listed processos", "running", processos, "retrying", retrying)
 	return &pb.ListProcessosRes{ProcessosEmExecucao: processos, ProcessosEmTentativa: retrying}, nil
 }
 
@@ -268,7 +275,7 @@ func (g *GravacaoService) UpdateVeiculos(ctx context.Context, req *pb.UpdateVeic
 	veiculos, err := g.veiculoCore.QueryAll(ctx)
 	if err != nil {
 		e := fmt.Sprintf("query veiculos database: %s", err)
-		g.log.Errorw("update veiculos", "ERROR", e)
+		g.log.Errorw("Could not update veiculos", "error", e)
 		return &pb.UpdateVeiculosRes{}, status.Error(codes.Internal, e)
 	}
 
@@ -279,7 +286,7 @@ func (g *GravacaoService) UpdateVeiculos(ctx context.Context, req *pb.UpdateVeic
 
 	g.processador.UpdateMatchlist(matchlist)
 
-	g.log.Infow("update veiculos", "updated", matchlist)
+	g.log.Infow("Updated veiculos", "veiculos", matchlist)
 	return &pb.UpdateVeiculosRes{}, nil
 }
 
@@ -289,11 +296,10 @@ func (g *GravacaoService) UpdateArmazenamento(ctx context.Context, req *pb.Updat
 
 	err := g.processador.UpdateArmazenamento(armazenamento, horasRetencao)
 	if err != nil {
-		e := fmt.Sprintf("could not update armazenamento: %s", err)
-		g.log.Errorw("update armazenamento", "ERROR", e)
-		return &pb.UpdateArmazenamentoRes{}, status.Error(codes.Internal, e)
+		g.log.Errorw("Could not update armazenamento", "error", err)
+		return &pb.UpdateArmazenamentoRes{}, status.Error(codes.Internal, err.Error())
 	}
 
-	g.log.Infow("update armazenamento", "armazenamento", armazenamento, "horas retencao", horasRetencao)
+	g.log.Infow("Updated armazenamento", "armazenamento", armazenamento, "horas_retencao", horasRetencao)
 	return &pb.UpdateArmazenamentoRes{}, nil
 }

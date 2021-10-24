@@ -66,7 +66,7 @@ func (g *GerenciaClient) ErrorReport(err operrors.OpError) error {
 	defer cancel()
 
 	r := &pb.ErrorReportReq{
-		ServidorGravacaoId: err.ServidorID,
+		ServidorGravacaoId: err.ServidorGravacaoID,
 		ProcessoId:         err.ProcessoID,
 		RegistroId:         err.RegistroID,
 		Error:              err.Err.Error(),

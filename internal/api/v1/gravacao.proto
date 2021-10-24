@@ -46,13 +46,17 @@ message StartProcessosReq {
     repeated string processos = 1;
 }
 
-message StartProcessosRes {}
+message StartProcessosRes {
+    repeated string non_started_processos = 1;
+}
 
 message StopProcessosReq {
     repeated string processos = 1;
 }
 
-message StopProcessosRes {}
+message StopProcessosRes {
+    repeated string non_stopped_processos = 1;
+}
 
 message ListProcessosReq {}
 

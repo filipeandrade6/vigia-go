@@ -39,9 +39,9 @@ var (
 )
 
 type OpError struct {
-	ServidorID string
-	ProcessoID string
-	RegistroID string
+	ServidorGravacaoID string
+	ProcessoID         string
+	RegistroID         string
 	// Err        OpErr
 	Err             error
 	StoppedProcesso bool
@@ -54,7 +54,7 @@ func (o *OpError) Error() string {
 	// 	return "<nil>"
 	// }
 
-	s := "srv[" + o.ServidorID + "]"
+	s := "srv[" + o.ServidorGravacaoID + "]"
 	if o.ProcessoID != "" {
 		s += " prc[" + o.ProcessoID + "]"
 	}
