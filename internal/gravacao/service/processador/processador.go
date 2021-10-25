@@ -117,6 +117,7 @@ func (p *Processador) Stop() error {
 // =================================================================================
 // Processo
 
+// TODO mudar aqui, dependecy injection da camera,
 func (p *Processador) StartProcessos(pReq []Processo) {
 	for _, prc := range pReq {
 		p.mu.RLock()
@@ -139,7 +140,10 @@ func (p *Processador) StartProcessos(pReq []Processo) {
 			p.armazenamento,
 			p.regChan,
 			p.interErrChan,
-		)
+		) // TODO não utilizar novo e colocar o armazenamento, regChan e interErrChan no Start
+		// !
+		// !
+		// !
 
 		p.mu.Lock()
 		p.processos[prc.ProcessoID] = np

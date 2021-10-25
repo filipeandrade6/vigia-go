@@ -12,6 +12,12 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/sys/validate"
 )
 
+type Camera interface {
+	New(processoID, enderecoIP string, porta, canal int, usuario, senha string, processador int, armazenamento string, regChan chan registro.Registro, errChan chan *operrors.OpError)
+	Start()
+	Stop()
+}
+
 type Processo struct {
 	ProcessoID    string
 	EnderecoIP    string
@@ -22,10 +28,9 @@ type Processo struct {
 	Processador   int
 	Armazenamento string
 	regChan       chan registro.Registro
-	// errChan       chan *traffic.ProcessoError
-	errChan     chan *operrors.OpError
-	stopChan    chan struct{}
-	stoppedChan chan struct{}
+	errChan       chan *operrors.OpError
+	stopChan      chan struct{}
+	stoppedChan   chan struct{}
 }
 
 func NewProcesso(
@@ -38,7 +43,6 @@ func NewProcesso(
 	processador int,
 	armazenamento string,
 	regChan chan registro.Registro,
-	// errChan chan *traffic.ProcessoError,
 	errChan chan *operrors.OpError,
 ) *Processo {
 	return &Processo{
@@ -104,7 +108,6 @@ func processoTeste(
 	senha string,
 	armazenamento string,
 	regChan chan registro.Registro,
-	// errChan chan *traffic.ProcessoError,
 	errChan chan *operrors.OpError,
 	stopChan chan struct{},
 	stoppedChan chan struct{},
@@ -137,7 +140,6 @@ func processoTeste(
 
 			err := os.WriteFile(filepath.Join(armazenamento, fmt.Sprintf("%d-%s.txt", i, r.RegistroID)), []byte("hello\ngo\n"), 0644)
 			if err != nil {
-				// errChan <- &traffic.ProcessoError{ProcessoID: processoID, Err: err}
 				errChan <- &operrors.OpError{ProcessoID: processoID, Err: err}
 			}
 			i++

@@ -57,8 +57,6 @@ func NewGravacaoService(log *zap.SugaredLogger) *GravacaoService {
 	}
 }
 
-// TODO pensar no caso do gerencia ficar offline
-
 func (g *GravacaoService) Registrar(ctx context.Context, req *pb.RegistrarReq) (*pb.RegistrarRes, error) {
 	if g.gerencia != nil {
 		e := "already registered gerencia service"
