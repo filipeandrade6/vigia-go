@@ -11,6 +11,7 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/core/processo"
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
 	"github.com/filipeandrade6/vigia-go/internal/core/veiculo"
+	"github.com/filipeandrade6/vigia-go/internal/gravacao/dahua/v1/traffic"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/service/processador"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/filipeandrade6/vigia-go/internal/sys/operrors"
@@ -216,7 +217,7 @@ func (g *GravacaoService) RemoverRegistro(ctx context.Context, req *pb.RemoverRe
 func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProcessosReq) (*pb.StartProcessosRes, error) {
 	prcs := req.GetProcessos()
 
-	var processos []processador.Processo
+	var processos []processador.Camera
 	for _, prc := range prcs {
 		p, err := g.processoCore.QueryByID(ctx, prc)
 		if err != nil {
@@ -232,15 +233,24 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 			return &pb.StartProcessosRes{}, status.Error(codes.Internal, e)
 		}
 
-		processos = append(processos, processador.Processo{
-			ProcessoID:  prc,
-			EnderecoIP:  c.EnderecoIP,
-			Porta:       c.Porta,
-			Canal:       c.Canal,
-			Usuario:     c.Usuario,
-			Senha:       c.Senha,
-			Processador: p.Processador,
-		})
+		processos = append(processos, traffic.New(
+			prc,
+			c.EnderecoIP,
+			c.Porta,
+			c.Canal,
+			c.Usuario,
+			c.Senha,
+		))
+
+		// processos = append(processos, processador.Processo{
+		// 	ProcessoID:  prc,
+		// 	EnderecoIP:  c.EnderecoIP,
+		// 	Porta:       c.Porta,
+		// 	Canal:       c.Canal,
+		// 	Usuario:     c.Usuario,
+		// 	Senha:       c.Senha,
+		// 	Processador: p.Processador,
+		// })
 	}
 
 	g.processador.StartProcessos(processos)
