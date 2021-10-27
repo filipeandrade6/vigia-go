@@ -22,8 +22,8 @@ type Processador struct {
 	matchChan    chan string
 
 	mu        *sync.RWMutex
-	processos map[string]*Processo
-	retry     map[string]*Processo
+	processos map[string]Camera // TODO era ponteiros
+	retry     map[string]Camera // TODO era ponteiros
 	matchlist map[string]bool
 
 	interErrChan chan *operrors.OpError
@@ -46,8 +46,8 @@ func New(
 		matchChan:    matchChan,
 
 		mu:        &sync.RWMutex{},
-		processos: make(map[string]*Processo),
-		retry:     make(map[string]*Processo),
+		processos: make(map[string]Camera),
+		retry:     make(map[string]Camera),
 		matchlist: make(map[string]bool),
 
 		interErrChan: make(chan *operrors.OpError),
@@ -90,7 +90,7 @@ func (p *Processador) Start() {
 				p.processos[processoID] = processo
 				p.mu.Unlock()
 
-				processo.Start()
+				processo.Start(p.armazenamento, p.regChan, p.interErrChan)
 			}
 		}
 	}
@@ -118,38 +118,38 @@ func (p *Processador) Stop() error {
 // Processo
 
 // TODO mudar aqui, dependecy injection da camera,
-func (p *Processador) StartProcessos(pReq []Processo) {
+func (p *Processador) StartProcessos(pReq []Camera) {
 	for _, prc := range pReq {
 		p.mu.RLock()
-		_, ok := p.processos[prc.ProcessoID]
-		_, ok2 := p.retry[prc.ProcessoID]
+		_, ok := p.processos[prc.GetID()]
+		_, ok2 := p.retry[prc.GetID()]
 		p.mu.RUnlock()
 		if ok || ok2 {
 			continue
 		}
 
-		np := NewProcesso(
-			prc.ProcessoID,
-			prc.EnderecoIP,
-			prc.Porta,
-			prc.Canal,
-			prc.Usuario,
-			prc.Senha,
-			prc.Processador,
+		// np := NewProcesso(
+		// 	prc.ProcessoID,
+		// 	prc.EnderecoIP,
+		// 	prc.Porta,
+		// 	prc.Canal,
+		// 	prc.Usuario,
+		// 	prc.Senha,
+		// 	prc.Processador,
 
-			p.armazenamento,
-			p.regChan,
-			p.interErrChan,
-		) // TODO não utilizar novo e colocar o armazenamento, regChan e interErrChan no Start
+		// 	p.armazenamento,
+		// 	p.regChan,
+		// 	p.interErrChan,
+		// ) // TODO não utilizar novo e colocar o armazenamento, regChan e interErrChan no Start
 		// !
 		// !
 		// !
 
 		p.mu.Lock()
-		p.processos[prc.ProcessoID] = np
+		p.processos[prc.GetID()] = prc
 		p.mu.Unlock()
 
-		np.Start()
+		prc.Start(p.armazenamento, p.regChan, p.interErrChan)
 	}
 }
 
@@ -218,48 +218,54 @@ func (p *Processador) UpdateMatchlist(placas []string) {
 // Armazenamento
 
 func (p *Processador) UpdateArmazenamento(armazenamento string, horasRetencao int) error {
-	prcsBkp := make(map[string]*Processo)
-	p.mu.RLock()
-	for k, v := range p.processos {
-		prcsBkp[k] = v
-	}
-
-	var prcs []string
-	for k := range prcsBkp {
-		prcs = append(prcs, k)
-	}
-	p.mu.RUnlock()
-
-	if nonStoppedPrc := p.StopProcessos(prcs); nonStoppedPrc != nil {
-		return fmt.Errorf("could not stop processos: %s", nonStoppedPrc)
-	}
-
-	p.mu.Lock()
-	p.armazenamento = armazenamento
-	p.horasRetencao = horasRetencao
-	p.mu.Unlock()
-
-	if err := os.MkdirAll(p.armazenamento, os.ModePerm); err != nil {
-		return err
-	}
-
-	var nPrcs []Processo
-	for _, p := range prcsBkp {
-		nPrcs = append(nPrcs, Processo{
-			ProcessoID:  p.ProcessoID,
-			EnderecoIP:  p.EnderecoIP,
-			Porta:       p.Porta,
-			Canal:       p.Canal,
-			Usuario:     p.Usuario,
-			Senha:       p.Senha,
-			Processador: p.Processador,
-		})
-	}
-
-	p.StartProcessos(nPrcs)
-
+	fmt.Print("ola")
 	return nil
 }
+
+// 	prcsBkp := make(map[string]Camera)
+// 	p.mu.RLock()
+// 	for k, v := range p.processos {
+// 		prcsBkp[k] = v
+// 	}
+
+// 	var prcs []string
+// 	for k := range prcsBkp {
+// 		prcs = append(prcs, k)
+// 	}
+// 	p.mu.RUnlock()
+
+// 	if nonStoppedPrc := p.StopProcessos(prcs); nonStoppedPrc != nil {
+// 		return fmt.Errorf("could not stop processos: %s", nonStoppedPrc)
+// 	}
+
+// 	p.mu.Lock()
+// 	p.armazenamento = armazenamento
+// 	p.horasRetencao = horasRetencao
+// 	p.mu.Unlock()
+
+// 	if err := os.MkdirAll(p.armazenamento, os.ModePerm); err != nil {
+// 		return err
+// 	}
+
+// 	var nPrcs []Camera
+// 	for _, p := range prcsBkp {
+// 		nPrcs = append(nPrcs, ))
+
+// 		nPrcs = append(nPrcs, Processo{
+// 			ProcessoID:  p.ProcessoID,
+// 			EnderecoIP:  p.EnderecoIP,
+// 			Porta:       p.Porta,
+// 			Canal:       p.Canal,
+// 			Usuario:     p.Usuario,
+// 			Senha:       p.Senha,
+// 			Processador: p.Processador,
+// 		})
+// 	}
+
+// 	p.StartProcessos(nPrcs)
+
+// 	return nil
+// }
 
 // =================================================================================
 

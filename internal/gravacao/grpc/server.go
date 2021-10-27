@@ -11,7 +11,6 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/core/processo"
 	"github.com/filipeandrade6/vigia-go/internal/core/registro"
 	"github.com/filipeandrade6/vigia-go/internal/core/veiculo"
-	"github.com/filipeandrade6/vigia-go/internal/gravacao/dahua/v1/traffic"
 	"github.com/filipeandrade6/vigia-go/internal/gravacao/service/processador"
 	"github.com/filipeandrade6/vigia-go/internal/sys/database"
 	"github.com/filipeandrade6/vigia-go/internal/sys/operrors"
@@ -233,7 +232,7 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 			return &pb.StartProcessosRes{}, status.Error(codes.Internal, e)
 		}
 
-		processos = append(processos, traffic.New(
+		processos = append(processos, processador.NewCameraTeste(
 			prc,
 			c.EnderecoIP,
 			c.Porta,
@@ -241,6 +240,15 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 			c.Usuario,
 			c.Senha,
 		))
+
+		// processos = append(processos, traffic.New(
+		// 	prc,
+		// 	c.EnderecoIP,
+		// 	c.Porta,
+		// 	c.Canal,
+		// 	c.Usuario,
+		// 	c.Senha,
+		// ))
 
 		// processos = append(processos, processador.Processo{
 		// 	ProcessoID:  prc,
