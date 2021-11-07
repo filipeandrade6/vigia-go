@@ -61,16 +61,16 @@ func Run(log *zap.SugaredLogger, cfg config.Configuration) error {
 
 	svc := grpc_gravacao.NewGravacaoService(log)
 
-	opts := []grpc_zap.Option{
-		grpc_zap.WithLevels(grpc_zap.DefaultCodeToLevel), // TODO tem outros opts como WithDurationField, tem como add campos no logger com Extract_unary e Decider que ignora chamadas de healthcheck
-	}
+	// opts := []grpc_zap.Option{
+	// 	grpc_zap.WithLevels(grpc_zap.DefaultCodeToLevel), // TODO tem outros opts como WithDurationField, tem como add campos no logger com Extract_unary e Decider que ignora chamadas de healthcheck
+	// }
 
 	grpc_zap.ReplaceGrpcLoggerV2(log.Desugar()) // TODO
 
 	grpcServer := grpc.NewServer(
 		grpc_middleware.WithUnaryServerChain(
 			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
-			grpc_zap.UnaryServerInterceptor(log.Desugar(), opts...), // TODO
+			// grpc_zap.UnaryServerInterceptor(log.Desugar(), opts...), // TODO
 		),
 	)
 

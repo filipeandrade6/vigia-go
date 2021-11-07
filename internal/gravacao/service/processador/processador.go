@@ -13,6 +13,15 @@ import (
 	"github.com/filipeandrade6/vigia-go/internal/sys/operrors"
 )
 
+// TODO utilizar defer nos mux pois melhorar a leitura > performance.
+
+type Camera interface {
+	// New(processoID, enderecoIP string, porta, canal int, usuario, senha string)
+	Start(armazenamento string, regChan chan registro.Registro, errChan chan *operrors.OpError)
+	Stop()
+	GetID() string
+}
+
 type Processador struct {
 	armazenamento string
 	horasRetencao int
@@ -117,7 +126,6 @@ func (p *Processador) Stop() error {
 // =================================================================================
 // Processo
 
-// TODO mudar aqui, dependecy injection da camera,
 func (p *Processador) StartProcessos(pReq []Camera) {
 	for _, prc := range pReq {
 		p.mu.RLock()
@@ -127,23 +135,6 @@ func (p *Processador) StartProcessos(pReq []Camera) {
 		if ok || ok2 {
 			continue
 		}
-
-		// np := NewProcesso(
-		// 	prc.ProcessoID,
-		// 	prc.EnderecoIP,
-		// 	prc.Porta,
-		// 	prc.Canal,
-		// 	prc.Usuario,
-		// 	prc.Senha,
-		// 	prc.Processador,
-
-		// 	p.armazenamento,
-		// 	p.regChan,
-		// 	p.interErrChan,
-		// ) // TODO não utilizar novo e colocar o armazenamento, regChan e interErrChan no Start
-		// !
-		// !
-		// !
 
 		p.mu.Lock()
 		p.processos[prc.GetID()] = prc

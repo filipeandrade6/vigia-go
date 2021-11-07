@@ -152,7 +152,6 @@ func (g *GravacaoService) start() {
 
 			go g.errBuffFlush()
 			go g.matchBuffFlush()
-
 		}
 	}
 }
@@ -233,15 +232,6 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 			return &pb.StartProcessosRes{}, status.Error(codes.Internal, e)
 		}
 
-		// processos = append(processos, processador.NewCameraTeste(
-		// 	prc,
-		// 	c.EnderecoIP,
-		// 	c.Porta,
-		// 	c.Canal,
-		// 	c.Usuario,
-		// 	c.Senha,
-		// ))
-
 		processos = append(processos, traffic.New(
 			prc,
 			c.EnderecoIP,
@@ -250,16 +240,6 @@ func (g *GravacaoService) StartProcessos(ctx context.Context, req *pb.StartProce
 			c.Usuario,
 			c.Senha,
 		))
-
-		// processos = append(processos, processador.Processo{
-		// 	ProcessoID:  prc,
-		// 	EnderecoIP:  c.EnderecoIP,
-		// 	Porta:       c.Porta,
-		// 	Canal:       c.Canal,
-		// 	Usuario:     c.Usuario,
-		// 	Senha:       c.Senha,
-		// 	Processador: p.Processador,
-		// })
 	}
 
 	g.processador.StartProcessos(processos)
