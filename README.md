@@ -2,6 +2,13 @@
 
 Programa para processamento de metadados de câmeras.
 
+Utiliza.
+
+* Go
+* gRPC
+* PostgreSQL
+* Arquitetura distribuida (servidor - cliente)
+
 #### JUMPSTART
 
 1. clone o repositório
