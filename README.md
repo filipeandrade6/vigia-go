@@ -8,7 +8,6 @@ Utiliza.
 * gRPC
 * PostgreSQL
 * JWT
-* Arquitetura gerencia/client
 * Docker
 
 #### Comandos *Makefile*
